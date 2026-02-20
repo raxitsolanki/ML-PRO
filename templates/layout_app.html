@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}DPS Dashboard{% endblock %}</title>
+
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- FontAwesome -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+          <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body class="h-screen overflow-hidden bg-gray-100 font-[Poppins]">
+
+<!-- ================= NAVBAR ================= -->
+<nav class="bg-white border-b border-gray-200 sticky top-0 z-40">
+    <div class="max-w-7.3xl mx-auto px-6">
+        <div class="flex justify-between items-center h-16">
+
+            <!-- LEFT: HAMBURGER + LOGO -->
+            <div class="flex items-center gap-2">
+
+                <!-- HAMBURGER (MOBILE ONLY) -->
+                <button id="hamburgerBtn"
+                        class="md:hidden text-2xl text-gray-700 focus:outline-none">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+
+                <!-- LOGO -->
+                <a href="/login" class="flex items-center gap-3 group">
+                    <div class="logo-box p-2 rounded-xl bg-emerald-50 group-hover:bg-emerald-100 transition">
+                        <i class="fa-solid fa-heart-pulse text-emerald-500 text-2xl group-hover:scale-110 transition-transform"></i>
+                    </div>
+    
+                    <span class="font-extrabold text-2xl sm:text-3xl tracking-wide 
+                                 bg-gradient-to-r from-slate-900 to-emerald-600 
+                                 bg-clip-text text-transparent">
+                        DPS<span class="text-emerald-500"></span>
+                    </span>
+                </a>
+            </div>
+
+            <!-- RIGHT MENU -->
+            <div class="flex items-center gap-5">
+                {% if session.get('loggedin') %}
+                    
+
+                    <a href="{{ url_for('profile') }}"
+                       class="text-gray-600 hover:text-emerald-600 text-sm font-medium flex items-center gap-1">
+                        <i class="fa-solid fa-user"></i>
+                        <span class="hidden sm:inline">My Profile</span>
+                    </a>
+
+                    <a href="{{ url_for('logout') }}"
+                       class="text-gray-600 hover:text-red-600 flex items-center gap-1">
+                        Logout <i class="fa-solid fa-right-from-bracket"></i>
+                    </a>
+                {% else %}
+                    <a href="{{ url_for('login') }}" class="text-gray-600 hover:text-[#5b21b6] text-sm font-medium">
+                        Login
+                    </a>
+                    <a href="{{ url_for('register') }}"
+                       class="bg-[#5b21b6] hover:bg-[#4c1d95] text-white px-5 py-2 rounded-lg text-sm font-medium shadow">
+                        Sign Up
+                    </a>
+                {% endif %}
+            </div>
+
+        </div>
+    </div>
+</nav>
+
+<!-- ================= APP LAYOUT ================= -->
+<div class="flex h-[calc(89.5vh-4rem)]">
+
+    <!-- ================= SIDEBAR ================= -->
+    <aside id="sidebar"
+    class="fixed md:static inset-y-0 left-0 w-64 bg-gray-800 text-gray-100
+           transform -translate-x-full md:translate-x-0
+           transition-transform duration-300 z-50 flex flex-col shadow-lg">
+
+ <!-- Logo -->
+ <div class="p-6 flex items-center gap-3 border-b border-gray-700">
+     <i class="fa-solid fa-heart-pulse text-2xl text-white-400"></i>
+     <span class="text-xl font-bold">DPS Health</span>
+ </div>
+
+ <!-- Menu -->
+ <nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
+
+     <a href="{{ url_for('dashboard') }}"
+        class="flex items-center gap-3 p-3 rounded-lg transition-colors duration-200
+        {% if request.endpoint == 'dashboard' %} bg-gray-700 text-white {% else %} hover:bg-gray-700 hover:text-white {% endif %}">
+         <i class="fa-solid fa-house w-5"></i> Dashboard
+     </a>
+
+     <a href="{{ url_for('profile') }}"
+        class="flex items-center gap-3 p-3 rounded-lg transition-colors duration-200
+        {% if request.endpoint == 'profile' %} bg-gray-700 text-white {% else %} hover:bg-gray-700 hover:text-white {% endif %}">
+         <i class="fa-solid fa-user w-5"></i> My Profile
+     </a>
+
+     <a href="{{ url_for('prediction') }}"
+        class="flex items-center gap-3 p-3 rounded-lg transition-colors duration-200
+        {% if request.endpoint == 'prediction' %} bg-gray-700 text-white {% else %} hover:bg-gray-700 hover:text-white {% endif %}">
+         <i class="fa-solid fa-chart-line w-5"></i> Prediction
+     </a>
+
+     <a href="{{ url_for('suggestion') }}"
+        class="flex items-center gap-3 p-3 rounded-lg transition-colors duration-200
+        {% if request.endpoint == 'suggestion' %} bg-gray-700 text-white {% else %} hover:bg-gray-700 hover:text-white {% endif %}">
+         <i class="fa-solid fa-lightbulb w-5"></i> Suggestion
+     </a>
+
+     <a href="{{ url_for('contactus') }}"
+        class="flex items-center gap-3 p-3 rounded-lg transition-colors duration-200
+        {% if request.endpoint == 'contactus' %} bg-gray-700 text-white {% else %} hover:bg-gray-700 hover:text-white {% endif %}">
+         <i class="fa-solid fa-envelope w-5"></i> Contact Us
+     </a>
+
+ </nav>
+
+ <!-- Logout -->
+ <div class="p-4 border-t border-gray-700">
+     <a href="{{ url_for('logout') }}"
+        class="block text-center py-2 rounded-full bg-red-500 hover:bg-red-600 text-white font-semibold transition-colors duration-200">
+         Logout
+     </a>
+ </div>
+</aside>
+
+
+
+    <!-- ================= OVERLAY (MOBILE) ================= -->
+    <div id="sidebarOverlay"
+         class="fixed inset-0 bg-black/50 hidden z-20 md:hidden"></div>
+
+    <!-- ================= MAIN CONTENT ================= -->
+    <!-- ================= MAIN CONTENT ================= -->
+<div class="flex-1 flex flex-col md:ml-0">
+
+    
+   
+
+    <!-- PAGE CONTENT -->
+    <main class="flex-1 overflow-y-auto p-3 md:p-4 mb-0">
+        {% block content %}{% endblock %}
+    </main>
+</div>
+
+<!-- ================= FOOTER ================= -->
+<footer class="bg-white border-t border-gray-200 py-5 w-full fixed bottom-0 left-0">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-1">
+        <p class="text-gray-500 text-sm">
+            &copy; 2026 DPS. All rights reserved.
+        </p>
+        <div class="flex gap-5 text-gray-400">
+            <a href="https://github.com/raxitsolanki" class="text-slate-400 hover:text-emerald-500 transition"><i class="fa-brands fa-github text-xl"></i></a>
+            <a href="#" class="text-slate-400 hover:text-emerald-500 transition"><i class="fa-brands fa-twitter text-xl"></i></a>
+            <a href="https://www.linkedin.com/in/raxit-solanki-5a1021280/" class="text-slate-400 hover:text-emerald-500 transition"><i class="fa-brands fa-linkedin text-xl"></i></a>
+        </div>
+    </div>
+</footer>
+
+       
+
+
+<!-- ================= SIDEBAR SCRIPT ================= -->
+<script>
+const sidebar = document.getElementById('sidebar');
+const overlay = document.getElementById('sidebarOverlay');
+const hamburgerBtn = document.getElementById('hamburgerBtn');
+
+if (hamburgerBtn) {
+    hamburgerBtn.addEventListener('click', () => {
+        sidebar.classList.toggle('-translate-x-full');
+        overlay.classList.toggle('hidden');
+    });
+}
+
+if (overlay) {
+    overlay.addEventListener('click', () => {
+        sidebar.classList.add('-translate-x-full');
+        overlay.classList.add('hidden');
+    });
+}
+</script>
+
+
+</body>
+</html>

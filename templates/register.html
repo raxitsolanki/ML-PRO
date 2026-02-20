@@ -1,0 +1,193 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<div class="auth-card">
+
+    <div class="text-center mb-8">
+        <div class="bg-emerald-50 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm border border-emerald-100">
+            <i class="fa-solid fa-user-plus text-emerald-500 text-3xl"></i>
+        </div>
+        <h2 class="text-2xl font-extrabold text-slate-900 tracking-tight">Create Account</h2>
+        <p class="text-sm text-slate-500 mt-1 font-medium">
+            Join DPS and manage your health journey
+        </p>
+    </div>
+
+    <form action="{{ url_for('register') }}" method="POST" onsubmit="return validateForm()" class="space-y-4">
+
+        <div>
+            <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Username</label>
+            <div class="input-icon">
+                <i class="fa-solid fa-at"></i>
+                <input type="text" name="username" required minlength="3"
+                    placeholder="Enter user name"
+                    class="w-full pl-14 pr-4 py-4 rounded-2xl border border-slate-200
+                    text-slate-800 font-medium focus:ring-4 focus:ring-emerald-500/10 
+                    focus:border-emerald-500 focus:outline-none transition-all">
+            </div>
+        </div>
+
+        <div>
+            <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Email Address</label>
+            <div class="input-icon">
+                <i class="fa-solid fa-envelope"></i>
+                <input type="email" name="email" required
+                    placeholder="Enter Email Address"
+                    class="w-full pl-14 pr-4 py-4 rounded-2xl border border-slate-200
+                    text-slate-800 font-medium focus:ring-4 focus:ring-emerald-500/10 
+                    focus:border-emerald-500 focus:outline-none transition-all">
+            </div>
+        </div>
+
+       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+    <!-- PASSWORD -->
+    <div>
+        <label for="password"
+            class="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">
+            Password
+        </label>
+
+        <div class="relative">
+            <!-- Lock Icon -->
+            <i class="fa-solid fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+
+            <!-- Input -->
+            <!-- Input -->
+<input
+    id="password"
+    type="password"
+    name="password"
+    required
+    minlength="6"
+    placeholder="••••••••"
+    onkeyup="validateForm()"
+    class="w-full pl-14 pr-12 py-4 rounded-2xl border border-slate-200
+           text-slate-800 font-medium focus:ring-4 focus:ring-emerald-500/10 
+           focus:border-emerald-500 focus:outline-none transition-all"
+/>
+
+
+            <!-- Eye -->
+            <button
+                type="button"
+                class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 transition"
+                onclick="togglePassword('password', this.querySelector('i'))"
+            >
+                <i class="fa-solid fa-eye"></i>
+            </button>
+        </div>
+
+        <!-- Password Error -->
+        <p id="passwordError" class="text-[10px] font-bold text-red-500 hidden flex items-center gap-1 mt-1">
+            <i class="fa-solid fa-circle-exclamation"></i> Must have Uppercase, Number & Special Symbol.
+        </p>
+    </div>
+
+    <!-- CONFIRM PASSWORD -->
+<!-- CONFIRM PASSWORD -->
+<div>
+    <label for="confirm_password"
+        class="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">
+        Confirm Password
+    </label>
+
+    <div class="relative">
+        <i class="fa-solid fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+
+        <input
+            id="confirm_password"
+            type="password"
+            name="confirm_password"
+            required
+            minlength="6"
+            placeholder="••••••••"
+            onkeyup="validateForm()"
+            class="w-full pl-14 pr-12 py-4 rounded-2xl border border-slate-200
+                   text-slate-800 font-medium focus:ring-4 focus:ring-emerald-500/10 
+                   focus:border-emerald-500 focus:outline-none transition-all"
+        />
+
+        <!-- Eye -->
+        <button
+            type="button"
+            class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 transition"
+            onclick="togglePassword('confirm_password', this.querySelector('i'))">
+            <i class="fa-solid fa-eye"></i>
+        </button>
+    </div>
+
+    <p id="confirmPasswordError"
+       class="text-[10px] font-bold text-red-500 hidden flex items-center gap-1 mt-1">
+        <i class="fa-solid fa-circle-xmark"></i>
+        Passwords do not match.
+    </p>
+</div>
+
+
+</div>
+
+        <button type="submit" class="w-full bg-slate-900 text-white py-3.5 rounded-xl text-xs font-bold
+        flex items-center justify-center gap-2 shadow-lg shadow-slate-100
+        hover:bg-emerald-600 transition-all active:scale-95 mt-2">
+            <i class="fa-solid fa-user-plus"></i>
+            Register Account
+        </button>
+    </form>
+
+    <p class="text-center text-sm text-slate-500 mt-8 font-medium">
+        Already have an account?
+        <a href="{{ url_for('login') }}" class="text-slate-900 font-bold hover:text-emerald-600 transition underline-offset-4 hover:underline">
+            Sign In
+        </a>
+    </p>
+</div>
+
+<script>
+function togglePassword(fieldId, icon) {
+    const input = document.getElementById(fieldId);
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.replace('fa-eye', 'fa-eye-slash');
+    } else {
+        input.type = 'password';
+        icon.classList.replace('fa-eye-slash', 'fa-eye');
+    }
+}
+
+function validateForm() {
+    const password = document.getElementById('password');
+    const confirm = document.getElementById('confirm_password');
+    const passError = document.getElementById('passwordError');
+    const matchError = document.getElementById('confirmPasswordError');
+
+    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{6,}$/;
+
+    let isValid = true;
+
+    // Password strength check
+    if (password.value.length > 0 && !regex.test(password.value)) {
+        passError.classList.replace('hidden', 'flex');
+        password.classList.add('border-red-400');
+        isValid = false;
+    } else {
+        passError.classList.replace('flex', 'hidden');
+        password.classList.remove('border-red-400');
+    }
+
+    // Matching check
+    if (confirm.value.length > 0 && password.value !== confirm.value) {
+        matchError.classList.replace('hidden', 'flex');
+        confirm.classList.add('border-red-400');
+        isValid = false;
+    } else {
+        matchError.classList.replace('flex', 'hidden');
+        confirm.classList.remove('border-red-400');
+    }
+
+    return isValid;
+}
+</script>
+
+{% endblock %}

@@ -1,0 +1,225 @@
+/* =========================================
+   1. FONTS & MODERN ROOT VARIABLES
+========================================= */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+    --navy: #1e293b;
+    --navy-light: #334155;
+    --emerald: #10b981;
+    --emerald-soft: rgba(16, 185, 129, 0.1);
+    --bg-light: #f8fafc;
+    --glass-white: rgba(255, 255, 255, 0.85);
+    --border-soft: rgba(226, 232, 240, 0.8);
+    --shadow-premium: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+}
+
+/* =========================================
+   2. GLOBAL RESET & BASE STYLES
+========================================= */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--bg-light);
+    background-image: radial-gradient(#e2e8f0 0.8px, transparent 0.8px);
+    background-size: 24px 24px;
+    color: var(--navy);
+    line-height: 1.6;
+}
+
+/* =========================================
+   3. PREMIUM AUTH CARD (Glassmorphism)
+========================================= */
+.auth-card {
+    background: var(--glass-white);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-radius: 2rem;
+    border: 1px solid var(--border-soft);
+    width: 100%;
+    max-width: 440px;
+    padding: 3rem 2.5rem;
+    margin: auto;
+    box-shadow: var(--shadow-premium);
+    transition: transform 0.3s ease;
+}
+
+.auth-card:hover {
+    transform: translateY(-4px);
+}
+
+/* =========================================
+   4. INPUT FIELDS & ICON WRAPPERS
+========================================= */
+.form-input {
+    width: 100%;
+    padding: 14px 16px;
+    background-color: #ffffff;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 1rem;
+    color: var(--navy);
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.form-input:focus {
+    border-color: var(--navy);
+    box-shadow: 0 0 0 4px rgba(30, 41, 59, 0.08);
+    outline: none;
+}
+
+.input-icon {
+    position: relative;
+    margin-bottom: 1.25rem;
+}
+
+.input-icon i {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+    font-size: 1rem;
+    pointer-events: none;
+    transition: color 0.2s;
+}
+
+.input-icon:focus-within i {
+    color: var(--navy);
+}
+
+.input-icon .form-input {
+    padding-left: 46px;
+}
+
+/* =========================================
+   5. BUTTONS (Premium Look)
+========================================= */
+.btn-primary {
+    width: 100%;
+    padding: 14px;
+    background-color: var(--navy);
+    color: #ffffff;
+    border: none;
+    border-radius: 1rem;
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 4px 12px rgba(30, 41, 59, 0.15);
+}
+
+.btn-primary:hover {
+    background-color: #000000;
+    transform: scale(1.02);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+}
+
+.btn-primary:active {
+    transform: scale(0.98);
+}
+
+/* =========================================
+   6. TOASTS & ALERTS
+========================================= */
+.toast-card {
+    background: white;
+    border-radius: 1.25rem;
+    padding: 1rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--border-soft);
+}
+
+.toast-success { border-left: 5px solid var(--emerald); }
+.toast-error { border-left: 5px solid #ef4444; }
+
+.animate-slide-in {
+    animation: slideIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+/* =========================================
+   7. HEALTH STATUS CARDS (Dashboard)
+========================================= */
+.card-diabetes { border-left: 5px solid #8b5cf6 !important; background: #f5f3ff; }
+.card-nondiabetes { border-left: 5px solid var(--emerald) !important; background: #ecfdf5; }
+
+/* =========================================
+   8. GOOGLE & DIVIDER
+========================================= */
+.google-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;              /* gap chhota */
+    padding: 12px 14px;   /* height & width dono kam */
+    background: white;
+    color: var(--navy);
+    border-radius: 0.75rem; /* rounded thoda kam */
+    border: 1px solid #e2e8f0;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.8rem;   /* text chhota */
+    transition: all 0.2s;
+}
+
+/* Google logo size bhi chhota */
+.google-btn img {
+    width: 16px;
+    height: 16px;
+}
+
+
+.google-btn:hover {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+}
+
+.divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin: 1.5rem 0;
+    color: #94a3b8;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.divider::before, .divider::after {
+    content: "";
+    flex: 1;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.divider::before { margin-right: 1rem; }
+.divider::after { margin-left: 1rem; }
+
+/* =========================================
+   9. CUSTOM SCROLLBAR
+========================================= */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-light); }
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--navy); }

@@ -1,0 +1,243 @@
+{% extends "layout_app.html" %}
+{% block title %}Profile - DSP Health{% endblock %}
+
+{% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --navy: #1e293b;
+    --emerald: #10b981;
+    --slate-bg: #f8fafc;
+  }
+  
+  body { font-family: 'Poppins', sans-serif; background-color: var(--slate-bg); }
+
+  /* Premium Card Shadow */
+  .premium-card {
+    background: #ffffff;
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.04), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+    border-radius: 2.5rem;
+  }
+
+  /* Animated Profile Gradient */
+  .profile-header-gradient {
+    background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .profile-header-gradient::before {
+    content: '';
+    position: absolute;
+    width: 200px;
+    height: 200px;
+    background: rgba(16, 185, 129, 0.1);
+    border-radius: 50%;
+    top: -50px;
+    right: -50px;
+  }
+
+  /* Info Item Hover */
+  .info-group {
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+  }
+  .info-group:hover {
+    background: white;
+    border-color: #e2e8f0;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+  }
+
+  /* Modal Backdrop */
+  .glass-backdrop {
+    background: rgba(15, 23, 42, 0.7);
+    backdrop-filter: blur(8px);
+  }
+</style>
+
+<div class="min-h-screen py-16 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-4xl mx-auto">
+    
+    <div class="mb-10 text-center">
+      <h1 class="text-4xl md:text-5xl font-extrabold text-[--navy] tracking-tight">
+        Account <span class="text-[var(--emerald)]">Settings</span>
+      </h1>
+      <p class="text-gray-500 text-lg md:text-xl max-w-2xl font-medium mx-auto mt-4">
+        Manage your personal information and security preferences.
+      </p>
+    </div>
+
+  
+
+    <div class="premium-card overflow-hidden">
+      
+      <div class="profile-header-gradient px-8 py-12 flex flex-col items-center sm:flex-row sm:justify-between sm:text-left text-center">
+        <div class="flex flex-col sm:flex-row items-center gap-6">
+          <div class="w-24 h-24 bg-white/10 backdrop-blur-md rounded-3xl border border-white/20 flex items-center justify-center shadow-2xl relative group">
+            <span class="text-4xl font-bold text-white uppercase">{{ user.username[0] }}</span>
+            <div class="absolute -bottom-2 -right-2 w-8 h-8 bg-[--emerald] rounded-xl border-4 border-[#1e293b] flex items-center justify-center">
+                <i class="fa-solid fa-check text-[10px] text-white"></i>
+            </div>
+          </div>
+          
+          <div>
+            <h2 class="text-2xl font-bold text-white tracking-wide">{{ user.username }}</h2>
+            <p class="text-emerald-400 font-medium flex items-center gap-2 justify-center sm:justify-start">
+              <i class="fa-solid fa-shield-halved text-xs"></i> Verified Account
+            </p>
+          </div>
+        </div>
+
+        <button id="openProfileModal" 
+                class="mt-6 sm:mt-0 bg-white/10 hover:bg-white text-white hover:text-[--navy] border border-white/20 px-6 py-3 rounded-2xl font-bold text-sm transition-all flex items-center gap-2">
+          <i class="fa-solid fa-user-gear"></i> Edit Profile
+        </button>
+      </div>
+
+      <div class="p-8 sm:p-12 grid grid-cols-1 md:grid-cols-2 gap-6 bg-slate-50/50">
+        
+        <div class="info-group p-6 rounded-3xl bg-white/50 border border-slate-100">
+          <label class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-2 block">Username</label>
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-[--navy]">
+                <i class="fa-solid fa-at"></i>
+            </div>
+            <p class="text-lg font-bold text-[--navy]">{{ user.username }}</p>
+          </div>
+        </div>
+
+        <div class="info-group p-6 rounded-3xl bg-white/50 border border-slate-100">
+          <label class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-2 block">Email Address</label>
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-[--navy]">
+                <i class="fa-solid fa-envelope"></i>
+            </div>
+            <p class="text-lg font-bold text-[--navy]">{{ user.email }}</p>
+          </div>
+        </div>
+
+        <div class="info-group p-6 rounded-3xl bg-white/50 border border-slate-100">
+          <label class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-2 block">Member Since</label>
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center text-[--emerald]">
+                <i class="fa-solid fa-calendar-check"></i>
+            </div>
+            <p class="text-lg font-bold text-[--navy]">{{ user.created_at.strftime('%B %d, %Y') }}</p>
+          </div>
+        </div>
+
+        <div class="info-group p-6 rounded-3xl bg-white/50 border border-slate-100">
+          <label class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-2 block">Local System Time</label>
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-500">
+                <i class="fa-solid fa-clock"></i>
+            </div>
+            <p id="live-datetime" class="text-lg font-bold text-[--navy] tabular-nums"></p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="profileModal" class="fixed inset-0 glass-backdrop hidden z-50 flex items-center justify-center p-4">
+  <div class="bg-white rounded-[2.5rem] w-full max-w-lg shadow-2xl relative overflow-hidden animate-in fade-in zoom-in duration-300">
+    
+    <div class="px-8 py-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+      <div>
+        <h3 class="text-xl font-bold text-[--navy]">Edit Account</h3>
+        <p class="text-xs text-slate-400">Update your credentials securely</p>
+      </div>
+      <button id="closeProfileModal" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-red-50 hover:text-red-500 transition-colors">
+        <i class="fa-solid fa-xmark text-lg"></i>
+      </button>
+    </div>
+
+    <div class="p-8 space-y-8">
+      <form action="{{ url_for('update_username') }}" method="POST" class="group">
+        <label class="text-[11px] font-bold text-slate-500 uppercase mb-3 block ml-1">Change Display Name</label>
+        <div class="relative">
+          <input type="text" name="new_username" value="{{ user.username }}" required
+            class="w-full h-14 bg-slate-50 border border-slate-200 px-5 rounded-2xl focus:ring-4 focus:ring-slate-100 focus:border-[--navy] outline-none transition-all font-medium">
+          <button type="submit" class="absolute right-2 top-2 h-10 px-4 bg-[--navy] text-white rounded-xl text-xs font-bold hover:bg-black transition-all">
+            Update
+          </button>
+        </div>
+      </form>
+
+      <div class="relative py-2 flex items-center gap-4">
+        <div class="h-px bg-slate-100 flex-1"></div>
+        <span class="text-[10px] font-bold text-slate-300 uppercase tracking-widest">Security Zone</span>
+        <div class="h-px bg-slate-100 flex-1"></div>
+      </div>
+
+     
+
+<!-- ================= Update Email Form ================= -->
+
+
+
+
+      <form action="{{ url_for('forgot_password') }}" method="POST">
+        <div class="bg-red-50/50 p-4 rounded-3xl border border-red-100 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-red-500 shadow-sm">
+                    <i class="fa-solid fa-lock"></i>
+                </div>
+                <div>
+                    <p class="text-sm font-bold text-red-900">Reset Password</p>
+                    
+                </div>
+            </div>
+            <input type="hidden" name="email" value="{{ user.email }}">
+            <button type="submit" class="px-4 py-2 bg-white text-red-600 text-xs font-extrabold rounded-lg border border-red-200 hover:bg-red-600 hover:text-white transition-all">
+                Proceed
+            </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  // UI Script
+  const modal = document.getElementById('profileModal');
+  const openBtn = document.getElementById('openProfileModal');
+  const closeBtn = document.getElementById('closeProfileModal');
+
+  openBtn.onclick = () => {
+    modal.classList.remove('hidden');
+    document.body.style.overflow = 'hidden'; // Stop scrolling
+  }
+  
+  closeBtn.onclick = () => {
+    modal.classList.add('hidden');
+    document.body.style.overflow = 'auto';
+  }
+
+  // Live Clock - Premium Format
+  function updateDateTime() {
+    const now = new Date();
+    const options = { 
+      hour: '2-digit', minute: '2-digit', second: '2-digit',
+      hour12: true 
+    };
+    const timeStr = now.toLocaleTimeString('en-IN', options);
+    document.getElementById('live-datetime').textContent = timeStr;
+  }
+  setInterval(updateDateTime, 1000);
+  updateDateTime();
+
+
+
+
+
+    
+    
+    
+    </script>
+{% endblock %}

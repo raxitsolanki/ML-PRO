@@ -1,0 +1,151 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+<div class="auth-card max-w-md mx-auto">
+
+    <!-- HEADER -->
+    <div class="text-center mb-8">
+        <div class="bg-emerald-50 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm border border-emerald-100">
+            <i class="fa-solid fa-heart-pulse text-emerald-500 text-3xl"></i>
+        </div>
+        <h2 class="text-2xl font-extrabold text-slate-900 tracking-tight">
+            Welcome Back
+        </h2>
+        <p class="text-sm text-slate-500 mt-1 font-medium">
+            Sign in to your DPS account
+        </p>
+    </div>
+
+    <!-- FORM -->
+    <form action="{{ url_for('login') }}" method="POST" novalidate>
+
+        <!-- EMAIL -->
+        <div class="mb-4">
+            <label for="email"
+                class="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">
+                Email Address
+            </label>
+            <div class="input-icon relative">
+                <i class="fa-solid fa-envelope"></i>
+                <input
+                    id="email"
+                    type="email"
+                    name="email"
+                    required
+                    autocomplete="email"
+                    placeholder="name@email.com"
+                    class="w-full pl-14 pr-4 py-4 rounded-2xl border border-slate-200
+                    text-slate-800 font-medium focus:ring-4 focus:ring-emerald-500/10 
+                    focus:border-emerald-500 focus:outline-none transition-all"
+                >
+            </div>
+        </div>
+
+        <!-- PASSWORD -->
+        <div class="mb-4">
+            <label for="login_password"
+                class="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">
+                Password
+            </label>
+        
+            <div class="relative">
+                <!-- Lock Icon -->
+                <i class="fa-solid fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+        
+                <!-- Input -->
+                <input
+                    id="login_password"
+                    type="password"
+                    name="password"
+                    required
+                    minlength="6"
+                    autocomplete="current-password"
+                    placeholder="••••••••"
+                    class="w-full pl-14 pr-4 py-4 rounded-2xl border border-slate-200
+                    text-slate-800 font-medium focus:ring-4 focus:ring-emerald-500/10 
+                    focus:border-emerald-500 focus:outline-none transition-all"
+                >
+        
+                <!-- Eye Button -->
+                <button
+                    type="button"
+                    class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 transition"
+                    onclick="togglePassword('login_password', this.querySelector('i'))"
+                >
+                    <i class="fa-solid fa-eye"></i>
+                </button>
+            </div>
+        </div>
+        
+
+        <!-- OPTIONS -->
+        <div class="flex items-center justify-between mb-8 text-xs font-semibold">
+            <label class="flex items-center text-slate-500 cursor-pointer group">
+                <input
+                    type="checkbox"
+                    name="remember"
+                    class="mr-2 w-4 h-4 rounded border-slate-300 text-emerald-500 focus:ring-emerald-500 transition cursor-pointer"
+                >
+                <span class="group-hover:text-slate-800 transition">
+                    Remember me
+                </span>
+            </label>
+
+            <a href="{{ url_for('forgot_password') }}"
+                class="text-slate-800 hover:text-emerald-600 transition underline-offset-4 hover:underline">
+                Forgot Password?
+            </a>
+        </div>
+
+        <!-- SUBMIT -->
+        <button type="submit" class="w-full bg-slate-900 text-white py-3.5 rounded-xl text-xs font-bold
+        flex items-center justify-center gap-2 shadow-lg shadow-slate-100
+        hover:bg-emerald-600 transition-all active:scale-95 mt-2">
+            <i class="fa-solid fa-right-to-bracket mr-2"></i>
+            Sign In to Dashboard
+        </button>
+
+    </form>
+
+    <!-- DIVIDER -->
+    <div class="divider">OR</div>
+
+    <!-- GOOGLE LOGIN -->
+    <a href="{{ url_for('google_login') }}" class="google-btn">
+        <img
+            src="https://developers.google.com/identity/images/g-logo.png"
+            alt="Google Logo"
+        >
+        Continue with Google
+    </a>
+
+    <!-- REGISTER -->
+    <p class="text-center text-sm text-slate-500 mt-10 font-medium">
+        Don't have an account?
+        <a href="{{ url_for('register') }}"
+            class="text-slate-900 font-bold hover:text-emerald-600 transition underline-offset-4 hover:underline">
+            Create Account
+        </a>
+    </p>
+
+</div>
+
+<!-- PASSWORD TOGGLE SCRIPT -->
+<script>
+function togglePassword(fieldId, icon) {
+    const input = document.getElementById(fieldId);
+
+    if (!input || !icon) return;
+
+    if (input.type === "password") {
+        input.type = "text";
+        icon.classList.replace("fa-eye", "fa-eye-slash");
+    } else {
+        input.type = "password";
+        icon.classList.replace("fa-eye-slash", "fa-eye");
+    }
+}
+</script>
+
+{% endblock %}

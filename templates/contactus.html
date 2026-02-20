@@ -1,0 +1,202 @@
+{% extends "layout_app.html" %}
+
+{% block title %}Contact Us - DSP Health{% endblock %}
+
+{% block content %}
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+
+<style>
+:root {
+  --navy: #1e293b;
+  --emerald: #10b981;
+}
+
+.font-poppins { font-family: 'Poppins', sans-serif; }
+
+/* Proper Size & Alignment */
+.main-container {
+    min-h: 750px; /* Force consistent height */
+}
+
+/* Floating Label Logic */
+.input-group { position: relative; width: 100%; }
+.input-group label {
+    position: absolute;
+    left: 1rem;
+    top: 1rem;
+    color: #94a3b8;
+    transition: all 0.3s ease;
+    pointer-events: none;
+    background: transparent;
+}
+
+.input-field {
+    width: 100%;
+    border: 1.5px solid #e2e8f0;
+    padding: 1rem;
+    border-radius: 16px;
+    outline: none;
+    transition: all 0.3s ease;
+    background: #ffffff;
+}
+
+.input-field:focus ~ label,
+.input-field:not(:placeholder-shown) ~ label {
+    top: -0.6rem;
+    left: 0.8rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--emerald);
+    background: white;
+    padding: 0 6px;
+}
+
+.input-field:focus {
+    border-color: var(--navy);
+    box-shadow: 0 0 0 4px rgba(30, 41, 59, 0.05);
+}
+
+/* Map Container proper sizing */
+.map-box {
+    height: 300px;
+    width: 100%;
+}
+
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.animate-slide-up { animation: slideUp 0.6s ease-out forwards; }
+</style>
+
+<div class="min-h-screen bg-[#f8fafc] px-4 sm:px-6 lg:px-16 py-12 font-poppins">
+
+    <div class="text-center mb-12 animate-slide-up">
+        <h1 class="text-3xl md:text-5xl font-extrabold text-[--navy] tracking-tight mb-2">
+            Contact <span class="text-emerald-500">Us</span>
+        </h1>
+        <!-- Short description -->
+        <p class="text-gray-600 text-lg md:text-xl max-w-2xl mx-auto">
+            Have questions or need help? Our team is here to assist you promptly.
+        </p>
+    </div>
+
+
+    <div class="max-w-6xl mx-auto animate-slide-up">
+        <div class="bg-white rounded-[2.5rem] shadow-2xl shadow-slate-200/50 border border-slate-100 overflow-hidden flex flex-col lg:flex-row main-container">
+            
+            <div class="lg:w-[60%] p-8 sm:p-12 border-b lg:border-b-0 lg:border-r border-slate-100">
+                <h2 class="text-2xl font-bold text-[--navy] mb-8">Send us a message</h2>
+                
+                <form action="{{ url_for('contactus') }}" method="POST" class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="input-group">
+                            <input type="text" name="name" placeholder=" " required class="input-field">
+                            <label>Full Name</label>
+                        </div>
+                        <div class="input-group">
+                            <input type="email" name="email" placeholder=" " required class="input-field">
+                            <label>Email Address</label>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <input type="text" name="subject" placeholder=" " required class="input-field">
+                        <label>Subject</label>
+                    </div>
+
+                    <div class="input-group">
+                        <textarea name="message" rows="4" placeholder=" " required class="input-field"></textarea>
+                        <label>Your Message</label>
+                    </div>
+                    
+                    <div class="flex flex-col sm:flex-row items-center justify-between gap-6 pt-2">
+                        <div class="py-2">
+                            <div class="g-recaptcha" data-sitekey="{{ site_key }}"></div><br>
+                        
+    
+                            <div class="flex justify-center mt-4">
+                                <button type="submit"
+                                    class="w-full max-w-[320px]
+                                           bg-slate-900 text-white py-3.5 rounded-xl
+                                           text-base font-bold
+                                           flex items-center justify-center gap-2
+                                           shadow-lg shadow-slate-100
+                                           hover:bg-emerald-600 transition-all
+                                           active:scale-95">
+                            
+                                    <i class="fa-solid fa-paper-plane text-emerald-400 text-lg"></i>
+                                    <span class="tracking-wide">Deliver Message</span>
+                                </button>
+                            </div>
+                            
+                            </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="lg:w-[40%] bg-slate-50/50 p-8 sm:p-12 flex flex-col justify-between">
+                <div class="space-y-8">
+                    <h3 class="text-xl font-bold text-[--navy] mb-6">Get in touch</h3>
+
+                    <div class="space-y-6">
+                        <div class="flex items-center gap-5 group">
+                            <div class="w-12 h-12 bg-white rounded-2xl shadow-sm flex items-center justify-center text-emerald-500 border border-slate-100 group-hover:bg-emerald-500 group-hover:text-white transition-all">
+                                <i class="fa-solid fa-envelope"></i>
+                            </div>
+                            <div>
+                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Email</p>
+                                <p class="text-[--navy] font-semibold">dpshealth26@gmail.com</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-5 group">
+                            <div class="w-12 h-12 bg-white rounded-2xl shadow-sm flex items-center justify-center text-blue-500 border border-slate-100 group-hover:bg-blue-500 group-hover:text-white transition-all">
+                                <i class="fa-solid fa-phone"></i>
+                            </div>
+                            <div>
+                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Phone</p>
+                                <p class="text-[--navy] font-semibold">+91 89807 89373</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-5 group">
+                            <div class="w-12 h-12 bg-white rounded-2xl shadow-sm flex items-center justify-center text-rose-500 border border-slate-100 group-hover:bg-rose-500 group-hover:text-white transition-all">
+                                <i class="fa-solid fa-location-dot"></i>
+                            </div>
+                            <div>
+                                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Location</p>
+                                <p class="text-[--navy] font-semibold">Surat, Gujarat</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-10 rounded-[2rem] overflow-hidden border-4 border-white shadow-xl map-box">
+                    <iframe
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d119066.41709424424!2d72.739894488346!3d21.17024010174066!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be04e59411d1563%3A0xfe4558290938b042!2sSurat%2C%20Gujarat!5e0!3m2!1sen!2sin!4v1700000000000!5m2!1sen!2sin"
+                        width="100%" height="100%" style="border:0;" allowfullscreen=""
+                        loading="lazy" referrerpolicy="no-referrer-when-downgrade">
+                    </iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // reCAPTCHA validation
+    document.querySelector('form').addEventListener('submit', function(e) {
+        if (typeof grecaptcha !== 'undefined') {
+            var response = grecaptcha.getResponse();
+            if(response.length === 0){
+                alert("Please verify that you are not a robot.");
+                e.preventDefault();
+            }
+        }
+    });
+</script>
+
+{% endblock %}

@@ -1,0 +1,151 @@
+{% extends "admin/admin_layout.html" %}
+{% block content %}
+
+<div class="flex items-center justify-between mb-6">
+
+    <!-- LEFT SIDE TITLE -->
+    <h1 class="text-2xl font-bold">
+        Fingerprint Predictions
+    </h1>
+
+    <!-- RIGHT SIDE BUTTON -->
+    <a href="{{ url_for('admin_prediction') }}"
+       class="inline-flex items-center gap-2 
+       bg-gray-200 text-gray-800 px-4 py-2 rounded-lg 
+              hover:bg-gray-300 transition text-sm font-semibold">
+        <i class="fa-solid fa-arrow-left"></i>
+        Back to Report Data
+    </a>
+
+</div>
+
+
+
+<!-- TABLE CONTAINER -->
+<div class="overflow-x-auto rounded-lg shadow-md border border-gray-200">
+
+  <table class="min-w-full divide-y divide-gray-200 bg-white table-auto text-[11px]">
+
+    <thead class="bg-gray-200">
+      <tr class="text-left uppercase tracking-tighter font-bold text-gray-900">
+        <th class="px-2 py-2">ID</th> 
+        <th class="px-2 py-2">Email</th>
+        <th class="px-2 py-2">Gender</th>
+        <th class="px-2 py-2">Age</th>
+        <th class="px-2 py-2">Smoking</th>
+        <th class="px-2 py-2">BMI</th>
+        <th class="px-2 py-2">HbA1c</th>
+        <th class="px-2 py-2">Glucose</th>
+        <th class="px-2 py-2">Ridge</th>
+        <th class="px-2 py-2">Complexity</th>
+        <th class="px-2 py-2">Pattern</th>
+        <th class="px-2 py-2">Result</th>
+        <th class="px-2 py-2">Image</th>
+        <th class="px-2 py-2">Date</th>
+        <th class="px-2 py-2 text-center">Action</th>
+      </tr>
+    </thead>
+
+    <tbody class="divide-y divide-gray-100">
+
+      {% for p in predictions %}
+      <tr class="hover:bg-gray-50 transition-colors">
+        <td class="px-2 py-2 font-semibold text-gray-700">
+            {{ p.id }}
+        </td>
+
+        <td class="px-2 py-2 whitespace-nowrap">{{ p.email }}</td>
+
+        <td class="px-2 py-2">
+          {% if p.gender == 1 %} M {% else %} F {% endif %}
+        </td>
+
+        <td class="px-2 py-2">{{ p.age }}</td>
+
+        <td class="px-2 py-2">
+          {% if p.smoking == 0 %} Never
+          {% elif p.smoking == 1 %} Former
+          {% else %} Current
+          {% endif %}
+        </td>
+
+        <td class="px-2 py-2 font-semibold">{{ p.bmi }}</td>
+        <td class="px-2 py-2">{{ p.hba1c }}</td>
+        <td class="px-2 py-2">{{ p.glucose }}</td>
+        <td class="px-2 py-2">{{ p.ridge_density }}</td>
+        <td class="px-2 py-2">{{ p.complexity_score }}</td>
+        <td class="px-2 py-2">{{ p.pattern_type }}</td>
+
+        <!-- RESULT -->
+        <td class="px-2 py-2">
+          <span class="px-1.5 py-0.5 rounded-full font-bold text-[9px]
+            {% if 'LOW' in p.result %}
+              bg-emerald-100 text-emerald-800 border border-emerald-200
+            {% elif 'MEDIUM' in p.result %}
+              bg-yellow-100 text-yellow-800 border border-yellow-200
+            {% else %}
+              bg-red-100 text-red-700 border border-red-200
+            {% endif %}">
+            {{ p.result }}
+          </span>
+        </td>
+
+        <!-- IMAGE -->
+        <td class="px-2 py-2">
+          {% if p.fingerprint_image %}
+            <img src="{{ url_for('static', filename='uploads/' + p.fingerprint_image) }}"
+                 class="w-10 h-10 object-cover rounded border">
+          {% else %}
+            -
+          {% endif %}
+        </td>
+
+        <td class="px-2 py-2 whitespace-nowrap text-gray-500">
+          {{ p.created_at.strftime('%Y-%m-%d %H:%M') }}
+        </td>
+
+        <!-- DELETE -->
+        <td class="px-2 py-2 text-center">
+          <form action="{{ url_for('delete_finger_prediction', id=p.id) }}"
+                method="POST"
+                onsubmit="return confirm('Delete this fingerprint record?')">
+
+            <button type="submit"
+                    class="bg-red-500 text-white px-2 py-1 rounded
+                           hover:bg-red-700 transition text-[9px]
+                           flex items-center gap-1 mx-auto">
+              <i class="fa-solid fa-trash-can"></i> Del
+            </button>
+
+          </form>
+        </td>
+
+      </tr>
+      {% endfor %}
+
+    </tbody>
+
+  </table>
+
+</div>
+<div class="bg-white border-t border-gray-200 px-6 py-4 flex justify-end">
+    
+    <div class="flex items-center gap-3 
+                bg-gradient-to-r from-[#5b21b6] to-[#7c3aed] 
+                text-white px-4 py-2 rounded-xl shadow-md">
+        
+        <i class="fa-solid fa-database text-sm opacity-90"></i>
+        
+        <span class="text-sm font-medium tracking-wide">
+            Total Records:
+        </span>
+        
+        <span class="bg-white/20 px-3 py-1 rounded-lg text-sm font-bold backdrop-blur-sm">
+            {{ total_count }}
+        </span>
+
+    </div>
+
+</div>
+
+{% endblock %}

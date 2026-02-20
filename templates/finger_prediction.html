@@ -1,0 +1,282 @@
+{% extends "layout_app.html" %}
+{% block title %}Fingerprint Diagnosis - DSP Health{% endblock %}
+
+{% block content %}
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+.premium-font { font-family: 'Plus Jakarta Sans', sans-serif; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in {
+  animation: fadeIn 0.6s ease-out forwards;
+}
+</style>
+
+<div class="p-4 sm:p-6 lg:p-12 bg-slate-50 min-h-screen premium-font">
+
+<!-- ================= HEADER ================= -->
+<div class="text-center max-w-2xl mx-auto mb-12 animate-fade-in">
+  <span class="inline-flex items-center gap-2 text-emerald-600 font-bold text-xs uppercase tracking-[0.4em] mb-3">
+    <i class="fa-solid fa-fingerprint"></i>
+    Biometric AI Intelligence
+  </span>
+
+  <h1 class="text-3xl sm:text-4xl md:text-5xl font-black text-slate-900 mb-4">
+    Fingerprint-Based <span class="text-emerald-500">Predictions</span>
+  </h1>
+
+  <p class="text-slate-500 font-medium text-sm sm:text-lg">
+    Advanced biometric fingerprint analysis combined with clinical indicators.
+  </p>
+</div>
+<div class="max-w-4xl mx-auto mb-6 flex justify-end">
+  <div class="bg-white border border-slate-200 rounded-[2.2rem] 
+              shadow-xl shadow-slate-200/40 px-6 py-4 
+              flex items-center gap-6 animate-fade-in">
+
+      <div class="text-right hidden sm:block">
+        <p class="text-[11px] font-black uppercase tracking-[0.3em] text-slate-800 flex items-center gap-2">
+          Standard Mode
+          <i class="fa-solid fa-arrow-right text-[10px] text-slate-500 group-hover:translate-x-1 transition-transform"></i>
+      </p>
+      
+          <p class="text-xs text-slate-400 font-medium">
+              Clinical prediction based diagnosis
+          </p>
+      </div>
+
+      <a href="{{ url_for('prediction') }}"
+         class="group relative px-8 py-5 
+                bg-slate-900 text-white 
+                rounded-[2rem] font-black text-[11px]
+                tracking-[0.3em] uppercase 
+                shadow-2xl shadow-slate-400/40
+                flex items-center gap-3
+                hover:bg-slate-800 transition-all
+                hover:-translate-y-1 active:scale-95">
+
+          <i class="fa-solid fa-microscope text-xl 
+                    group-hover:scale-110 transition-transform"></i>
+          <span>Clinical Prediction</span>
+      </a>
+  </div>
+</div>
+
+
+<!-- ================= FORM ================= -->
+<div class="max-w-4xl mx-auto animate-fade-in">
+<form action="{{ url_for('finger_prediction') }}" method="POST" enctype="multipart/form-data"
+      class="bg-white rounded-[2.5rem] shadow-2xl p-6 sm:p-12 border border-slate-100 grid grid-cols-1 md:grid-cols-2 gap-6">
+
+<!-- Gender -->
+<div>
+  <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Gender</label>
+  <div class="relative mt-2">
+    <i class="fa-solid fa-venus-mars absolute left-4 top-1/2 -translate-y-1/2 text-slate-300"></i>
+    <select name="gender" required
+      class="w-full pl-11 pr-4 py-3 rounded-xl bg-slate-50 border-2 border-slate-100 font-semibold focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 outline-none">
+      <option value="">Select</option>
+      <option value="0">Female</option>
+      <option value="1">Male</option>
+    </select>
+  </div>
+</div>
+
+<!-- Age -->
+<div>
+  <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Age</label>
+  <div class="relative mt-2">
+    <i class="fa-solid fa-calendar-day absolute left-4 top-1/2 -translate-y-1/2 text-slate-300"></i>
+    <input type="number" name="age" min="1" max="120" required
+      class="w-full pl-11 pr-4 py-3 rounded-xl bg-slate-50 border-2 border-slate-100 font-semibold focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 outline-none">
+  </div>
+</div>
+
+<!-- Smoking -->
+<div>
+  <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Smoking</label>
+  <div class="relative mt-2">
+    <i class="fa-solid fa-smoking absolute left-4 top-1/2 -translate-y-1/2 text-slate-300"></i>
+    <select name="smoking" required
+      class="w-full pl-11 pr-4 py-3 rounded-xl bg-slate-50 border-2 border-slate-100 font-semibold focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 outline-none">
+      <option value="0">Never</option>
+      <option value="1">Former</option>
+      <option value="2">Current</option>
+    </select>
+  </div>
+</div>
+
+<!-- BMI -->
+<div>
+  <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">BMI</label>
+  <div class="relative mt-2">
+    <i class="fa-solid fa-weight-scale absolute left-4 top-1/2 -translate-y-1/2 text-slate-300"></i>
+    <input type="number" step="0.1" name="bmi" required
+      class="w-full pl-11 pr-4 py-3 rounded-xl bg-slate-50 border-2 border-slate-100 font-semibold focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 outline-none">
+  </div>
+</div>
+
+<!-- HbA1c -->
+<div>
+  <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">HbA1c</label>
+  <div class="relative mt-2">
+    <i class="fa-solid fa-vial absolute left-4 top-1/2 -translate-y-1/2 text-slate-300"></i>
+    <input type="number" step="0.1" name="hba1c" required 
+      class="w-full pl-11 pr-4 py-3 rounded-xl bg-slate-50 border-2 border-slate-100 font-semibold focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 outline-none">
+  </div>
+</div>
+
+<!-- Glucose -->
+<div>
+  <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Glucose</label>
+  <div class="relative mt-2">
+    <i class="fa-solid fa-gauge-high absolute left-4 top-1/2 -translate-y-1/2 text-slate-300"></i>
+    <input type="number" name="glucose" required
+      class="w-full pl-11 pr-4 py-3 rounded-xl bg-slate-50 border-2 border-slate-100 font-semibold focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 outline-none">
+  </div>
+</div>
+
+<!-- Fingerprint -->
+<div class="md:col-span-2">
+  <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Fingerprint Image</label>
+  <div class="relative mt-3">
+    <i class="fa-solid fa-fingerprint absolute left-5 top-1/2 -translate-y-1/2 text-emerald-500 text-lg"></i>
+    <input type="file" name="fingerprint" accept="image/*" required
+      class="w-full pl-14 pr-4 py-4 rounded-xl bg-slate-50 border-2 border-dashed border-emerald-200 font-semibold cursor-pointer hover:bg-emerald-50 transition-all">
+  </div>
+</div>
+
+<!-- Submit -->
+<div class="md:col-span-2 pt-6">
+  <button type="submit"
+                        class="w-full bg-slate-900 text-white py-6 rounded-[2rem] font-black text-sm tracking-[0.3em] shadow-2xl shadow-slate-300 
+                               flex items-center justify-center gap-4 hover:bg-emerald-600 transition-all duration-300 
+                               hover:-translate-y-1 active:scale-[0.97] uppercase group">
+                    
+                    <i class="fa-solid fa-microscope text-emerald-400 text-xl group-hover:rotate-12 transition-transform"></i>
+    Generate Fingerprint Diagnosis
+    <i class="fa-solid fa-arrow-right text-slate-500 group-hover:text-white group-hover:translate-x-2 transition-all"></i>
+  </button>
+</div>
+
+</form>
+</div>
+
+<!-- ================= RESULT ================= -->
+{% if finger_prediction %}
+<div class="max-w-6xl mx-auto mt-20 animate-fade-in">
+  <div class="relative overflow-hidden rounded-[3.5rem] 
+              border-2 
+              {% if 'HIGH' in finger_prediction %}border-red-100
+              {% elif 'MEDIUM' in finger_prediction %}border-amber-100
+              {% else %}border-emerald-100{% endif %}
+              bg-white shadow-[0_40px_90px_-20px_rgba(0,0,0,0.18)]">
+
+    <!-- Soft Glow -->
+    <div class="absolute -right-24 -top-24 w-[26rem] h-[26rem]
+                {% if 'HIGH' in finger_prediction %}bg-red-100/60
+                {% elif 'MEDIUM' in finger_prediction %}bg-amber-100/60
+                {% else %}bg-emerald-100/60{% endif %}
+                rounded-full blur-[120px]"></div>
+
+    <div class="relative z-10 p-10 md:p-16 text-center">
+
+      <!-- ICON -->
+      <div class="mx-auto mb-10 w-40 h-40 rounded-full border-4 border-dashed
+        {% if 'HIGH' in finger_prediction %}border-red-300
+        {% elif 'MEDIUM' in finger_prediction %}border-amber-300
+        {% else %}border-emerald-300{% endif %}
+        flex items-center justify-center animate-[spin_14s_linear_infinite]">
+
+        <div class="w-28 h-28 rounded-full flex items-center justify-center
+          {% if 'HIGH' in finger_prediction %}bg-red-500
+          {% elif 'MEDIUM' in finger_prediction %}bg-amber-500
+          {% else %}bg-emerald-500{% endif %}
+          text-white text-5xl shadow-2xl">
+          <i class="fa-solid fa-fingerprint"></i>
+        </div>
+      </div>
+
+      <!-- BADGE -->
+      <div class="inline-flex items-center gap-3 px-6 py-2 rounded-full
+        {% if 'HIGH' in finger_prediction %}bg-red-100 text-red-700
+        {% elif 'MEDIUM' in finger_prediction %}bg-amber-100 text-amber-700
+        {% else %}bg-emerald-100 text-emerald-700{% endif %}
+        text-[11px] font-black uppercase tracking-[0.35em] mb-6">
+
+        <span class="relative flex h-2.5 w-2.5">
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75
+            {% if 'HIGH' in finger_prediction %}bg-red-400
+            {% elif 'MEDIUM' in finger_prediction %}bg-amber-400
+            {% else %}bg-emerald-400{% endif %}">
+          </span>
+          <span class="relative inline-flex rounded-full h-2.5 w-2.5
+            {% if 'HIGH' in finger_prediction %}bg-red-500
+            {% elif 'MEDIUM' in finger_prediction %}bg-amber-500
+            {% else %}bg-emerald-500{% endif %}">
+          </span>
+        </span>
+
+        Fingerprint AI Verdict
+      </div>
+
+      <!-- RESULT -->
+      <h2 class="text-4xl sm:text-6xl font-black text-slate-900 tracking-tight mb-6">
+        {{ finger_prediction }}
+      </h2>
+
+      <p class="text-slate-500 font-medium text-lg max-w-2xl mx-auto mb-14">
+        Our biometric AI engine evaluated fingerprint ridge patterns along with
+        clinical indicators to determine your diabetes-related risk level.
+      </p>
+
+      <!-- ACTION BUTTONS -->
+      <div class="flex flex-wrap gap-6 justify-center">
+
+        <a href="{{ url_for('suggestion') }}"
+           class="group relative px-12 py-5 rounded-[2rem]
+           {% if 'HIGH' in finger_prediction %}bg-red-600
+           {% elif 'MEDIUM' in finger_prediction %}bg-amber-600
+           {% else %}bg-emerald-600{% endif %}
+           text-white font-black text-xs tracking-[0.3em]
+           shadow-2xl hover:scale-105 transition-all overflow-hidden">
+
+          <span class="absolute inset-0 bg-white/20 translate-y-full
+                       group-hover:translate-y-0 transition-transform"></span>
+          <span class="relative flex items-center gap-3">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+            VIEW SUGGESTIONS
+          </span>
+        </a>
+
+        <a href="{{ url_for('download_finger_report', user_id=session['id']) }}"
+           class="px-10 py-5 bg-slate-900 text-white rounded-[2rem]
+                  font-black text-xs tracking-[0.3em]
+                  hover:bg-slate-800 transition-all shadow-xl flex items-center gap-3">
+          <i class="fa-solid fa-file-pdf"></i>
+          EXPORT REPORT
+        </a>
+
+      </div>
+    </div>
+
+    <!-- FOOTER STRIP -->
+    <div class="px-10 py-4 flex justify-center
+      {% if 'HIGH' in finger_prediction %}bg-red-600
+      {% elif 'MEDIUM' in finger_prediction %}bg-amber-600
+      {% else %}bg-emerald-600{% endif %}
+      text-white/80 text-[11px] font-black tracking-[0.25em] uppercase">
+      AI Biometric Risk Assessment
+    </div>
+
+  </div>
+</div>
+{% endif %}
+
+
+</div>
+{% endblock %}

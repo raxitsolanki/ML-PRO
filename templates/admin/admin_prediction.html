@@ -1,0 +1,114 @@
+{% extends "admin/admin_layout.html" %}
+
+{% block content %}
+<div class="flex items-center justify-between mb-6">
+
+  <!-- LEFT SIDE TITLE -->
+  <h1 class="text-2xl font-bold">
+      Reports Predictions
+  </h1>
+
+  <!-- RIGHT SIDE BUTTON -->
+  <a href="{{ url_for('admin_finger_predictions') }}"
+   class="group inline-flex items-center gap-2
+          bg-gradient-to-r from-emerald-600 to-teal-600
+          text-white px-5 py-2.5 rounded-xl
+          shadow-md shadow-emerald-500/30
+          hover:from-emerald-700 hover:to-teal-700
+          hover:shadow-lg hover:shadow-emerald-500/40
+          transition-all duration-300
+          text-sm font-semibold">
+
+    <i class="fa-solid fa-fingerprint 
+              group-hover:scale-110 transition-transform"></i>
+
+    View Fingerprint Records
+</a>
+
+</div>
+
+
+
+<!-- Overflow container ko handle karne ke liye tweaks -->
+<div class="overflow-x-auto rounded-lg shadow-md border border-gray-200">
+  <table class="min-w-full divide-y divide-gray-200 bg-white table-auto text-[11px]">
+    <thead class="bg-gray-200">
+      <tr class="text-left uppercase tracking-tighter font-bold text-gray-900">
+        <th class="px-2 py-2">ID</th>
+        <!-- Email column ki width control ki gayi hai -->
+        <th class="px-2 py-2 max-w-[120px]">Email</th>
+        <th class="px-1 py-2 text-center">Age</th>
+        <th class="px-1 py-2 text-center">Gen</th>
+        <th class="px-1 py-2 text-center">Hyp.</th>
+        <th class="px-1 py-2 text-center">Heart</th>
+        <th class="px-2 py-2">Smoking</th>
+        <th class="px-1 py-2 text-center">BMI</th>
+        <th class="px-1 py-2 text-center">HbA1c</th>
+        <th class="px-1 py-2 text-center">Gluc.</th>
+        <th class="px-2 py-2">Result</th>
+        <th class="px-2 py-2">Date</th>
+        <th class="px-2 py-2 text-center">Action</th>
+      </tr>
+    </thead>
+
+    <tbody class="divide-y divide-gray-100">
+      {% for p in predictions %}
+      <tr class="hover:bg-gray-50 transition-colors">
+        <td class="px-2 py-2 whitespace-nowrap">{{ p.id }}</td>
+        <!-- Email truncate taaki layout na bigde -->
+        <td class="px-2 py-2 truncate max-w-[120px]" title="{{ p.email }}">
+            {{ p.email if p.email else 'N/A' }}
+        </td>
+
+        <td class="px-1 py-2 text-center">{{ p.age }}</td>
+        <td class="px-1 py-2 text-center">{% if p.gender == 1 %} M {% else %} F {% endif %}</td>
+        <td class="px-1 py-2 text-center">{% if p.hypertension == 1 %} Yes {% else %} No {% endif %}</td>
+        <td class="px-1 py-2 text-center">{% if p.heart_disease == 1 %} Yes {% else %} No {% endif %}</td>
+        <td class="px-2 py-2 whitespace-nowrap">
+            {% if p.smoking == 0 %} Never {% elif p.smoking == 1 %} Former {% else %} Current {% endif %}
+        </td>
+        <td class="px-1 py-2 text-center font-semibold">{{ p.bmi }}</td>
+        <td class="px-1 py-2 text-center">{{ p.hba1c }}</td>
+        <td class="px-1 py-2 text-center">{{ p.glucose }}</td>
+        <td class="px-2 py-2">
+          <span class="px-1.5 py-0.5 rounded-full font-bold text-[9px] whitespace-nowrap
+                       {% if 'NOT' in p.result %}bg-emerald-100 text-emerald-800 border border-emerald-200{% else %}bg-red-100 text-red-700 border border-red-200{% endif %}">
+            {{ p.result }}
+          </span>
+        </td>
+        <td class="px-2 py-2 whitespace-nowrap text-gray-500">{{ p.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+        <td class="px-2 py-2 text-center">
+          <form action="{{ url_for('delete_prediction', id=p.id) }}" method="POST" 
+                onsubmit="return confirm('Are you sure?')">
+            <button type="submit"
+                    class="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-700 transition text-[9px] flex items-center gap-1 mx-auto">
+              <i class="fa-solid fa-trash-can"></i> Del
+            </button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+<div class="bg-white border-t border-gray-200 px-6 py-4 flex justify-end">
+    
+  <div class="flex items-center gap-3 
+              bg-gradient-to-r from-[#5b21b6] to-[#7c3aed] 
+              text-white px-4 py-2 rounded-xl shadow-md">
+      
+      <i class="fa-solid fa-database text-sm opacity-90"></i>
+      
+      <span class="text-sm font-medium tracking-wide">
+          Total Records:
+      </span>
+      <span class="bg-white/20 px-3 py-1 rounded-lg text-sm font-bold backdrop-blur-sm">
+          {{ total_count }}
+      </span>
+  </span>
+</div>
+
+
+
+</div>
+{% endblock %}

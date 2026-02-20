@@ -1,0 +1,671 @@
+{% extends "layout_app.html" %}
+
+{% block title %}Health Insights - DSP Health{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --navy: #1e293b;
+        --green: #22c55e;
+        --soft-bg: #f8fafc;
+    }
+
+    /* Tab Animation */
+    .tab-btn {
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .active-tab {
+        background: var(--navy) !important;
+        color: white !important;
+        box-shadow: 0 10px 20px rgba(30, 41, 59, 0.2);
+        transform: translateY(-2px);
+    }
+
+    /* Premium Card Design */
+    .suggestion-card {
+        background: white;
+        border: 1px solid rgba(226, 232, 240, 0.8);
+        transition: all 0.4s ease;
+        border-radius: 30px;
+    }
+    .suggestion-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.08);
+        border-color: var(--green);
+    }
+
+    /* Icon Background */
+    .icon-box {
+        background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+        color: var(--green);
+    }
+    /* Smooth Scrollbar for Modal Content */
+    .custom-scrollbar::-webkit-scrollbar { width: 5px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #cbd5e1; }
+
+    /* Modal Animation */
+    .animate-fade-in {
+        animation: modalScaleUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes modalScaleUp {
+        from { opacity: 0; transform: scale(0.9) translateY(20px); }
+        to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+</style>
+
+<div class="min-h-screen bg-[--soft-bg] p-6 md:p-12">
+    <div class="max-w-7xl mx-auto mb-12">
+        <h1 class="text-4xl md:text-6xl font-black text-[--navy] mb-4 tracking-tight">
+            Health <span class="text-[--emerald]">Suggestions</span>
+            
+        </h1>
+        <p class="text-gray-500 text-lg md:text-xl max-w-2xl font-medium">
+            Personalized lifestyle adjustments and medical insights to keep your health on track.
+        </p>
+    </div>
+
+    <div class="max-w-7xl mx-auto mb-12">
+        <div class="inline-flex bg-white p-2 rounded-[25px] shadow-sm border border-gray-100">
+            <button id="diabetes-tab" class="tab-btn active-tab px-8 py-3 rounded-[20px] font-bold text-sm uppercase tracking-wider">
+                Diabetes Care
+            </button>
+            <button id="nondiabetes-tab" class="tab-btn px-8 py-3 rounded-[20px] font-bold text-sm uppercase tracking-wider text-gray-400">
+                General Wellness
+            </button>
+        </div>
+    </div>
+    
+    <!-- Your diabetes cards/content here -->
+<!-- ================= CARD 1 ================= -->
+<div id="diabetes-section" class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 animate-fade-in">
+
+    <div class="suggestion-card p-8 flex flex-col justify-between bg-white rounded-[28px] border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 min-h-[500px]">
+        <div>
+            <div class="icon-box w-14 h-14 rounded-2xl bg-green-50 flex items-center justify-center mb-6">
+                <i class="fa-solid fa-utensils text-2xl text-[--green]"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-[--navy] mb-3 tracking-tight">Dietary Guide</h2>
+            <p class="text-gray-500 text-sm mb-6 leading-relaxed">Stable blood sugar begins with the right plate. Focus on low-GI Indian staples.</p>
+            <ul class="space-y-3 mb-8">
+                <li class="flex items-center gap-3 text-sm font-semibold text-gray-600"><i class="fa-solid fa-circle-check text-[--green]"></i> Ragi & Multigrain staples</li>
+                <li class="flex items-center gap-3 text-sm font-semibold text-gray-600"><i class="fa-solid fa-circle-check text-[--green]"></i> Moong Dal & Legumes</li>
+                <li class="flex items-center gap-3 text-sm font-semibold text-gray-600"><i class="fa-solid fa-circle-check text-[--green]"></i> Leafy Greens & Salads</li>
+                <li class="flex items-center gap-3 text-sm font-semibold text-gray-600"><i class="fa-solid fa-circle-check text-[--green]"></i> Low-GI Fruits (Guava)</li>
+            </ul>
+        </div>
+        <button onclick="openAbout('food')" class="w-full py-4 bg-[--navy] text-white rounded-2xl font-bold hover:bg-black transition-all flex items-center justify-center gap-2 shadow-lg shadow-slate-200">
+            View Details <i class="fa-solid fa-chevron-right text-xs"></i>
+        </button>
+    </div>
+
+    <div class="suggestion-card p-8 flex flex-col justify-between bg-white rounded-[28px] border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 min-h-[500px]">
+        <div>
+            <div class="icon-box w-14 h-14 rounded-2xl bg-red-50 flex items-center justify-center mb-6">
+                <i class="fa-solid fa-triangle-exclamation text-2xl text-red-500"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-[--navy] mb-3 tracking-tight">Warning Signs</h2>
+            <p class="text-gray-500 text-sm mb-6 leading-relaxed">Recognizing early signals helps prevent serious long-term complications.</p>
+            <ul class="space-y-3 mb-8">
+                <li class="flex items-center gap-3 text-sm font-semibold text-gray-600"><i class="fa-solid fa-circle-check text-red-500"></i> Thirst & Frequent Urination</li>
+                <li class="flex items-center gap-3 text-sm font-semibold text-gray-600"><i class="fa-solid fa-circle-check text-red-500"></i> Slow Wound Healing</li>
+                <li class="flex items-center gap-3 text-sm font-semibold text-gray-600"><i class="fa-solid fa-circle-check text-red-500"></i> Persistent Fatigue</li>
+                <li class="flex items-center gap-3 text-sm font-semibold text-gray-600"><i class="fa-solid fa-circle-check text-red-500"></i> Numbness in Hands/Feet</li>
+            </ul>
+        </div>
+        <button onclick="openAbout('warning')" class="w-full py-4 bg-[--navy] text-white rounded-2xl font-bold hover:bg-black transition-all flex items-center justify-center gap-2 shadow-lg shadow-slate-200">
+            Check Symptoms <i class="fa-solid fa-chevron-right text-xs"></i>
+        </button>
+    </div>
+
+    <div class="suggestion-card p-8 flex flex-col justify-between bg-white rounded-[28px] border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 min-h-[500px]">
+        <div>
+            <div class="icon-box w-14 h-14 rounded-2xl bg-indigo-50 flex items-center justify-center mb-6">
+                <i class="fa-solid fa-calendar-check text-2xl text-indigo-600"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-[--navy] mb-3 tracking-tight">Daily Routine</h2>
+            <p class="text-gray-500 text-sm mb-6 leading-relaxed">Consistency in your schedule improves natural insulin sensitivity.</p>
+            <ul class="space-y-3 mb-8">
+                <li class="flex items-center gap-3 text-sm font-semibold text-gray-600"><i class="fa-solid fa-circle-check text-indigo-500"></i> Fixed Meal Timings</li>
+                <li class="flex items-center gap-3 text-sm font-semibold text-gray-600"><i class="fa-solid fa-circle-check text-indigo-500"></i> Regular Glucose Checks</li>
+                <li class="flex items-center gap-3 text-sm font-semibold text-gray-600"><i class="fa-solid fa-circle-check text-indigo-500"></i> Post-Meal Active Walks</li>
+                <li class="flex items-center gap-3 text-sm font-semibold text-gray-600"><i class="fa-solid fa-circle-check text-indigo-500"></i> No-Skip Breakfast Rule</li>
+            </ul>
+        </div>
+        <button onclick="openAbout('routine')" class="w-full py-4 bg-[--navy] text-white rounded-2xl font-bold hover:bg-black transition-all flex items-center justify-center gap-2 shadow-lg shadow-slate-200">
+            View Schedule <i class="fa-solid fa-chevron-right text-xs"></i>
+        </button>
+    </div>
+
+    <div class="suggestion-card p-8 flex flex-col justify-between bg-white rounded-[28px] border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 min-h-[500px]">
+        <div>
+            <div class="icon-box w-14 h-14 rounded-2xl bg-teal-50 flex items-center justify-center mb-6">
+                <i class="fa-solid fa-clipboard-list text-2xl text-teal-600"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-[--navy] mb-3 tracking-tight">Monitoring</h2>
+            <p class="text-gray-500 text-sm mb-6 leading-relaxed">Proactive tracking screenings help detect complications early.</p>
+            <ul class="space-y-3 mb-8">
+                <li class="flex items-center gap-3 text-sm font-semibold text-gray-600"><i class="fa-solid fa-circle-check text-teal-500"></i> HbA1c (Every 3 Months)</li>
+                <li class="flex items-center gap-3 text-sm font-semibold text-gray-600"><i class="fa-solid fa-circle-check text-teal-500"></i> Blood Sugar Logs</li>
+                <li class="flex items-center gap-3 text-sm font-semibold text-gray-600"><i class="fa-solid fa-circle-check text-teal-500"></i> Eye & Foot Exams</li>
+                <li class="flex items-center gap-3 text-sm font-semibold text-gray-600"><i class="fa-solid fa-circle-check text-teal-500"></i> Kidney/Lipid (Yearly)</li>
+            </ul>
+        </div>
+        <button onclick="openAbout('monitoring')" class="w-full py-4 bg-[--navy] text-white rounded-2xl font-bold hover:bg-black transition-all flex items-center justify-center gap-2 shadow-lg shadow-slate-200">
+            Full Checklist <i class="fa-solid fa-chevron-right text-xs"></i>
+        </button>
+    </div>
+
+    <div class="suggestion-card p-8 flex flex-col justify-between bg-white rounded-[28px] border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 min-h-[500px]">
+        <div>
+            <div class="icon-box w-14 h-14 rounded-2xl bg-emerald-50 flex items-center justify-center mb-6">
+                <i class="fa-solid fa-gauge-high text-2xl text-emerald-600"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-[--navy] mb-3 tracking-tight">Target Levels</h2>
+            <p class="text-gray-500 text-sm mb-6 leading-relaxed">Recommended ranges for long-term health and metabolic control.</p>
+            <ul class="space-y-3 mb-8">
+                <li class="flex items-center gap-3 text-sm font-semibold text-gray-600"><i class="fa-solid fa-circle-check text-emerald-500"></i> Fasting: 80–130 mg/dL</li>
+                <li class="flex items-center gap-3 text-sm font-semibold text-gray-600"><i class="fa-solid fa-circle-check text-emerald-500"></i> Post-Meal: < 180 mg/dL</li>
+                <li class="flex items-center gap-3 text-sm font-semibold text-gray-600"><i class="fa-solid fa-circle-check text-emerald-500"></i> HbA1c Goal: Below 7%</li>
+                <li class="flex items-center gap-3 text-sm font-semibold text-gray-600"><i class="fa-solid fa-circle-check text-emerald-500"></i> BP: Below 140/90 mmHg</li>
+            </ul>
+        </div>
+        <button onclick="openAbout('targets')" class="w-full py-4 bg-[--navy] text-white rounded-2xl font-bold hover:bg-black transition-all flex items-center justify-center gap-2 shadow-lg shadow-slate-200">
+            View Targets <i class="fa-solid fa-chevron-right text-xs"></i>
+        </button>
+    </div>
+
+    <div class="suggestion-card p-8 flex flex-col justify-between bg-white rounded-[28px] border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 min-h-[500px]">
+        <div>
+            <div class="icon-box w-14 h-14 rounded-2xl bg-amber-50 flex items-center justify-center mb-6">
+                <i class="fa-solid fa-pills text-2xl text-amber-600"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-[--navy] mb-3 tracking-tight">Safety Protocol</h2>
+            <p class="text-gray-500 text-sm mb-6 leading-relaxed">Essential protocols to prevent dangerous blood sugar fluctuations.</p>
+            <ul class="space-y-3 mb-8">
+                <li class="flex items-center gap-3 text-sm font-semibold text-gray-600"><i class="fa-solid fa-circle-check text-amber-500"></i> Consistent Daily Timings</li>
+                <li class="flex items-center gap-3 text-sm font-semibold text-gray-600"><i class="fa-solid fa-circle-check text-amber-500"></i> Proper Insulin Storage</li>
+                <li class="flex items-center gap-3 text-sm font-semibold text-gray-600"><i class="fa-solid fa-circle-check text-amber-500"></i> Hypoglycemia Awareness</li>
+                <li class="flex items-center gap-3 text-sm font-semibold text-gray-600"><i class="fa-solid fa-circle-check text-amber-500"></i> No Sudden Dose Changes</li>
+            </ul>
+        </div>
+        <button onclick="openAbout('medication')" class="w-full py-4 bg-[--navy] text-white rounded-2xl font-bold hover:bg-black transition-all flex items-center justify-center gap-2 shadow-lg shadow-slate-200">
+            Safety Guide <i class="fa-solid fa-chevron-right text-xs"></i>
+        </button>
+    </div>
+
+</div>
+        <!-- Non-Diabetes Cards -->
+        <div id="nondiabetes-section" class="hidden max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 animate-fade-in">
+
+    <div class="suggestion-card p-8 flex flex-col justify-between bg-white rounded-[28px] border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 min-h-[500px]">
+        <div class="flex-1">
+            <div class="icon-box w-14 h-14 rounded-2xl bg-emerald-50 flex items-center justify-center mb-6">
+                <i class="fa-solid fa-leaf text-2xl text-emerald-600"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-[--navy] mb-3 tracking-tight">Healthy Eating</h2>
+            <p class="text-gray-500 text-sm mb-6 leading-relaxed">Focus on a nutrient-rich diet to maintain energy and long-term metabolic health.</p>
+            <ul class="space-y-3 mb-8">
+                <li class="flex items-center gap-3 text-sm font-semibold text-gray-600"><i class="fa-solid fa-circle-check text-emerald-500"></i> Whole Grains & Millets</li>
+                <li class="flex items-center gap-3 text-sm font-semibold text-gray-600"><i class="fa-solid fa-circle-check text-emerald-500"></i> High Fiber Green Salads</li>
+                <li class="flex items-center gap-3 text-sm font-semibold text-gray-600"><i class="fa-solid fa-circle-check text-emerald-500"></i> Low-fat Dairy & Proteins</li>
+                <li class="flex items-center gap-3 text-sm font-semibold text-gray-600"><i class="fa-solid fa-circle-check text-emerald-500"></i> Portion Control Habits</li>
+            </ul>
+        </div>
+        <button onclick="openAbout('healthyEating')" class="w-full h-[56px] bg-[--navy] text-white rounded-2xl font-bold hover:bg-black transition-all flex items-center justify-center gap-2 shadow-lg shadow-slate-200">
+            View Details <i class="fa-solid fa-chevron-right text-xs"></i>
+        </button>
+    </div>
+
+    <div class="suggestion-card p-8 flex flex-col justify-between bg-white rounded-[28px] border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 min-h-[500px]">
+        <div class="flex-1">
+            <div class="icon-box w-14 h-14 rounded-2xl bg-blue-50 flex items-center justify-center mb-6">
+                <i class="fa-solid fa-person-running text-2xl text-blue-600"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-[--navy] mb-3 tracking-tight">Physical Activity</h2>
+            <p class="text-gray-500 text-sm mb-6 leading-relaxed">Regular movement is the most effective way to prevent future chronic conditions.</p>
+            <ul class="space-y-3 mb-8">
+                <li class="flex items-center gap-3 text-sm font-semibold text-gray-600"><i class="fa-solid fa-circle-check text-blue-500"></i> 150 min Brisk Walking / Week</li>
+                <li class="flex items-center gap-3 text-sm font-semibold text-gray-600"><i class="fa-solid fa-circle-check text-blue-500"></i> Muscle Strengthening (2 days)</li>
+                <li class="flex items-center gap-3 text-sm font-semibold text-gray-600"><i class="fa-solid fa-circle-check text-blue-500"></i> Flexibility & Yoga Exercises</li>
+                <li class="flex items-center gap-3 text-sm font-semibold text-gray-600"><i class="fa-solid fa-circle-check text-blue-500"></i> Aim for 8k - 10k Steps daily</li>
+            </ul>
+        </div>
+        <button onclick="openAbout('physicalActivity')" class="w-full h-[56px] bg-[--navy] text-white rounded-2xl font-bold hover:bg-black transition-all flex items-center justify-center gap-2 shadow-lg shadow-slate-200">
+            View Details <i class="fa-solid fa-chevron-right text-xs"></i>
+        </button>
+    </div>
+
+    <div class="suggestion-card p-8 flex flex-col justify-between bg-white rounded-[28px] border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 min-h-[500px]">
+        <div class="flex-1">
+            <div class="icon-box w-14 h-14 rounded-2xl bg-violet-50 flex items-center justify-center mb-6">
+                <i class="fa-solid fa-list-check text-2xl text-violet-600"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-[--navy] mb-3 tracking-tight">Do’s & Don’ts</h2>
+            <p class="text-gray-500 text-sm mb-6 leading-relaxed">Small daily adjustments to your lifestyle can lead to massive health improvements.</p>
+            <ul class="space-y-3 mb-8">
+                <li class="flex items-center gap-3 text-sm font-semibold text-gray-600"><i class="fa-solid fa-circle-xmark text-red-500"></i> Avoid Late-night Heavy Meals</li>
+                <li class="flex items-center gap-3 text-sm font-semibold text-gray-600"><i class="fa-solid fa-circle-xmark text-red-500"></i> Limit Refined Flour & Sugars</li>
+                <li class="flex items-center gap-3 text-sm font-semibold text-gray-600"><i class="fa-solid fa-circle-check text-emerald-500"></i> Track Body Weight Regularly</li>
+                <li class="flex items-center gap-3 text-sm font-semibold text-gray-600"><i class="fa-solid fa-circle-check text-emerald-500"></i> Drink 3-4 Liters of Water</li>
+            </ul>
+        </div>
+        <button onclick="openAbout('dosDonts')" class="w-full h-[56px] bg-[--navy] text-white rounded-2xl font-bold hover:bg-black transition-all flex items-center justify-center gap-2 shadow-lg shadow-slate-200">
+            View Details <i class="fa-solid fa-chevron-right text-xs"></i>
+        </button>
+    </div>
+
+    <div class="suggestion-card p-8 flex flex-col justify-between bg-white rounded-[28px] border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 min-h-[500px]">
+        <div class="flex-1">
+            <div class="icon-box w-14 h-14 rounded-2xl bg-rose-50 flex items-center justify-center mb-6">
+                <i class="fa-solid fa-shield-heart text-2xl text-rose-600"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-[--navy] mb-3 tracking-tight">Risk Reduction</h2>
+            <p class="text-gray-500 text-sm mb-6 leading-relaxed">Understand how to keep chronic metabolic conditions at bay effectively.</p>
+            <ul class="space-y-3 mb-8">
+                <li class="flex items-center gap-3 text-sm font-semibold text-gray-600"><i class="fa-solid fa-circle-check text-rose-500"></i> Maintain Healthy Waist Size</li>
+                <li class="flex items-center gap-3 text-sm font-semibold text-gray-600"><i class="fa-solid fa-circle-check text-rose-500"></i> Quit Tobacco & Smoking</li>
+                <li class="flex items-center gap-3 text-sm font-semibold text-gray-600"><i class="fa-solid fa-circle-check text-rose-500"></i> Annual Lipid Profile Tests</li>
+                <li class="flex items-center gap-3 text-sm font-semibold text-gray-600"><i class="fa-solid fa-circle-check text-rose-500"></i> Early Detection Screenings</li>
+            </ul>
+        </div>
+        <button onclick="openAbout('riskReduction')" class="w-full h-[56px] bg-[--navy] text-white rounded-2xl font-bold hover:bg-black transition-all flex items-center justify-center gap-2 shadow-lg shadow-slate-200">
+            View Tips <i class="fa-solid fa-chevron-right text-xs"></i>
+        </button>
+    </div>
+
+    <div class="suggestion-card p-8 flex flex-col justify-between bg-white rounded-[28px] border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 min-h-[500px]">
+        <div class="flex-1">
+            <div class="icon-box w-14 h-14 rounded-2xl bg-orange-50 flex items-center justify-center mb-6">
+                <i class="fa-solid fa-dna text-2xl text-orange-600"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-[--navy] mb-3 tracking-tight">Prediabetes Risk</h2>
+            <p class="text-gray-500 text-sm mb-6 leading-relaxed">Know the signs and risk factors to reverse potential diabetes early.</p>
+            <ul class="space-y-3 mb-8">
+                <li class="flex items-center gap-3 text-sm font-semibold text-gray-600"><i class="fa-solid fa-circle-check text-orange-500"></i> Family History Screening</li>
+                <li class="flex items-center gap-3 text-sm font-semibold text-gray-600"><i class="fa-solid fa-circle-check text-orange-500"></i> BMI Management (Target 23)</li>
+                <li class="flex items-center gap-3 text-sm font-semibold text-gray-600"><i class="fa-solid fa-circle-check text-orange-500"></i> Blood Pressure Monitoring</li>
+                <li class="flex items-center gap-3 text-sm font-semibold text-gray-600"><i class="fa-solid fa-circle-check text-orange-500"></i> Sedentary Habit Awareness</li>
+            </ul>
+        </div>
+        <button onclick="openAbout('prediabetesRisk')" class="w-full h-[56px] bg-[--navy] text-white rounded-2xl font-bold hover:bg-black transition-all flex items-center justify-center gap-2 shadow-lg shadow-slate-200">
+            Check Risks <i class="fa-solid fa-chevron-right text-xs"></i>
+        </button>
+    </div>
+
+    <div class="suggestion-card p-8 flex flex-col justify-between bg-white rounded-[28px] border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 min-h-[500px]">
+        <div class="flex-1">
+            <div class="icon-box w-14 h-14 rounded-2xl bg-cyan-50 flex items-center justify-center mb-6">
+                <i class="fa-solid fa-brain text-2xl text-cyan-600"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-[--navy] mb-3 tracking-tight">Mental Wellness</h2>
+            <p class="text-gray-500 text-sm mb-6 leading-relaxed">Cortisol (stress hormone) management is key to metabolic balance.</p>
+            <ul class="space-y-3 mb-8">
+                <li class="flex items-center gap-3 text-sm font-semibold text-gray-600"><i class="fa-solid fa-circle-check text-cyan-500"></i> Deep Breathing & Mindfulness</li>
+                <li class="flex items-center gap-3 text-sm font-semibold text-gray-600"><i class="fa-solid fa-circle-check text-cyan-500"></i> Screen-free Sleeping Habits</li>
+                <li class="flex items-center gap-3 text-sm font-semibold text-gray-600"><i class="fa-solid fa-circle-check text-cyan-500"></i> Quality Social Engagement</li>
+                <li class="flex items-center gap-3 text-sm font-semibold text-gray-600"><i class="fa-solid fa-circle-check text-cyan-500"></i> Work-Life Harmony Goals</li>
+            </ul>
+        </div>
+        <button onclick="openAbout('stress')" class="w-full h-[56px] bg-[--navy] text-white rounded-2xl font-bold hover:bg-black transition-all flex items-center justify-center gap-2 shadow-lg shadow-slate-200">
+            View Details <i class="fa-solid fa-chevron-right text-xs"></i>
+        </button>
+    </div>
+
+</div>
+<!-- ================= DETAILS MODAL ================= -->
+<div id="detailsModal" 
+     class="fixed inset-0 bg-[#0f172a]/80 backdrop-blur-md hidden items-center justify-center z-[100] p-4 transition-all duration-300">
+    
+    <div class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-2xl overflow-hidden relative animate-fade-in border border-white/20">
+        
+        <div class="h-2 w-full bg-gradient-to-r from-emerald-400 via-[--navy] to-indigo-500"></div>
+
+        <div class="p-8 md:p-12">
+            <button onclick="closeModal()" 
+                    class="absolute top-8 right-8 w-10 h-10 flex items-center justify-center rounded-full bg-slate-50 text-gray-400 hover:bg-red-50 hover:text-red-500 transition-all duration-200 group">
+                <i class="fa-solid fa-xmark text-xl group-hover:scale-110 transition-transform"></i>
+            </button>
+
+            <div class="mb-8">
+                <h3 id="modalTitle" class="text-3xl md:text-4xl font-extrabold text-[--navy] tracking-tight leading-tight">
+                    </h3>
+                <div class="h-1 w-20 bg-emerald-500 mt-3 rounded-full"></div>
+            </div>
+
+            <div id="modalContent" 
+                 class="text-gray-600 text-lg leading-relaxed space-y-4 max-h-[55vh] overflow-y-auto pr-4 custom-scrollbar">
+                </div>
+
+            <div class="mt-10">
+                <button onclick="closeModal()" 
+                        class="w-full py-4 bg-slate-100 text-[--navy] font-bold text-lg rounded-2xl hover:bg-slate-200 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+                    Close Window
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Tab Switching JS -->
+<script>
+    // Tab Switching Logic
+    const dTab = document.getElementById('diabetes-tab');
+    const ndTab = document.getElementById('nondiabetes-tab');
+    const dSec = document.getElementById('diabetes-section');
+    const ndSec = document.getElementById('nondiabetes-section');
+
+    function toggleTabs(activeBtn, inactiveBtn, activeSec, inactiveSec) {
+        activeBtn.classList.add('active-tab');
+        activeBtn.classList.remove('text-gray-400');
+        inactiveBtn.classList.remove('active-tab');
+        inactiveBtn.classList.add('text-gray-400');
+        activeSec.classList.remove('hidden');
+        inactiveSec.classList.add('hidden');
+    }
+
+    dTab.addEventListener('click', () => toggleTabs(dTab, ndTab, dSec, ndSec));
+    ndTab.addEventListener('click', () => toggleTabs(ndTab, dTab, ndSec, dSec));
+
+
+
+const aboutData = {
+
+    food: {
+        title: "Recommended Indian Foods for Diabetes",
+        content: `
+        <p>
+            Choosing the right Indian foods helps control blood sugar and prevent complications. Focus on low-GI, high-fiber foods.
+          </p>
+          
+          <h4 class="font-semibold text-gray-800 mt-4">✅ Best Foods</h4>
+          <ul class="list-disc pl-5 mt-2">
+            <li>Whole grains (ragi, oats, jowar)</li>
+            <li>Protein-rich dals & legumes</li>
+            <li>Green vegetables</li>
+            <li>Low-GI fruits (guava, apple)</li>
+            <li>Nuts & seeds (in moderation)</li>
+          </ul>
+          
+          <h4 class="font-semibold text-gray-800 mt-4">⚠️ Limit</h4>
+          <ul class="list-disc pl-5 mt-2">
+            <li>White rice, maida, sweets</li>
+            <li>Sugary drinks</li>
+            <li>Fried & fast food</li>
+          </ul>
+          
+       
+        `
+    },
+
+    warning: {
+        title: "Common Warning Signs of Diabetes",
+        content: `
+        <p>
+            Diabetes symptoms often develop slowly and may be ignored.
+            Early detection helps prevent serious complications.
+        </p>
+
+        <ul class="list-disc pl-5 space-y-1 mt-3">
+            <li>Frequent urination and excessive thirst</li>
+            <li>Unexplained weight loss or constant fatigue</li>
+            <li>Blurred vision or frequent headaches</li>
+            <li>Numbness, tingling, or burning sensation in hands & feet</li>
+            <li>Slow wound healing or frequent infections</li>
+        </ul>
+
+        <p class="mt-3 text-red-600 font-medium">
+            If these symptoms persist, consult a doctor without delay.
+        </p>
+        `
+    },
+
+    routine: {
+        title: "Daily Routine Tips for Diabetes Control",
+        content: `
+        <p>
+            A disciplined daily routine plays a key role in stabilizing
+            blood sugar levels and improving insulin sensitivity.
+        </p>
+
+        <ul class="list-disc pl-5 space-y-1 mt-3">
+            <li>Eat meals at fixed timings every day</li>
+            <li>Never skip breakfast</li>
+            <li>Check fasting & post-meal sugar regularly</li>
+            <li>Walk 20–30 minutes after meals</li>
+            <li>Sleep at least 7–8 hours daily</li>
+        </ul>
+
+        <p class="mt-3">
+            Consistency in routine is more important than intensity.
+        </p>
+        `
+    },
+
+    monitoring: {
+        title: "Diabetes Monitoring Checklist",
+        content: `
+        <p>
+            Regular monitoring helps identify health risks early
+            and ensures effective diabetes management.
+        </p>
+
+        <ul class="list-disc pl-5 space-y-1 mt-3">
+            <li>Fasting & post-meal glucose check (weekly)</li>
+            <li>HbA1c test every 3 months</li>
+            <li>Blood pressure monitoring</li>
+            <li>Annual eye examination</li>
+            <li>Foot examination to prevent ulcers</li>
+        </ul>
+
+        <p class="mt-3">
+            Maintain a health diary and share it during doctor visits.
+        </p>
+        `
+    },
+
+    targets: {
+        title: "Target Blood Sugar Levels",
+        content: `
+        <p>
+            Staying within recommended target ranges
+            reduces the risk of heart, kidney, nerve, and eye complications.
+        </p>
+
+        <ul class="list-disc pl-5 space-y-1 mt-3">
+            <li><b>Fasting glucose:</b> 80–130 mg/dL</li>
+            <li><b>Post-meal (2 hrs):</b> Less than 180 mg/dL</li>
+            <li><b>HbA1c goal:</b> Below 7% (individualized)</li>
+            <li><b>Blood pressure:</b> Below 140/90 mmHg</li>
+        </ul>
+
+        <p class="mt-3">
+            Target levels may vary depending on age and health condition.
+        </p>
+        `
+    },
+
+    medication: {
+        title: "Medication & Safety Guidelines",
+        content: `
+        <p>
+            Correct and consistent medication usage is essential
+            for preventing dangerous blood sugar fluctuations.
+        </p>
+
+        <ul class="list-disc pl-5 space-y-1 mt-3">
+            <li>Take medicines at the same time daily</li>
+            <li>Never stop insulin or tablets without medical advice</li>
+            <li>Store insulin safely at 2–8°C</li>
+            <li>Always carry a sugar source for emergencies</li>
+        </ul>
+
+        <p class="mt-3 text-red-600 font-medium">
+            If you experience dizziness, sweating, or confusion —
+            check blood sugar immediately.
+        </p>
+        `
+    }
+
+};
+
+const nonDiabetesData = {
+
+    healthyEating: {
+        title: "Healthy Eating Habits (Non-Diabetes)",
+        content: `
+        <p>
+            A balanced and nutritious diet plays a key role in preventing
+            lifestyle diseases and maintaining long-term health.
+        </p>
+
+        <ul class="list-disc pl-5 mt-3 space-y-2">
+            <li><b>Brown / hand-pounded rice:</b> Rich in fiber, improves digestion and keeps you full longer.</li>
+            <li><b>Sprouts, salads & vegetables:</b> Provide essential vitamins, minerals, and antioxidants.</li>
+            <li><b>Low-fat curd or buttermilk:</b> Supports gut health and immunity.</li>
+            <li><b>Limit sugar & fried foods:</b> Reduces risk of obesity, fatty liver, and heart disease.</li>
+        </ul>
+
+        <p class="mt-3">
+            Eating mindfully and avoiding overeating helps maintain a healthy metabolism.
+        </p>
+        `
+    },
+
+    physicalActivity: {
+        title: "Physical Activity & Fitness",
+        content: `
+        <p>
+            Regular physical activity improves heart health, muscle strength,
+            mental well-being, and overall energy levels.
+        </p>
+
+        <ul class="list-disc pl-5 mt-3 space-y-2">
+            <li><b>8,000–10,000 steps daily:</b> Helps maintain healthy weight and cardiovascular fitness.</li>
+            <li><b>Yoga & breathing exercises:</b> Improve flexibility, posture, and stress control.</li>
+            <li><b>Strength training (2x/week):</b> Builds muscle mass and improves bone density.</li>
+            <li><b>7–8 hours quality sleep:</b> Essential for muscle recovery and hormonal balance.</li>
+        </ul>
+
+        <p class="mt-3">
+            Consistency is more important than intensity for long-term benefits.
+        </p>
+        `
+    },
+
+    dosDonts: {
+        title: "Do’s & Don’ts for Healthy Living",
+        content: `
+        <p>
+            Following simple daily habits can significantly reduce the risk
+            of chronic diseases and improve quality of life.
+        </p>
+
+        <ul class="list-disc pl-5 mt-3 space-y-2">
+            <li><b>Avoid sugary drinks:</b> Prevents excess calorie intake and weight gain.</li>
+            <li><b>Reduce screen time:</b> Protects eye health and improves sleep quality.</li>
+            <li><b>Manage stress effectively:</b> Helps control blood pressure and mental health.</li>
+            <li><b>Do not ignore weight gain:</b> Early action prevents future health issues.</li>
+        </ul>
+
+        <p class="mt-3">
+            Small lifestyle changes done consistently create big health benefits.
+        </p>
+        `
+    },
+
+    riskReduction: {
+        title: "Risk Reduction Tips",
+        content: `
+        <p>
+            Reducing health risks early helps prevent future complications
+            and supports long-term wellness.
+        </p>
+
+        <ul class="list-disc pl-5 mt-3 space-y-2">
+            <li><b>Maintain a healthy BMI:</b> Lowers risk of diabetes, heart disease, and joint problems.</li>
+            <li><b>Quit smoking & alcohol:</b> Improves lung, liver, and heart health.</li>
+            <li><b>Stay physically active:</b> Keeps metabolism strong and energy levels high.</li>
+            <li><b>Regular health checkups:</b> Helps detect problems early.</li>
+        </ul>
+
+        <p class="mt-3">
+            Prevention is always better and cheaper than treatment.
+        </p>
+        `
+    },
+
+    prediabetesRisk: {
+        title: "Prediabetes Risk Factors",
+        content: `
+        <p>
+            Identifying risk factors early helps take preventive action
+            before diabetes develops.
+        </p>
+
+        <ul class="list-disc pl-5 mt-3 space-y-2">
+            <li><b>Family history of diabetes:</b> Genetic risk requires extra lifestyle care.</li>
+            <li><b>Overweight (BMI &gt; 25):</b> Increases insulin resistance.</li>
+            <li><b>Sedentary lifestyle:</b> Reduces insulin sensitivity.</li>
+            <li><b>PCOS or gestational diabetes:</b> Higher risk of future diabetes.</li>
+        </ul>
+
+        <p class="mt-3">
+            Early lifestyle modification can completely reverse prediabetes.
+        </p>
+        `
+    },
+
+    stress: {
+        title: "Stress & Mental Wellness",
+        content: `
+        <p>
+            Mental health is as important as physical health.
+            Chronic stress can lead to sleep disorders, anxiety, and lifestyle diseases.
+        </p>
+
+        <ul class="list-disc pl-5 mt-3 space-y-2">
+            <li><b>Meditation 10–15 min/day:</b> Improves focus and emotional balance.</li>
+            <li><b>Avoid chronic sleep deprivation:</b> Essential for brain recovery.</li>
+            <li><b>Limit caffeine intake:</b> Prevents anxiety and sleep disruption.</li>
+            <li><b>Seek counseling:</b> Professional help is important if stress persists.</li>
+        </ul>
+
+        <p class="mt-3">
+            A calm mind leads to a healthier and happier life.
+        </p>
+        `
+    }
+};
+
+
+/* ================= UPDATED OPEN FUNCTION ================= */
+function openAbout(type) {
+
+    // diabetes data already exists
+    if (typeof aboutData !== "undefined" && aboutData[type]) {
+        document.getElementById("modalTitle").innerText = aboutData[type].title;
+        document.getElementById("modalContent").innerHTML = aboutData[type].content;
+    }
+
+    // non-diabetes data
+    else if (nonDiabetesData[type]) {
+        document.getElementById("modalTitle").innerText = nonDiabetesData[type].title;
+        document.getElementById("modalContent").innerHTML = nonDiabetesData[type].content;
+    }
+
+    document.getElementById("detailsModal").classList.remove("hidden");
+    document.getElementById("detailsModal").classList.add("flex");
+}
+
+function closeModal() {
+    document.getElementById("detailsModal").classList.add("hidden");
+    document.getElementById("detailsModal").classList.remove("flex");
+}
+</script>
+
+
+{% endblock %}

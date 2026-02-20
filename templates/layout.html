@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DPS | Healthcare Portal</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    
+    <style>
+        /* Sirf Main content ko scrollable banane ke liye essential CSS */
+        body {
+            height: 100vh;
+            overflow: hidden; /* Body scroll nahi hogi */
+            display: flex;
+            flex-direction: column;
+        }
+
+        .main-content {
+            flex: 1; /* Baki bachi hui space le lega */
+            overflow-y: auto; /* Sirf yahan scroll bar aayega */
+            padding-top: 5rem; /* Navbar height ki space */
+            padding-bottom: 4rem; /* Footer height ki space */
+        }
+
+        /* Clean Scrollbar for Main Content */
+        .main-content::-webkit-scrollbar {
+            width: 6px;
+        }
+        .main-content::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+
+<body class="bg-pattern">
+
+  <nav class="fixed top-0 left-0 w-full z-50 bg-white/80 backdrop-blur-xl border-b border-slate-100 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center h-20">
+
+            <!-- LOGO -->
+            <a href="/login" class="flex items-center gap-3 group">
+                <div class="logo-box p-2 rounded-xl bg-emerald-50 group-hover:bg-emerald-100 transition">
+                    <i class="fa-solid fa-heart-pulse text-emerald-500 text-2xl group-hover:scale-110 transition-transform"></i>
+                </div>
+
+                <span class="font-extrabold text-2xl sm:text-3xl tracking-wide 
+                             bg-gradient-to-r from-slate-900 to-emerald-600 
+                             bg-clip-text text-transparent">
+                    DPS<span class="text-emerald-500"></span>
+                </span>
+            </a>
+
+            <!-- ACTIONS -->
+            <div class="flex items-center gap-6">
+
+                {% if session.get('loggedin') %}
+
+                    <!-- PROFILE -->
+                    <a href="{{ url_for('profile') }}"
+                       class="flex items-center gap-2 text-xs sm:text-sm font-bold uppercase tracking-widest
+                              text-slate-500 hover:text-emerald-600 transition">
+                        <i class="fa-solid fa-user-circle text-lg"></i>
+                        <span class="hidden sm:inline">Profile</span>
+                    </a>
+
+                    <!-- LOGOUT -->
+                    <a href="{{ url_for('logout') }}"
+                       class="flex items-center gap-2 bg-red-50 text-red-600 px-4 py-2 rounded-xl
+                              text-xs sm:text-sm font-bold uppercase tracking-widest
+                              hover:bg-red-100 transition shadow-sm">
+                        Logout
+                        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                    </a>
+
+                {% else %}
+
+                    <!-- LOGIN -->
+                    <!-- LOGIN -->
+<a href="{{ url_for('login') }}"
+class="px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-bold uppercase tracking-widest
+       transition-all duration-300 ease-in-out
+       {% if request.endpoint == 'login' %}
+         bg-gradient-to-r from-slate-300 to-slate-400 text-slate-900 shadow-md
+       {% else %}
+       bg-white text-slate-400 hover:bg-gradient-to-r hover:from-emerald-600 hover:to-slate-900 hover:text-white hover:shadow-md
+       {% endif %}">
+ Login
+</a>
+
+<!-- SIGN UP -->
+<a href="{{ url_for('register') }}"
+class="px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-bold uppercase tracking-widest
+       transition-all duration-300 ease-in-out
+       {% if request.endpoint == 'register' %}
+         bg-gradient-to-r from-emerald-500 to-emerald-700 text-white shadow-md
+       {% else %}
+         bg-white text-slate-400 hover:bg-gradient-to-r hover:from-emerald-600 hover:to-slate-900 hover:text-white hover:shadow-md
+       {% endif %}">
+ Sign Up
+</a>
+
+                {% endif %}
+
+            </div>
+        </div>
+    </div>
+</nav>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+<div class="toast-container fixed top-24 right-6 z-[60]">
+    {% for category, message in messages %}
+        <div class="toast-card {% if category in ['error', 'danger'] %} toast-error {% else %} toast-success {% endif %} animate-slide-in mb-3">
+            <div class="w-10 h-10 rounded-full flex items-center justify-center 
+                {% if category in ['error', 'danger'] %} bg-red-50 text-red-500 {% else %} bg-emerald-50 text-emerald-500 {% endif %}">
+                <i class="fa-solid {% if category in ['error', 'danger'] %} fa-circle-exclamation {% else %} fa-circle-check {% endif %}"></i>
+            </div>
+            <div class="flex-1">
+                <p class="toast-title">{% if category in ['error', 'danger'] %} Error {% else %} Success {% endif %}</p>
+                <p class="toast-msg text-xs">{{ message }}</p>
+            </div>
+            <button onclick="this.closest('.toast-card').remove()" class="text-slate-300 hover:text-slate-600">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endwith %}
+
+<main class="main-content">
+    <div class="content-wrapper max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        {% block content %}{% endblock %}
+    </div>
+</main>
+
+<footer class="footer fixed bottom-0 left-0 w-full bg-white/80 backdrop-blur-md border-t border-slate-100 z-50">
+    <div class="max-w-7xl mx-auto px-4 h-16 flex justify-between items-center">
+        <p class="text-gray-500 text-sm">
+            &copy; 2026 DPS. All rights reserved.</p>
+
+        <div class="footer-socials flex gap-4">
+            <a href="https://github.com/raxitsolanki" class="text-slate-400 hover:text-emerald-500 transition"><i class="fa-brands fa-github text-lg"></i></a>
+            <a href="#" class="text-slate-400 hover:text-emerald-500 transition"><i class="fa-brands fa-twitter text-xl"></i></a>
+            <a href="https://www.linkedin.com/in/raxit-solanki-5a1021280/" class="text-slate-400 hover:text-emerald-500 transition"><i class="fa-brands fa-linkedin text-lg"></i></a>
+        </div>
+    </div>
+</footer>
+
+</body>
+</html>
