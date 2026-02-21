@@ -1,14 +1,24 @@
 Flask==2.3.2
 gunicorn==23.0.0
 
+# Database
 mysql-connector-python==9.1.0
 
+# OAuth / Authentication
 authlib==1.6.6
 requests==2.32.4
 
+# Machine Learning
 numpy==1.26.4
+pandas==2.3.3
+scikit-learn==1.6.1
 joblib==1.2.0
 
+# OpenCV (Server Safe Version)
+opencv-python-headless==4.8.1.78
+
+# PDF Generation
 reportlab==4.4.5
 
+# Security / Utilities
 Werkzeug==3.1.3
