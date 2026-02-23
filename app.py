@@ -64,14 +64,11 @@ def get_db_connection():
         return None
 
 # ================= EMAIL FUNCTION =================
-import smtplib
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
-from email.mime.application import MIMEApplication
-
 def send_email(to_email, subject, message, attachment_bytes=None, attachment_filename=None):
-    sender_email = "dpshealth26@gmail.com"
-    sender_password = "tqxm dyeu qtld xsdp" 
+    
+
+    sender_email = os.environ.get("EMAIL_USER")
+    sender_password = os.environ.get("EMAIL_PASS") 
 
     msg = MIMEMultipart()
     msg['From'] = sender_email
@@ -85,17 +82,16 @@ def send_email(to_email, subject, message, attachment_bytes=None, attachment_fil
         msg.attach(part)
 
     try:
-        # Port 587 is the standard for STARTTLS
-        server = smtplib.SMTP('smtp.gmail.com', 587) 
+        server = smtplib.SMTP('smtp.gmail.com', 587)
+        server.set_debuglevel(1) # Optional: helps you see logs in Render
         server.starttls() 
         server.login(sender_email, sender_password)
         server.send_message(msg)
         server.quit()
-        print("Email sent successfully!")
+        return True # Helpful for your route logic
     except Exception as e:
-        print("Email sending failed:", e)
-        raise e
-
+        print(f"SMTP Error: {e}")
+        return False
 # ================= OTP FUNCTIONS =================
 def generate_otp():
     return str(random.randint(100000, 999999))
