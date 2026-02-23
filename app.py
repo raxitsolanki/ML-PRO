@@ -64,16 +64,23 @@ def get_db_connection():
         return None
 
 # ================= EMAIL FUNCTION =================
-def send_email(to_email, subject, message, attachment_bytes=None, attachment_filename=None):
-    
+import smtplib
+import os
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.mime.application import MIMEApplication
 
-    sender_email = os.environ.get("EMAIL_USER")
-    sender_password = os.environ.get("EMAIL_PASS") 
+def send_email(to_email, subject, message, attachment_bytes=None, attachment_filename=None):
+    # Render Environment Variables use karein (Security ke liye best hai)
+    sender_email = os.environ.get("EMAIL_USER", "dpshealth26@gmail.com")
+    sender_password = os.environ.get("EMAIL_PASS", "tqxm dyeu qtld xsdp") 
 
     msg = MIMEMultipart()
     msg['From'] = sender_email
     msg['To'] = to_email
     msg['Subject'] = subject
+    
+    # HTML message attach karein
     msg.attach(MIMEText(message, 'html'))
 
     if attachment_bytes and attachment_filename:
@@ -82,13 +89,14 @@ def send_email(to_email, subject, message, attachment_bytes=None, attachment_fil
         msg.attach(part)
 
     try:
+        # FIX: Port 587 use karein STARTTLS ke saath
         server = smtplib.SMTP('smtp.gmail.com', 587)
-        server.set_debuglevel(1) # Optional: helps you see logs in Render
-        server.starttls() 
+        server.starttls() # Connection ko secure banata hai
         server.login(sender_email, sender_password)
         server.send_message(msg)
         server.quit()
-        return True # Helpful for your route logic
+        print("Email sent successfully!")
+        return True
     except Exception as e:
         print(f"SMTP Error: {e}")
         return False
