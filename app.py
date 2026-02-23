@@ -65,6 +65,11 @@ def home():
     return redirect(url_for('login'))
 
 
+from flask import Flask, request, render_template, redirect, url_for, flash, session
+from werkzeug.security import generate_password_hash, check_password_hash
+import psycopg2
+from psycopg2.extras import RealDictCursor # Dictionary support ke liye
+
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
@@ -74,49 +79,54 @@ def register():
 
         hashed_password = generate_password_hash(password)
 
-        conn = get_db_connection()
-        cursor = conn.cursor(dictionary=True)
+        try:
+            conn = get_db_connection()
+            # PostgreSQL ke liye RealDictCursor use karein
+            cursor = conn.cursor(cursor_factory=RealDictCursor)
 
-        # Check email already exists
-        cursor.execute("SELECT id FROM userss WHERE email=%s", (email,))
-        if cursor.fetchone():
-            flash("Email already registered!", "danger")
+            # 1. Check if email exists (Table name: userss)
+            cursor.execute("SELECT id FROM userss WHERE email=%s", (email,))
+            if cursor.fetchone():
+                flash("Email already registered!", "danger")
+                return redirect(url_for('register'))
+
+            # 2. Insert into Table (Table name userss hi rakhein)
+            cursor.execute("""
+                INSERT INTO userss (username, email, password)
+                VALUES (%s, %s, %s)
+            """, (username, email, hashed_password))
+
+            conn.commit()
+            cursor.close()
+            conn.close()
+
+            flash("Registration successful! Please login.", "success")
+            return redirect(url_for('login'))
+            
+        except Exception as e:
+            print(f"Error: {e}") # Render logs mein ye dikhega
+            flash("Something went wrong!", "danger")
             return redirect(url_for('register'))
 
-        cursor.execute("""
-            INSERT INTO users (username, email, password)
-            VALUES (%s, %s, %s)
-        """, (username, email, hashed_password))
-
-        conn.commit()
-        cursor.close()
-        conn.close()
-
-        flash("Registration successful! Please login.", "success")
-        return redirect(url_for('login'))
-
     return render_template('register.html')
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['password']
 
         conn = get_db_connection()
-        cursor = conn.cursor(dictionary=True)
+        cursor = conn.cursor(cursor_factory=RealDictCursor)
 
+        # Table name: userss
         cursor.execute("SELECT * FROM userss WHERE email=%s", (email,))
         user = cursor.fetchone()
 
         cursor.close()
         conn.close()
 
-        if not user:
-            flash("Invalid email or password!", "danger")
-            return redirect(url_for('login'))
-
-        if not check_password_hash(user['password'], password):
+        if not user or not check_password_hash(user['password'], password):
             flash("Invalid email or password!", "danger")
             return redirect(url_for('login'))
 
