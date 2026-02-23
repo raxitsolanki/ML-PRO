@@ -78,7 +78,7 @@ def register():
         cursor = conn.cursor(dictionary=True)
 
         # Check email already exists
-        cursor.execute("SELECT id FROM users WHERE email=%s", (email,))
+        cursor.execute("SELECT id FROM userss WHERE email=%s", (email,))
         if cursor.fetchone():
             flash("Email already registered!", "danger")
             return redirect(url_for('register'))
@@ -106,7 +106,7 @@ def login():
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
 
-        cursor.execute("SELECT * FROM users WHERE email=%s", (email,))
+        cursor.execute("SELECT * FROM userss WHERE email=%s", (email,))
         user = cursor.fetchone()
 
         cursor.close()
