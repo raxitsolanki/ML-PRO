@@ -64,9 +64,14 @@ def get_db_connection():
         return None
 
 # ================= EMAIL FUNCTION =================
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.mime.application import MIMEApplication
+
 def send_email(to_email, subject, message, attachment_bytes=None, attachment_filename=None):
     sender_email = "dpshealth26@gmail.com"
-    sender_password = "tqxm dyeu qtld xsdp"  # Gmail App Password
+    sender_password = "tqxm dyeu qtld xsdp" 
 
     msg = MIMEMultipart()
     msg['From'] = sender_email
@@ -78,12 +83,15 @@ def send_email(to_email, subject, message, attachment_bytes=None, attachment_fil
         part = MIMEApplication(attachment_bytes, Name=attachment_filename)
         part['Content-Disposition'] = f'attachment; filename="{attachment_filename}"'
         msg.attach(part)
+
     try:
-        server = smtplib.SMTP('smtp.gmail.com', 465)
-        server.starttls()
+        # Port 587 is the standard for STARTTLS
+        server = smtplib.SMTP('smtp.gmail.com', 587) 
+        server.starttls() 
         server.login(sender_email, sender_password)
         server.send_message(msg)
         server.quit()
+        print("Email sent successfully!")
     except Exception as e:
         print("Email sending failed:", e)
         raise e
