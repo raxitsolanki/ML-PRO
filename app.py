@@ -71,18 +71,22 @@ def send_email(to_email, subject, message, attachment_bytes=None, attachment_fil
     msg['From'] = sender_email
     msg['To'] = to_email
     msg['Subject'] = subject
-    msg.attach(MIMEText(message, 'html'))
+    msg.attach(MIMEText(message, "html"))
 
     if attachment_bytes and attachment_filename:
         part = MIMEApplication(attachment_bytes, Name=attachment_filename)
-        part['Content-Disposition'] = f'attachment; filename="{attachment_filename}"'
+        part["Content-Disposition"] = f'attachment; filename="{attachment_filename}"'
         msg.attach(part)
+
     try:
-        server = smtplib.SMTP('smtp.gmail.com', 587)
-        server.starttls()
-        server.login(sender_email, sender_password)
-        server.send_message(msg)
-        server.quit()
+        context = ssl.create_default_context()
+
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465, context=context, timeout=10) as server:
+            server.login(sender_email, sender_password)
+            server.send_message(msg)
+
+        print("Email sent successfully")
+
     except Exception as e:
         print("Email sending failed:", e)
         raise e
