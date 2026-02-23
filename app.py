@@ -60,6 +60,10 @@ def get_db_connection():
         print("Database connection failed:", e)
         return None
 
+@app.route('/')
+def home():
+    return redirect(url_for('login'))
+
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
