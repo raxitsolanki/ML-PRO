@@ -48,17 +48,15 @@ app.config["RECAPTCHA_SITE_KEY"] = "6Ld8zVEsAAAAAJc2zFhJZhZxvcD1DIi0KrIfFD9Y"
 app.config["RECAPTCHA_SECRET_KEY"] = "6Ld8zVEsAAAAAMY07J_W71tWimYAW1V3FRU8iD5H"
 
 
-# ================= DATABASE CONFIG =================
-db_config = {
-    'host': 'localhost',
-    'user': 'root',
-    'password': 'Rakshit@18',
-    'database': 'studyhub_db'
-}
-
 def get_db_connection():
     try:
-        conn = mysql.connector.connect(**db_config)
+        conn = mysql.connector.connect(
+            host=os.environ.get("DB_HOST"),
+            user=os.environ.get("DB_USER"),
+            password=os.environ.get("DB_PASSWORD"),
+            database=os.environ.get("DB_NAME"),
+            port=int(os.environ.get("DB_PORT")),
+        )
         return conn
     except Error as e:
         print("Database connection failed:", e)
