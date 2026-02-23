@@ -434,109 +434,62 @@ def admin_dashboard():
 
 # ================= VIEW USERS =================
 @app.route('/admin/users')
-@admin_required
+@admin_required   # make sure you have this decorator
 def admin_users():
 
     search = request.args.get('search', '').strip()
     sort = request.args.get('sort', 'latest')
 
-    conn = None
-    cursor = None
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
 
-    try:
-        conn = get_db_connection()
-        cursor = conn.cursor(dictionary=True)
+    # Base Query
+    query = "SELECT id, username, email FROM userss"
+    params = []
 
-        query = """
-            SELECT id, username, email, is_verified, created_at
-            FROM userss
-        """
+    # 🔍 Search Filter
+    if search:
+        query += " WHERE username LIKE %s OR email LIKE %s"
+        like_search = f"%{search}%"
+        params.extend([like_search, like_search])
 
-        conditions = []
-        values = []
+    # 🔽 Sorting
+    if sort == "az":
+        query += " ORDER BY username ASC"
+    elif sort == "za":
+        query += " ORDER BY username DESC"
+    else:
+        query += " ORDER BY id DESC"   # latest first
 
-        # 🔎 SEARCH
-        if search:
-            conditions.append("(username LIKE %s OR email LIKE %s)")
-            values.extend([f"%{search}%", f"%{search}%"])
+    cursor.execute(query, tuple(params))
+    users = cursor.fetchall()
 
-        if conditions:
-            query += " WHERE " + " AND ".join(conditions)
+    cursor.close()
+    conn.close()
 
-        # 🔤 SORTING
-        if sort == "az":
-            query += " ORDER BY username ASC"
-        elif sort == "za":
-            query += " ORDER BY username DESC"
-        elif sort == "latest":
-            query += " ORDER BY created_at DESC"
-        else:
-            query += " ORDER BY id DESC"
-
-        cursor.execute(query, values)
-        users = cursor.fetchall()
-
-        return render_template(
-            'admin/admin_users.html',
-            users=users,
-            search=search,
-            sort=sort
-        )
-
-    except Exception as e:
-        print("Admin Users Error:", e)
-        flash("Unable to load users.", "danger")
-        return redirect(url_for('admin_dashboard'))
-
-    finally:
-        if cursor:
-            cursor.close()
-        if conn:
-            conn.close()
-@app.route('/admin/delete-user/<int:user_id>', methods=['POST'])
+    return render_template(
+        "admin/users.html",
+        users=users,
+        search=search,
+        sort=sort
+    )
+       
+@app.route('/admin/delete_user/<int:user_id>', methods=['POST'])
 @admin_required
 def delete_user(user_id):
 
-    conn = None
-    cursor = None
+    conn = get_db_connection()
+    cursor = conn.cursor()
 
-    try:
-        conn = get_db_connection()
-        cursor = conn.cursor(dictionary=True)
+    cursor.execute("DELETE FROM userss WHERE id = %s", (user_id,))
+    conn.commit()
 
-        # ✅ Check if user exists
-        cursor.execute("SELECT id FROM userss WHERE id = %s", (user_id,))
-        user = cursor.fetchone()
+    cursor.close()
+    conn.close()
 
-        if not user:
-            flash("User not found.", "danger")
-            return redirect(url_for('admin_users'))
+    flash("User deleted successfully!", "success")
 
-        # ✅ Prevent deleting yourself (important security)
-        if session.get('admin_id') == user_id:
-            flash("You cannot delete your own admin account.", "warning")
-            return redirect(url_for('admin_users'))
-
-        # ✅ Delete user
-        cursor.execute("DELETE FROM userss WHERE id = %s", (user_id,))
-        conn.commit()
-
-        flash("User deleted successfully.", "success")
-        return redirect(url_for('admin_users'))
-
-    except Exception as e:
-        if conn:
-            conn.rollback()
-        print("Delete User Error:", e)
-        flash("Something went wrong while deleting user.", "danger")
-        return redirect(url_for('admin_users'))
-
-    finally:
-        if cursor:
-            cursor.close()
-        if conn:
-            conn.close()
-
+    return redirect(url_for('admin_users'))
 # ================= ADMIN LOGOUT =================
 @app.route('/admin/logout')
 @admin_required
