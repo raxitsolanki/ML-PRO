@@ -30,10 +30,7 @@ from flask import request, render_template, session, redirect, url_for
 from feature_extractor import extract_fingerprint_features
 import joblib
 from io import BytesIO
-import smtplib
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
-from email.mime.application import MIMEApplication
+
 
 # Load ML Model & Scaler
 model = pickle.load(open('diabetes_model.pkl', 'rb'))
@@ -63,247 +60,40 @@ def get_db_connection():
         print("Database connection failed:", e)
         return None
 
-# ================= EMAIL FUNCTION =================
-import smtplib
-import os
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
-from email.mime.application import MIMEApplication
 
-def send_email(to_email, subject, message, attachment_bytes=None, attachment_filename=None):
-    # Render Environment Variables use karein (Security ke liye best hai)
-    sender_email = os.environ.get("EMAIL_USER", "dpshealth26@gmail.com")
-    sender_password = os.environ.get("EMAIL_PASS", "tqxm dyeu qtld xsdp") 
-
-    msg = MIMEMultipart()
-    msg['From'] = sender_email
-    msg['To'] = to_email
-    msg['Subject'] = subject
-    
-    # HTML message attach karein
-    msg.attach(MIMEText(message, 'html'))
-
-    if attachment_bytes and attachment_filename:
-        part = MIMEApplication(attachment_bytes, Name=attachment_filename)
-        part['Content-Disposition'] = f'attachment; filename="{attachment_filename}"'
-        msg.attach(part)
-
-    try:
-        # FIX: Port 587 use karein STARTTLS ke saath
-        server = smtplib.SMTP('smtp.gmail.com', 587)
-        server.starttls() # Connection ko secure banata hai
-        server.login(sender_email, sender_password)
-        server.send_message(msg)
-        server.quit()
-        print("Email sent successfully!")
-        return True
-    except Exception as e:
-        print(f"SMTP Error: {e}")
-        return False
-# ================= OTP FUNCTIONS =================
-def generate_otp():
-    return str(random.randint(100000, 999999))
-
-def otp_expiry_time(minutes=5):
-    return datetime.now() + timedelta(minutes=minutes)
-
-# ================= LOGIN REQUIRED DECORATOR =================
-def login_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if 'loggedin' not in session:
-            flash("Please login first!", "warning")
-            return redirect(url_for('login'))
-        return f(*args, **kwargs)
-    return decorated_function
-
-# ================= AUTHLIB GOOGLE OAUTH CONFIG =================
-import os
-from dotenv import load_dotenv
-
-load_dotenv()
-
-oauth = OAuth(app)
-
-google = oauth.register(
-    name='google',
-    client_id=os.getenv("GOOGLE_CLIENT_ID"),
-    client_secret=os.getenv("GOOGLE_CLIENT_SECRET"),
-    server_metadata_url='https://accounts.google.com/.well-known/openid-configuration',
-    client_kwargs={
-        'scope': 'openid email profile'
-    }
-)
-
-# ================= ROUTES =================
-@app.route('/')
-def index():
-    if 'loggedin' in session:
-        return redirect(url_for('dashboard'))
-    return redirect(url_for('login'))
-
-
-# ================= GOOGLE LOGIN =================
-@app.route('/google-login')
-def google_login():
-    try:
-        redirect_uri = url_for('google_authorize', _external=True)
-        return google.authorize_redirect(redirect_uri)
-    except Exception as e:
-        flash("Google login failed. Try again.", "danger")
-        return redirect(url_for('login'))
-
-
-@app.route('/login/google/authorize')
-def google_authorize():
-    try:
-        token = google.authorize_access_token()
-
-        # Always fetch userinfo safely
-        resp = google.get('https://openidconnect.googleapis.com/v1/userinfo')
-
-        if resp.status_code != 200:
-            flash("Failed to fetch Google user info.", "danger")
-            return redirect(url_for('login'))
-
-        user_info = resp.json()
-
-        email = user_info.get('email')
-        name = user_info.get('name', 'User')
-        google_id = user_info.get('sub')  # ✅ FIX HERE
-
-        if not email or not google_id:
-            flash("Failed to retrieve Google account info.", "danger")
-            return redirect(url_for('login'))
-
-        conn = get_db_connection()
-        cursor = conn.cursor(dictionary=True)
-
-        # 1️⃣ Check if user exists via google_id
-        cursor.execute("SELECT * FROM users WHERE google_id=%s", (google_id,))
-        user = cursor.fetchone()
-
-        if not user:
-            # 2️⃣ Check by email
-            cursor.execute("SELECT * FROM users WHERE email=%s", (email,))
-            user = cursor.fetchone()
-
-            if user:
-                cursor.execute(
-                    "UPDATE users SET google_id=%s, is_verified=1 WHERE email=%s",
-                    (google_id, email)
-                )
-            else:
-                cursor.execute(
-                    "INSERT INTO users (username, email, google_id, is_verified) VALUES (%s, %s, %s, 1)",
-                    (name, email, google_id)
-                )
-
-            conn.commit()
-
-            cursor.execute("SELECT * FROM users WHERE email=%s", (email,))
-            user = cursor.fetchone()
-
-        cursor.close()
-        conn.close()
-
-        # ---------------- SESSION ----------------
-       # ---------------- SESSION ----------------
-        session.permanent = True
-        session['loggedin'] = True
-        session['id'] = user['id']          # ✅ THIS FIXES ERROR
-        session['user_email'] = email
-        session['username'] = user['username']
-
-
-        flash(f"Welcome {name}! Logged in with Google.", "success")
-        return redirect(url_for('dashboard'))
-
-    except Exception as e:
-        print("Google OAuth Error:", e)
-        flash("Google login failed. Check console.", "danger")
-        return redirect(url_for('login'))
-
-
-# ================= REGISTER =================
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
         username = request.form['username']
         email = request.form['email']
-        raw_password = request.form['password']
+        password = request.form['password']
 
-        # 🔐 PASSWORD VALIDATION (SERVER SIDE)
-        password_pattern = r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{6,}$'
-
-        if not re.match(password_pattern, raw_password):
-            flash(
-                "Password must be at least 6 characters and include uppercase, lowercase, number & special symbol.",
-                "danger"
-            )
-            return redirect(url_for('register'))
-
-        # Hash password only after validation
-        password = generate_password_hash(raw_password)
-
-        otp = generate_otp()
-        expiry = otp_expiry_time()
+        hashed_password = generate_password_hash(password)
 
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
 
-        # 1️⃣ Check if email already exists
+        # Check email already exists
         cursor.execute("SELECT id FROM users WHERE email=%s", (email,))
         if cursor.fetchone():
             flash("Email already registered!", "danger")
-            cursor.close()
-            conn.close()
             return redirect(url_for('register'))
 
-        # 2️⃣ Send OTP email first
-        subject = "Email Verification OTP"
-        message = f"""
-        <h3 style="color:#5b21b6;">Diabetes Prediction System</h3>
-        <p>Thank you for registering with us!</p>
-        <p>Your One-Time Password (OTP) to verify your email is:</p>
-        <h2 style="color:#5b21b6;">{otp}</h2>
-        <p>This OTP is valid for <b>5 minutes</b>.</p>
-        <p>If you did not register, please ignore this email.</p>
-        """
-
-        try:
-            send_email(email, subject, message)
-        except Exception:
-            flash("Your network is poor. Could not send OTP. Try again later.", "danger")
-            cursor.close()
-            conn.close()
-            return redirect(url_for('register'))
-
-        # 3️⃣ Insert user after successful email
         cursor.execute("""
-            INSERT INTO users (username, email, password, otp, otp_expiry, is_verified)
-            VALUES (%s, %s, %s, %s, %s, 0)
-        """, (username, email, password, otp, expiry))
-        conn.commit()
+            INSERT INTO users (username, email, password)
+            VALUES (%s, %s, %s)
+        """, (username, email, hashed_password))
 
+        conn.commit()
         cursor.close()
         conn.close()
 
-        # 4️⃣ Session for OTP verification
-        session['otp_email'] = email
-        session['otp_type'] = 'verify'
-
-        flash("OTP sent to your email for verification!", "info")
-        return redirect(url_for('verify_otp'))
+        flash("Registration successful! Please login.", "success")
+        return redirect(url_for('login'))
 
     return render_template('register.html')
-
-# ================= LOGIN =================
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    if 'loggedin' in session:
-       return redirect(url_for('dashboard'))
-
 
     if request.method == 'POST':
         email = request.form['email']
@@ -315,313 +105,26 @@ def login():
         cursor.execute("SELECT * FROM users WHERE email=%s", (email,))
         user = cursor.fetchone()
 
-        if not user or not check_password_hash(user['password'], password):
-            flash("Invalid email or password!", "error")
-            cursor.close()
-            conn.close()
-            return redirect(url_for('login'))
-
-        # Email must be verified
-        if user['is_verified'] == 0:
-            flash("Please verify your email first!", "warning")
-            cursor.close()
-            conn.close()
-            return redirect(url_for('login'))
-
-        # Send login OTP
-        otp = generate_otp()
-        expiry = otp_expiry_time()
-
-        cursor.execute(
-            "UPDATE users SET otp=%s, otp_expiry=%s WHERE email=%s",
-            (otp, expiry, email)
-        )
-        conn.commit()
-
-        subject = "Login OTP"
-
-        message = f"""
-<h3 style="color:#5b21b6;">Diabetes Prediction System</h3>
-
-<p>You are trying to <b>login</b> to your account.</p>
-
-<p>Your One-Time Password (OTP) is:</p>
-<h2 style="color:#5b21b6;">{otp}</h2>
-
-<p>This OTP is valid for <b>5 minute</b>.</p>
-
-<p>If you did not try to login, please ignore this email.</p>
-"""
-        send_email(email, subject, message)
-
-        session['otp_email'] = email
-        session['otp_type'] = 'login'
-
         cursor.close()
         conn.close()
 
-        flash("OTP sent to your email. Please verify to login.", "info")
-        return redirect(url_for('verify_otp'))
+        if not user:
+            flash("Invalid email or password!", "danger")
+            return redirect(url_for('login'))
+
+        if not check_password_hash(user['password'], password):
+            flash("Invalid email or password!", "danger")
+            return redirect(url_for('login'))
+
+        session['loggedin'] = True
+        session['id'] = user['id']
+        session['username'] = user['username']
+
+        flash("Login successful!", "success")
+        return redirect(url_for('dashboard'))
 
     return render_template('login.html')
 
-# ================= FORGOT PASSWORD =================
-@app.route('/forgot-password', methods=['GET', 'POST'])
-def forgot_password():
-    if request.method == 'POST':
-        email = request.form['email']
-
-        conn = get_db_connection()
-        cursor = conn.cursor(dictionary=True)
-
-        cursor.execute("SELECT id FROM users WHERE email=%s", (email,))
-        user = cursor.fetchone()
-
-        if not user:
-            flash("Email not found!", "error")
-            cursor.close()
-            conn.close()
-            return redirect(url_for('forgot_password'))
-
-        # Send OTP
-        otp = generate_otp()
-        expiry = otp_expiry_time()
-
-        cursor.execute(
-            "UPDATE users SET otp=%s, otp_expiry=%s WHERE email=%s",
-            (otp, expiry, email)
-        )
-        conn.commit()
-
-        subject = "Password Reset OTP"
-        message = f"""
-<h3 style="color:#5b21b6;">Diabetes Prediction System</h3>
-<p>You requested to reset your password.</p>
-
-<p>Your OTP is:</p>
-<h2 style="color:#5b21b6;">{otp}</h2>
-
-<p><b>Password Requirements:</b></p>
-<ul style="color:#5b21b6;">
-    <li>Minimum 6 characters</li>
-    <li>At least 1 uppercase letter (A-Z)</li>
-    <li>At least 1 lowercase letter (a-z)</li>
-    <li>At least 1 number (0-9)</li>
-    <li>At least 1 special character (@$!%*?&)</li>
-</ul>
-
-<p>If you did not request this, please ignore this email.</p>
-"""
-
-        send_email(email, subject, message)
-
-
-        session['otp_email'] = email
-        session['otp_type'] = 'reset'
-
-        cursor.close()
-        conn.close()
-
-        flash("OTP sent to your email!", "success")
-        return redirect(url_for('verify_otp'))
-
-    return render_template('forgot_password.html')
-
-# ================= VERIFY OTP =================
-@app.route('/verify-otp', methods=['GET', 'POST'])
-def verify_otp():
-    if 'otp_email' not in session or 'otp_type' not in session:
-        return redirect(url_for('login'))
-
-    email = session['otp_email']
-    otp_type = session['otp_type']
-
-    conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
-
-    # ================= RESEND OTP =================
-    if request.method == 'GET' and request.args.get('resend') == '1':
-        new_otp = str(random.randint(100000, 999999))
-        new_expiry = datetime.utcnow() + timedelta(minutes=5)
-
-        cursor.execute(
-            "UPDATE users SET otp=%s, otp_expiry=%s WHERE email=%s",
-            (new_otp, new_expiry, email)
-        )
-        conn.commit()
-
-        subject = "Your New OTP Code"
-        message = f"""
-        <h3 style="color:#5b21b6;">Diabetes Prediction System</h3>
-        <p>Your new OTP is:</p>
-        <h2 style="color:#5b21b6;">{new_otp}</h2>
-        <p>This OTP is valid for <b>5 minutes</b>.</p>
-        """
-
-        send_email(email, subject, message)
-
-        session.pop('otp_invalid', None)   # ✅ RESET INVALID STATE
-        flash("OTP has been sent to your email.", "otp_success")
-
-        cursor.close()
-        conn.close()
-        return redirect(url_for('verify_otp'))
-
-    # ================= VERIFY OTP =================
-    if request.method == 'POST':
-        otp_input = request.form.get('otp', '').strip()
-
-        cursor.execute("SELECT * FROM users WHERE email=%s", (email,))
-        user = cursor.fetchone()
-
-        if not user:
-            cursor.close()
-            conn.close()
-            return redirect(url_for('login'))
-
-        # ❌ INVALID FORMAT (NOT 6 DIGIT)
-        if not otp_input.isdigit() or len(otp_input) != 6:
-            cursor.execute(
-                "UPDATE users SET otp=NULL, otp_expiry=NULL WHERE email=%s",
-                (email,)
-            )
-            conn.commit()
-
-            session['otp_invalid'] = True
-            flash("Invalid or expired OTP. Please try again.", "otp_error")
-
-            cursor.close()
-            conn.close()
-            return redirect(url_for('verify_otp'))
-
-        # ❌ WRONG / EXPIRED OTP
-        if otp_input != user['otp'] or datetime.utcnow() > user['otp_expiry']:
-            cursor.execute(
-                "UPDATE users SET otp=NULL, otp_expiry=NULL WHERE email=%s",
-                (email,)
-            )
-            conn.commit()
-
-            session['otp_invalid'] = True
-            flash("Invalid or expired OTP. Please try again.", "otp_error")
-
-            cursor.close()
-            conn.close()
-            return redirect(url_for('verify_otp'))
-
-        # ✅ OTP VERIFIED
-        cursor.execute(
-            "UPDATE users SET otp=NULL, otp_expiry=NULL WHERE email=%s",
-            (email,)
-        )
-        conn.commit()
-
-        session.pop('otp_invalid', None)
-
-        # ===== HANDLE TYPES =====
-        if otp_type == 'verify':
-            cursor.execute(
-                "UPDATE users SET is_verified=1 WHERE email=%s",
-                (email,)
-            )
-            conn.commit()
-            session.pop('otp_email')
-            session.pop('otp_type')
-
-            flash("Email verified successfully!", "otp_success")
-            cursor.close()
-            conn.close()
-            return redirect(url_for('login'))
-
-        elif otp_type == 'login':
-            session['loggedin'] = True
-            session['id'] = user['id']
-            session['username'] = user['username']
-            session.pop('otp_email')
-            session.pop('otp_type')
-            cursor.close()
-            conn.close()
-            return redirect(url_for('dashboard'))
-
-        elif otp_type == 'reset':
-            session['reset_email'] = email
-            session.pop('otp_email')
-            session.pop('otp_type')
-            cursor.close()
-            conn.close()
-            return redirect(url_for('reset_password'))
-
-        elif otp_type == 'update_email':
-            cursor.execute(
-                "UPDATE users SET email=%s WHERE id=%s",
-                (email, session['id'])
-            )
-            conn.commit()
-            session.pop('otp_email')
-            session.pop('otp_type')
-
-            flash("Email updated successfully!", "otp_success")
-            cursor.close()
-            conn.close()
-            return redirect(url_for('profile'))
-
-    cursor.close()
-    conn.close()
-    return render_template('verify_otp.html')
-
-
-# ================= RESET PASSWORD =================
-@app.route('/reset-password', methods=['GET', 'POST'])
-def reset_password():
-    if 'reset_email' not in session:
-        return redirect(url_for('login'))
-
-    if request.method == 'POST':
-        password = request.form.get('password', '').strip()
-        confirm = request.form.get('password2', '').strip()
-
-        # 1️⃣ Empty check
-        if not password or not confirm:
-            flash("Please fill all fields!", "danger")
-            return redirect(url_for('reset_password'))
-
-        # 2️⃣ Match check
-        if password != confirm:
-            flash("Passwords do not match!", "danger")
-            return redirect(url_for('reset_password'))
-
-        # 3️⃣ 🔐 PASSWORD STRENGTH VALIDATION
-        password_pattern = r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{6,}$'
-
-        if not re.match(password_pattern, password):
-            flash(
-                "Password must be at least 6 characters and include uppercase, lowercase, number & special symbol.",
-                "danger"
-            )
-            return redirect(url_for('reset_password'))
-
-        # 4️⃣ Hash password
-        hashed_password = generate_password_hash(password)
-        email = session['reset_email']
-
-        # 5️⃣ Update password
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute(
-            "UPDATE users SET password=%s WHERE email=%s",
-            (hashed_password, email)
-        )
-        conn.commit()
-        cursor.close()
-        conn.close()
-
-        # 6️⃣ Cleanup session
-        session.pop('reset_email', None)
-
-        flash("Password reset successfully!", "success")
-        return redirect(url_for('login'))
-
-    return render_template('reset_password.html')
 
 # ================= HOME / DASHBOARD =================
 @app.route('/dashboard')
