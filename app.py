@@ -329,73 +329,7 @@ def profile():
     conn.close()
 
     return render_template('profile.html', user=user)
-# ================= UPDATE USERNAME =================
-@app.route('/update-username', methods=['POST'])
-def update_username():
-    if 'loggedin' not in session:
-        return redirect(url_for('login'))
 
-    new_username = request.form['new_username']
-
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute("UPDATE users SET username=%s WHERE id=%s", (new_username, session['id']))
-    conn.commit()
-    cursor.close()
-    conn.close()
-
-    flash("Username updated successfully!", "success")
-    return redirect(url_for('profile'))
-
-@app.route('/update-password', methods=['POST'])
-def update_password():
-    if 'loggedin' not in session:
-        return redirect(url_for('login'))
-
-    # Read form fields safely
-    new_password = request.form.get('new_password', '').strip()
-    confirm_password = request.form.get('confirm_password', '').strip()
-
-    # 1) Required fields
-    if not new_password or not confirm_password:
-        flash("Please fill all fields!", "error")
-        return redirect(url_for('profile'))
-
-    # 2) Match check
-    if new_password != confirm_password:
-        flash("New password and confirm password do not match!", "error")
-        return redirect(url_for('profile'))
-
-    # 3) Strength checks
-    import re
-    errors = []
-    if len(new_password) < 6:
-        errors.append("Minimum 6 characters")
-    if not re.search(r"[A-Z]", new_password):
-        errors.append("At least 1 uppercase letter (A-Z)")
-    if not re.search(r"[a-z]", new_password):
-        errors.append("At least 1 lowercase letter (a-z)")
-    if not re.search(r"[0-9]", new_password):
-        errors.append("At least 1 number (0-9)")
-    if not re.search(r"[@$!%*?&]", new_password):
-        errors.append("At least 1 special character (@$!%*?&)")
-
-    if errors:
-        flash("Password must have: " + ", ".join(errors), "error")
-        return redirect(url_for('profile'))
-
-    # 4) Update password
-    hashed = generate_password_hash(new_password)
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute("UPDATE users SET password=%s WHERE id=%s", (hashed, session['id']))
-   
-    conn.commit()
-    cursor.close()
-    conn.close()
-
-    flash("Password updated successfully!", "success")
-    return redirect(url_for('profile'))
 
 # ================= LOGOUT =================
 @app.route('/logout')
