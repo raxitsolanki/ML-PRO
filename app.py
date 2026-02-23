@@ -40,9 +40,7 @@ scaler = pickle.load(open('scaler.pkl', 'rb'))
 app = Flask(__name__)
 app.secret_key = 'super_secret_key_change_this'
 
-# ---------------- GOOGLE reCAPTCHA KEYS ----------------
-app.config["RECAPTCHA_SITE_KEY"] = "6Ld8zVEsAAAAAJc2zFhJZhZxvcD1DIi0KrIfFD9Y"
-app.config["RECAPTCHA_SECRET_KEY"] = "6Ld8zVEsAAAAAMY07J_W71tWimYAW1V3FRU8iD5H"
+
 
 
 # ================= DATABASE CONFIG =================
@@ -264,51 +262,31 @@ def suggestion():
 @app.route('/contactus', methods=['GET', 'POST'])
 def contactus():
     if request.method == 'POST':
+
+        # ---------------- GET FORM DATA ----------------
+        name = request.form.get('name', '').strip()
+        email = request.form.get('email', '').strip()
+        subject = request.form.get('subject', '').strip()
+        message = request.form.get('message', '').strip()
+
+        # ---------------- BASIC VALIDATION ----------------
+        if not name or not email or not subject or not message:
+            flash("All fields are required!", "danger")
+            return redirect(url_for('contactus'))
+
         conn = None
         cursor = None
 
         try:
-            # ---------------- FORM DATA ----------------
-            name = request.form.get('name', '').strip()
-            email = request.form.get('email', '').strip()
-            subject = request.form.get('subject', '').strip()
-            message = request.form.get('message', '').strip()
-
-            # ---------------- BASIC VALIDATION ----------------
-            if not name or not email or not subject or not message:
-                flash("All fields are required!", "error")
-                return redirect(url_for('contactus'))
-
-            # ---------------- CAPTCHA CHECK ----------------
-            recaptcha_response = request.form.get('g-recaptcha-response')
-            if not recaptcha_response:
-                flash("Please complete the CAPTCHA.", "error")
-                return redirect(url_for('contactus'))
-
-            verify_url = "https://www.google.com/recaptcha/api/siteverify"
-            payload = {
-                "secret": app.config["RECAPTCHA_SECRET_KEY"],
-                "response": recaptcha_response
-            }
-
-            r = requests.post(verify_url, data=payload, timeout=10)
-            result = r.json()
-
-            if not result.get("success"):
-                flash("reCAPTCHA verification failed. Try again.", "error")
-                return redirect(url_for('contactus'))
-
-            # ---------------- DB INSERT ----------------
+            # ---------------- DATABASE INSERT ----------------
             conn = get_db_connection()
-            if not conn:
-                flash("Database connection failed!", "error")
-                return redirect(url_for('contactus'))
-
             cursor = conn.cursor()
+
             cursor.execute("""
                 INSERT INTO contact_messages (name, email, subject, message)
                 VALUES (%s, %s, %s, %s)
             """, (name, email, subject, message))
+
             conn.commit()
 
             # ---------------- EMAIL TO ADMIN ----------------
@@ -326,7 +304,7 @@ def contactus():
             # ---------------- EMAIL TO USER ----------------
             user_subject = "We received your message"
             user_message = f"""
-            <h3 style="color:#5b21b6;">Diabetes Prediction System</h3>
+            <h3 style="color:#5b21b6;">DSP Health</h3>
             <p>Hi {name},</p>
             <p>Thank you for contacting us. We will reply shortly.</p>
             """
@@ -340,7 +318,7 @@ def contactus():
             if conn:
                 conn.rollback()
             print("Contact Form Error:", e)
-            flash("Something went wrong. Please try again.", "error")
+            flash("Something went wrong. Please try again.", "danger")
             return redirect(url_for('contactus'))
 
         finally:
@@ -349,8 +327,8 @@ def contactus():
             if conn:
                 conn.close()
 
-    return render_template('contactus.html',site_key=app.config["RECAPTCHA_SITE_KEY"])
-
+    # ✅ GET request
+    return render_template('contactus.html')
 
 @app.route('/profile')
 def profile():
@@ -460,70 +438,104 @@ def admin_dashboard():
 def admin_users():
 
     search = request.args.get('search', '').strip()
-    sort = request.args.get('sort', 'latest')  # default latest
+    sort = request.args.get('sort', 'latest')
 
-    conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
+    conn = None
+    cursor = None
 
-    query = """
-        SELECT id, username, email, is_verified, created_at
-        FROM userss
-    """
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
 
-    conditions = []
-    values = []
+        query = """
+            SELECT id, username, email, is_verified, created_at
+            FROM userss
+        """
 
-    # 🔎 SEARCH FILTER
-    if search:
-        conditions.append("(username LIKE %s OR email LIKE %s)")
-        values.append(f"%{search}%")
-        values.append(f"%{search}%")
+        conditions = []
+        values = []
 
-    if conditions:
-        query += " WHERE " + " AND ".join(conditions)
+        # 🔎 SEARCH
+        if search:
+            conditions.append("(username LIKE %s OR email LIKE %s)")
+            values.extend([f"%{search}%", f"%{search}%"])
 
-    # 🔤 SORTING
-    if sort == "az":
-        query += " ORDER BY username ASC"
-    elif sort == "za":
-        query += " ORDER BY username DESC"
-    elif sort == "latest":
-        query += " ORDER BY created_at DESC"
-    else:
-        query += " ORDER BY id DESC"
+        if conditions:
+            query += " WHERE " + " AND ".join(conditions)
 
-    cursor.execute(query, values)
-    users = cursor.fetchall()
+        # 🔤 SORTING
+        if sort == "az":
+            query += " ORDER BY username ASC"
+        elif sort == "za":
+            query += " ORDER BY username DESC"
+        elif sort == "latest":
+            query += " ORDER BY created_at DESC"
+        else:
+            query += " ORDER BY id DESC"
 
-    cursor.close()
-    conn.close()
+        cursor.execute(query, values)
+        users = cursor.fetchall()
 
-    return render_template(
-        'admin/admin_users.html',
-        users=users,
-        search=search,
-        sort=sort
-    )
+        return render_template(
+            'admin/admin_users.html',
+            users=users,
+            search=search,
+            sort=sort
+        )
 
+    except Exception as e:
+        print("Admin Users Error:", e)
+        flash("Unable to load users.", "danger")
+        return redirect(url_for('admin_dashboard'))
 
-
-
-# ================= DELETE USER (SECURE POST) =================
-@app.route('/admin/delete-user/<int:id>', methods=['POST'])
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+@app.route('/admin/delete-user/<int:user_id>', methods=['POST'])
 @admin_required
-def delete_user(id):
-    conn = get_db_connection()
-    cursor = conn.cursor()
+def delete_user(user_id):
 
-    cursor.execute("DELETE FROM users WHERE id=%s", (id,))
-    conn.commit()
+    conn = None
+    cursor = None
 
-    cursor.close()
-    conn.close()
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
 
-    flash("User deleted successfully", "success")
-    return redirect(url_for('admin_users'))
+        # ✅ Check if user exists
+        cursor.execute("SELECT id FROM userss WHERE id = %s", (user_id,))
+        user = cursor.fetchone()
 
+        if not user:
+            flash("User not found.", "danger")
+            return redirect(url_for('admin_users'))
+
+        # ✅ Prevent deleting yourself (important security)
+        if session.get('admin_id') == user_id:
+            flash("You cannot delete your own admin account.", "warning")
+            return redirect(url_for('admin_users'))
+
+        # ✅ Delete user
+        cursor.execute("DELETE FROM userss WHERE id = %s", (user_id,))
+        conn.commit()
+
+        flash("User deleted successfully.", "success")
+        return redirect(url_for('admin_users'))
+
+    except Exception as e:
+        if conn:
+            conn.rollback()
+        print("Delete User Error:", e)
+        flash("Something went wrong while deleting user.", "danger")
+        return redirect(url_for('admin_users'))
+
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
 
 # ================= ADMIN LOGOUT =================
 @app.route('/admin/logout')
