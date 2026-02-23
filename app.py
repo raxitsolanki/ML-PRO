@@ -79,7 +79,7 @@ def send_email(to_email, subject, message, attachment_bytes=None, attachment_fil
         part['Content-Disposition'] = f'attachment; filename="{attachment_filename}"'
         msg.attach(part)
     try:
-        server = smtplib.SMTP('smtp.gmail.com', 587)
+        server = smtplib.SMTP('smtp.gmail.com', 465)
         server.starttls()
         server.login(sender_email, sender_password)
         server.send_message(msg)
