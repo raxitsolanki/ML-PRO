@@ -81,15 +81,15 @@ def register():
         conn = None
         try:
             conn = get_db_connection()
-            cursor = conn.cursor(cursor_factory=RealDictCursor)
+            cursor = conn.cursor(dictionary=True)  # ✅ same style everywhere
 
-            # Check if email exists in 'userss'
-            cursor.execute("SELECT id FROM userss WHERE email=%s", (email,))
+            # Check if email already exists
+            cursor.execute("SELECT id FROM userss WHERE email = %s", (email,))
             if cursor.fetchone():
                 flash("Email already registered!", "danger")
                 return redirect(url_for('register'))
 
-            # Proper Insert into 'userss'
+            # Insert new user
             cursor.execute("""
                 INSERT INTO userss (username, email, password)
                 VALUES (%s, %s, %s)
@@ -97,39 +97,45 @@ def register():
 
             conn.commit()
             cursor.close()
+
             flash("Registration successful! Please login.", "success")
             return redirect(url_for('login'))
-            
+
         except Exception as e:
-            print(f"Registration Error: {e}")
-            flash(f"Error: {str(e)}", "danger")
+            print("Registration Error:", e)
+            flash("Something went wrong. Try again.", "danger")
             return redirect(url_for('register'))
+
         finally:
             if conn:
                 conn.close()
 
     return render_template('register.html')
-
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         email = request.form.get('email')
         password = request.form.get('password')
 
+        if not email or not password:
+            flash("Please enter email and password.", "danger")
+            return redirect(url_for('login'))
+
         conn = None
         try:
             conn = get_db_connection()
-            cursor = conn.cursor(cursor_factory=RealDictCursor)
+            cursor = conn.cursor(dictionary=True)
 
-            cursor.execute("SELECT * FROM userss WHERE email=%s", (email,))
+            cursor.execute("SELECT * FROM userss WHERE email = %s", (email,))
             user = cursor.fetchone()
-
             cursor.close()
 
             if user and check_password_hash(user['password'], password):
+                session.clear()
                 session['loggedin'] = True
                 session['id'] = user['id']
                 session['username'] = user['username']
+
                 flash("Login successful!", "success")
                 return redirect(url_for('dashboard'))
             else:
@@ -137,58 +143,50 @@ def login():
                 return redirect(url_for('login'))
 
         except Exception as e:
-            print(f"Login Error: {e}")
-            flash("Login failed. Check logs.", "danger")
+            print("Login Error:", e)
+            flash("Login failed. Please try again.", "danger")
             return redirect(url_for('login'))
+
         finally:
             if conn:
                 conn.close()
 
     return render_template('login.html')
-
-
-# ================= HOME / DASHBOARD =================
 @app.route('/dashboard')
 def dashboard():
-    # 1. Check if user is logged in
-    if 'loggedin' not in session:
-        flash("Please login first to access the dashboard", "danger")
+    if 'loggedin' not in session or not session.get('id'):
+        flash("Please login first to access the dashboard.", "warning")
         return redirect(url_for('login'))
 
     conn = None
     try:
         conn = get_db_connection()
-        # FIX: dictionary=True ki jagah RealDictCursor use karein
-        cursor = conn.cursor(cursor_factory=RealDictCursor)
+        cursor = conn.cursor(dictionary=True)
 
         cursor.execute(
-            "SELECT username, email FROM userss WHERE id=%s",
+            "SELECT username, email FROM userss WHERE id = %s",
             (session['id'],)
         )
         user = cursor.fetchone()
-
         cursor.close()
-        
-        # 2. Check if user exists in DB
+
         if not user:
             session.clear()
-            flash("User not found!", "danger")
+            flash("User not found. Please login again.", "danger")
             return redirect(url_for('login'))
 
-        # Dashboard-specific welcome message
-        # Note: flash category "success" ya "info" rakhein jo CSS mein support ho
-        flash(f"Welcome back, {user['username']}!", "success")
-
+        flash(f"Welcome back, {user['username']}!", "info")
         return render_template('dashboard.html', user=user)
 
     except Exception as e:
-        print(f"Dashboard Error: {e}")
-        flash("An error occurred while loading the dashboard.", "danger")
+        print("Dashboard Error:", e)
+        flash("Something went wrong.", "danger")
         return redirect(url_for('login'))
-        
+
     finally:
         if conn:
             conn.close()
+
 
 
 @app.route('/prediction', methods=['GET', 'POST'])
