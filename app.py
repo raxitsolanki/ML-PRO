@@ -65,32 +65,31 @@ def home():
     return redirect(url_for('login'))
 
 
-from flask import Flask, request, render_template, redirect, url_for, flash, session
-from werkzeug.security import generate_password_hash, check_password_hash
-import psycopg2
-from psycopg2.extras import RealDictCursor # Dictionary support ke liye
-
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        username = request.form['username']
-        email = request.form['email']
-        password = request.form['password']
+        username = request.form.get('username')
+        email = request.form.get('email')
+        password = request.form.get('password')
+
+        if not username or not email or not password:
+            flash("All fields are required!", "danger")
+            return redirect(url_for('register'))
 
         hashed_password = generate_password_hash(password)
 
+        conn = None
         try:
             conn = get_db_connection()
-            # PostgreSQL ke liye RealDictCursor use karein
             cursor = conn.cursor(cursor_factory=RealDictCursor)
 
-            # 1. Check if email exists (Table name: userss)
+            # Check if email exists in 'userss'
             cursor.execute("SELECT id FROM userss WHERE email=%s", (email,))
             if cursor.fetchone():
                 flash("Email already registered!", "danger")
                 return redirect(url_for('register'))
 
-            # 2. Insert into Table (Table name userss hi rakhein)
+            # Proper Insert into 'userss'
             cursor.execute("""
                 INSERT INTO userss (username, email, password)
                 VALUES (%s, %s, %s)
@@ -98,44 +97,52 @@ def register():
 
             conn.commit()
             cursor.close()
-            conn.close()
-
             flash("Registration successful! Please login.", "success")
             return redirect(url_for('login'))
             
         except Exception as e:
-            print(f"Error: {e}") # Render logs mein ye dikhega
-            flash("Something went wrong!", "danger")
+            print(f"Registration Error: {e}")
+            flash(f"Error: {str(e)}", "danger")
             return redirect(url_for('register'))
+        finally:
+            if conn:
+                conn.close()
 
     return render_template('register.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        email = request.form['email']
-        password = request.form['password']
+        email = request.form.get('email')
+        password = request.form.get('password')
 
-        conn = get_db_connection()
-        cursor = conn.cursor(cursor_factory=RealDictCursor)
+        conn = None
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor(cursor_factory=RealDictCursor)
 
-        # Table name: userss
-        cursor.execute("SELECT * FROM userss WHERE email=%s", (email,))
-        user = cursor.fetchone()
+            cursor.execute("SELECT * FROM userss WHERE email=%s", (email,))
+            user = cursor.fetchone()
 
-        cursor.close()
-        conn.close()
+            cursor.close()
 
-        if not user or not check_password_hash(user['password'], password):
-            flash("Invalid email or password!", "danger")
+            if user and check_password_hash(user['password'], password):
+                session['loggedin'] = True
+                session['id'] = user['id']
+                session['username'] = user['username']
+                flash("Login successful!", "success")
+                return redirect(url_for('dashboard'))
+            else:
+                flash("Invalid email or password!", "danger")
+                return redirect(url_for('login'))
+
+        except Exception as e:
+            print(f"Login Error: {e}")
+            flash("Login failed. Check logs.", "danger")
             return redirect(url_for('login'))
-
-        session['loggedin'] = True
-        session['id'] = user['id']
-        session['username'] = user['username']
-
-        flash("Login successful!", "success")
-        return redirect(url_for('dashboard'))
+        finally:
+            if conn:
+                conn.close()
 
     return render_template('login.html')
 
@@ -445,7 +452,7 @@ def admin_users():
 
     query = """
         SELECT id, username, email, is_verified, created_at
-        FROM users
+        FROM userss
     """
 
     conditions = []
