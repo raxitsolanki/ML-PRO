@@ -150,28 +150,45 @@ def login():
 # ================= HOME / DASHBOARD =================
 @app.route('/dashboard')
 def dashboard():
-    # If user not logged in
+    # 1. Check if user is logged in
     if 'loggedin' not in session:
-        flash("Please login first to access the dashboard", "login")
+        flash("Please login first to access the dashboard", "danger")
         return redirect(url_for('login'))
 
-    conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
+    conn = None
+    try:
+        conn = get_db_connection()
+        # FIX: dictionary=True ki jagah RealDictCursor use karein
+        cursor = conn.cursor(cursor_factory=RealDictCursor)
 
-    cursor.execute(
-        "SELECT username, email FROM users WHERE id=%s",
-        (session['id'],)
-    )
-    user = cursor.fetchone()
+        cursor.execute(
+            "SELECT username, email FROM userss WHERE id=%s",
+            (session['id'],)
+        )
+        user = cursor.fetchone()
 
-    cursor.close()
-    conn.close()
+        cursor.close()
+        
+        # 2. Check if user exists in DB
+        if not user:
+            session.clear()
+            flash("User not found!", "danger")
+            return redirect(url_for('login'))
 
-    # ✅ Dashboard-specific toast
-    flash(f"Welcome back, {user['username']}!", "dashboard")
+        # Dashboard-specific welcome message
+        # Note: flash category "success" ya "info" rakhein jo CSS mein support ho
+        flash(f"Welcome back, {user['username']}!", "success")
 
-    return render_template('dashboard.html', user=user)
+        return render_template('dashboard.html', user=user)
 
+    except Exception as e:
+        print(f"Dashboard Error: {e}")
+        flash("An error occurred while loading the dashboard.", "danger")
+        return redirect(url_for('login'))
+        
+    finally:
+        if conn:
+            conn.close()
 
 
 @app.route('/prediction', methods=['GET', 'POST'])
