@@ -487,7 +487,6 @@ def admin_dashboard():
 @app.route('/admin/users')
 @admin_required
 def admin_users():
-
     search = request.args.get('search', '').strip()
     sort = request.args.get('sort', 'latest')
 
@@ -498,13 +497,13 @@ def admin_users():
         query = "SELECT id, username, email FROM userss"
         params = []
 
-        # 🔍 Search filter
+        # Search filter
         if search:
             query += " WHERE username LIKE %s OR email LIKE %s"
             like_search = f"%{search}%"
             params.extend([like_search, like_search])
 
-        # 🔽 Sorting
+        # Sorting
         if sort == "az":
             query += " ORDER BY username ASC"
         elif sort == "za":
@@ -528,13 +527,12 @@ def admin_users():
         users=users,
         search=search,
         sort=sort
-    
     )
-       
+
+
 @app.route('/admin/delete_user/<int:user_id>', methods=['POST'])
 @admin_required
 def delete_user(user_id):
-
     conn = get_db_connection()
     cursor = conn.cursor()
 
