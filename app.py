@@ -489,11 +489,20 @@ def admin_dashboard():
 def admin_users():
     search = request.args.get('search', '').strip()
     sort = request.args.get('sort', 'latest')
-
-    conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
-
+    
+    users = []
     try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+
+        # Check if table exists
+        cursor.execute("SHOW TABLES LIKE 'userss'")
+        table_exists = cursor.fetchone()
+        if not table_exists:
+            flash("Users table does not exist.", "danger")
+            return render_template("admin/users.html", users=[], search=search, sort=sort)
+
+        # Base query
         query = "SELECT id, username, email FROM userss"
         params = []
 
@@ -516,38 +525,48 @@ def admin_users():
 
     except Exception as e:
         print("Admin Users Error:", e)
+        flash("Something went wrong while loading users.", "danger")
         users = []
 
     finally:
-        cursor.close()
-        conn.close()
+        try:
+            cursor.close()
+            conn.close()
+        except:
+            pass
 
-    return render_template(
-        "admin/users.html",
-        users=users,
-        search=search,
-        sort=sort
-    )
+    return render_template("admin/users.html", users=users, search=search, sort=sort)
 
 
 @app.route('/admin/delete_user/<int:user_id>', methods=['POST'])
 @admin_required
 def delete_user(user_id):
-    conn = get_db_connection()
-    cursor = conn.cursor()
-
     try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Check if table exists
+        cursor.execute("SHOW TABLES LIKE 'userss'")
+        table_exists = cursor.fetchone()
+        if not table_exists:
+            flash("Users table does not exist.", "danger")
+            return redirect(url_for('admin_users'))
+
+        # Delete user
         cursor.execute("DELETE FROM userss WHERE id = %s", (user_id,))
         conn.commit()
         flash("User deleted successfully!", "success")
 
     except Exception as e:
-        print("Delete Error:", e)
-        flash("Something went wrong.", "danger")
+        print("Delete User Error:", e)
+        flash("Something went wrong while deleting user.", "danger")
 
     finally:
-        cursor.close()
-        conn.close()
+        try:
+            cursor.close()
+            conn.close()
+        except:
+            pass
 
     return redirect(url_for('admin_users'))
 # ================= ADMIN LOGOUT =================
