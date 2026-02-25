@@ -60,7 +60,7 @@ def get_db_connection():
     except Error as e:
         print("Database connection failed:", e)
         return None
-aimport os
+import os
 from flask_mail import Mail
 
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
