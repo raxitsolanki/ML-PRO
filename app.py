@@ -30,6 +30,9 @@ from flask import request, render_template, session, redirect, url_for
 from feature_extractor import extract_fingerprint_features
 import joblib
 from io import BytesIO
+from flask_mail import Mail, Message
+from itsdangerous import URLSafeTimedSerializer
+from flask import url_for
 
 
 # Load ML Model & Scaler
@@ -57,6 +60,16 @@ def get_db_connection():
     except Error as e:
         print("Database connection failed:", e)
         return None
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USE_SSL'] = False
+
+app.config['MAIL_USERNAME'] = 'raxitsolanki20@gmail.com'
+app.config['MAIL_PASSWORD'] = 'ntjkikgjhncjraye'   # remove spaces
+app.config['MAIL_DEFAULT_SENDER'] = 'raxitsolanki20@gmail.com'
+
+mail = Mail(app)
 
 @app.route('/')
 def home():
@@ -151,112 +164,63 @@ def login():
 
     return render_template('login.html')
 
-from datetime import datetime, timedelta
-import secrets
-
-@app.route('/forgot-password', methods=['GET', 'POST'])
+@app.route('/forgot_password', methods=['GET', 'POST'])
 def forgot_password():
-
     if request.method == 'POST':
-        email = request.form.get('email')
+        email = request.form['email']
 
-        if not email:
-            flash("Please enter your email address.", "danger")
-            return redirect(url_for('forgot_password'))
+        user = User.query.filter_by(email=email).first()
 
-        conn = None
-        try:
-            conn = get_db_connection()
-            cursor = conn.cursor(dictionary=True)
+        if user:
+            token = serializer.dumps(email, salt='password-reset')
 
-            cursor.execute("SELECT * FROM userss WHERE email=%s", (email,))
-            user = cursor.fetchone()
+            reset_link = url_for('reset_password', token=token, _external=True)
 
-            if user:
-                # Generate secure token
-                token = secrets.token_urlsafe(32)
-                expiry = datetime.utcnow() + timedelta(minutes=15)
+            msg = Message(
+                subject="Password Reset Request",
+                recipients=[email]
+            )
 
-                # Save token in DB
-                cursor.execute("""
-                    UPDATE userss 
-                    SET reset_token=%s, reset_token_expiry=%s 
-                    WHERE id=%s
-                """, (token, expiry, user['id']))
-                conn.commit()
+            msg.body = f"""
+Hello,
 
-                reset_link = url_for('reset_password', token=token, _external=True)
+Click the link below to reset your password:
 
-                # For now print link in console (email integration later)
-                print("Reset Link:", reset_link)
+{reset_link}
 
-                flash("Password reset link has been sent to your email.", "success")
-            else:
-                flash("Email not found in our records.", "danger")
+If you did not request this, ignore this email.
+"""
 
-            cursor.close()
+            mail.send(msg)
 
-        except Exception as e:
-            print("Forgot Password Error:", e)
-            flash("Something went wrong. Please try again.", "danger")
-
-        finally:
-            if conn:
-                conn.close()
-
-        return redirect(url_for('forgot_password'))
+            flash("Reset link sent to your email.", "success")
+            return redirect(url_for('login'))
+        else:
+            flash("Email not found.", "danger")
 
     return render_template('forgot_password.html')
-@app.route('/reset-password/<token>', methods=['GET', 'POST'])
+from werkzeug.security import generate_password_hash
+
+@app.route('/reset_password/<token>', methods=['GET', 'POST'])
 def reset_password(token):
+    try:
+        email = serializer.loads(token, salt='password-reset', max_age=3600)
+    except:
+        flash("Reset link expired or invalid.", "danger")
+        return redirect(url_for('forgot_password'))
 
-    conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
-
-    cursor.execute("""
-        SELECT * FROM userss
-        WHERE reset_token=%s AND reset_token_expiry > %s
-    """, (token, datetime.utcnow()))
-
-    user = cursor.fetchone()
-
-    if not user:
-        cursor.close()
-        conn.close()
-        flash("Reset link is invalid or expired.", "danger")
-        return redirect(url_for('login'))
+    user = User.query.filter_by(email=email).first()
 
     if request.method == 'POST':
-        new_password = request.form.get('password')
-        confirm_password = request.form.get('confirm_password')
-
-        if not new_password or not confirm_password:
-            flash("Please fill all fields.", "danger")
-            return redirect(request.url)
-
-        if new_password != confirm_password:
-            flash("Passwords do not match.", "danger")
-            return redirect(request.url)
-
+        new_password = request.form['password']
         hashed_password = generate_password_hash(new_password)
 
-        cursor.execute("""
-            UPDATE userss 
-            SET password=%s,
-                reset_token=NULL,
-                reset_token_expiry=NULL
-            WHERE id=%s
-        """, (hashed_password, user['id']))
-        conn.commit()
+        user.password = hashed_password
+        db.session.commit()
 
-        cursor.close()
-        conn.close()
-
-        flash("Password reset successful! Please login.", "success")
+        flash("Password updated successfully.", "success")
         return redirect(url_for('login'))
 
-    cursor.close()
-    conn.close()
     return render_template('reset_password.html')
 
 @app.route('/dashboard')
