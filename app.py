@@ -60,14 +60,19 @@ def get_db_connection():
     except Error as e:
         print("Database connection failed:", e)
         return None
+aimport os
+from flask_mail import Mail
+
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USE_SSL'] = False
 
-app.config['MAIL_USERNAME'] = 'raxitsolanki20@gmail.com'
-app.config['MAIL_PASSWORD'] = 'ntjkikgjhncjraye'   # remove spaces
-app.config['MAIL_DEFAULT_SENDER'] = 'raxitsolanki20@gmail.com'
+app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
+app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
+app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_USERNAME')
+
+mail = Mail(app)
 
 mail = Mail(app)
 
