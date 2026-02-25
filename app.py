@@ -486,14 +486,7 @@ def admin_dashboard():
 from flask import Flask, render_template, request, redirect, url_for, flash
 import mysql.connector
 
-# Ensure your connection function is configured correctly
-def get_db_connection():
-    return mysql.connector.connect(
-        host="localhost",
-        user="root", 
-        password="your_password",
-        database="your_database_name"
-    )
+
 
 @app.route('/admin/users')
 @admin_required
