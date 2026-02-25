@@ -1,27 +1,27 @@
 {% extends "admin/admin_layout.html" %}
 
 {% block content %}
-<h1 class="text-3xl font-bold mb-6">Admin Dashboard</h1>
+<h1 class="text-3xl font-bold mb-6 text-center md:text-left">Admin Dashboard</h1>
 
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-    <div class="bg-white shadow rounded-xl p-6">
-        <h2 class="text-gray-500">Total Users</h2>
-        <p class="text-4xl font-bold text-[#5b21b6]">{{ total_users }}</p>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-4">
+    <div class="bg-white shadow rounded-xl p-4 sm:p-6">
+        <h2 class="text-gray-500 text-sm sm:text-base">Total Users</h2>
+        <p class="text-3xl sm:text-4xl font-bold text-[#5b21b6]">{{ total_users }}</p>
     </div>
-    <div class="bg-white shadow-lg rounded-xl p-6 hover:shadow-xl transition">
-        <h2 class="text-gray-500">Total Messages</h2>
-        <p class="text-4xl font-bold text-green-600">{{ total_messages }}</p>
+    <div class="bg-white shadow-lg rounded-xl p-4 sm:p-6 hover:shadow-xl transition">
+        <h2 class="text-gray-500 text-sm sm:text-base">Total Messages</h2>
+        <p class="text-3xl sm:text-4xl font-bold text-green-600">{{ total_messages }}</p>
     </div>
-    <div class="bg-white shadow-lg rounded-xl p-6 hover:shadow-xl transition">
-        <h2 class="text-gray-500">Total Predictions</h2>
-        <p class="text-4xl font-bold text-pink-600">{{ total_prediction }}</p>
+    <div class="bg-white shadow-lg rounded-xl p-4 sm:p-6 hover:shadow-xl transition">
+        <h2 class="text-gray-500 text-sm sm:text-base">Total Predictions</h2>
+        <p class="text-3xl sm:text-4xl font-bold text-pink-600">{{ total_prediction }}</p>
     </div>
 </div>
 
 <!-- Vertical Overview Chart with Gradient -->
-<div class="bg-white shadow rounded-xl p-6 mt-10">
-    <h2 class="text-gray-500 mb-4">Dashboard Overview</h2>
-    <canvas id="overviewChart"></canvas>
+<div class="bg-white shadow rounded-xl p-4 sm:p-6 mt-6 sm:mt-10 w-full h-64 sm:h-80">
+    <h2 class="text-gray-500 mb-2 sm:mb-4 text-sm sm:text-base">Dashboard Overview</h2>
+    <canvas id="overviewChart" class="w-full h-full"></canvas>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -30,23 +30,22 @@
     if (ctx) {
         const chartGradient = ctx.getContext('2d');
     
-        // Gradients for each bar
         const userGradient = chartGradient.createLinearGradient(0, 0, 0, 400);
-        userGradient.addColorStop(0, '#8b5cf6'); // purple top
-        userGradient.addColorStop(1, '#5b21b6'); // purple bottom
+        userGradient.addColorStop(0, '#8b5cf6'); 
+        userGradient.addColorStop(1, '#5b21b6'); 
     
         const messageGradient = chartGradient.createLinearGradient(0, 0, 0, 400);
-        messageGradient.addColorStop(0, '#34d399'); // green top
-        messageGradient.addColorStop(1, '#059669'); // green bottom
+        messageGradient.addColorStop(0, '#34d399'); 
+        messageGradient.addColorStop(1, '#059669'); 
     
         const predictionGradient = chartGradient.createLinearGradient(0, 0, 0, 400);
-        predictionGradient.addColorStop(0, '#f472b6'); // pink top
-        predictionGradient.addColorStop(1, '#db2777'); // pink bottom
+        predictionGradient.addColorStop(0, '#f472b6'); 
+        predictionGradient.addColorStop(1, '#db2777'); 
     
         new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: ['Users', 'Messages', 'Predictions'], // x-axis labels
+                labels: ['Users', 'Messages', 'Predictions'],
                 datasets: [{
                     label: 'Dashboard Metrics',
                     data: [
@@ -65,27 +64,21 @@
             },
             options: {
                 responsive: true,
-                animation: {
-                    duration: 1500,
-                    easing: 'easeOutQuart'
-                },
+                maintainAspectRatio: false,
+                animation: { duration: 1500, easing: 'easeOutQuart' },
                 plugins: {
                     legend: { display: false },
                     tooltip: {
                         enabled: true,
                         callbacks: {
-                            label: function(context) {
-                                return context.raw.toLocaleString();
-                            }
+                            label: function(context) { return context.raw.toLocaleString(); }
                         }
                     }
                 },
-                scales: {
-                    y: { beginAtZero: true }
-                }
+                scales: { y: { beginAtZero: true } }
             }
         });
     }
-    </script>
-    
+</script>
+
 {% endblock %}

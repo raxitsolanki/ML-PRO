@@ -491,28 +491,24 @@ def admin_users():
     sort = request.args.get('sort', 'latest')
     
     users = []
+    conn = None
+    cursor = None
+
     try:
         conn = get_db_connection()
+        # dictionary=True allows access like u['username'] in HTML
         cursor = conn.cursor(dictionary=True)
 
-        # Check if table exists
-        cursor.execute("SHOW TABLES LIKE 'userss'")
-        table_exists = cursor.fetchone()
-        if not table_exists:
-            flash("Users table does not exist.", "danger")
-            return render_template("admin/users.html", users=[], search=search, sort=sort)
-
-        # Base query
+        # Base Query using your table 'userss'
         query = "SELECT id, username, email FROM userss"
         params = []
 
-        # Search filter
         if search:
             query += " WHERE username LIKE %s OR email LIKE %s"
-            like_search = f"%{search}%"
-            params.extend([like_search, like_search])
+            like_pattern = f"%{search}%"
+            params.extend([like_pattern, like_pattern])
 
-        # Sorting
+        # Sorting logic
         if sort == "az":
             query += " ORDER BY username ASC"
         elif sort == "za":
@@ -524,16 +520,14 @@ def admin_users():
         users = cursor.fetchall()
 
     except Exception as e:
-        print("Admin Users Error:", e)
-        flash("Something went wrong while loading users.", "danger")
-        users = []
-
+        # This will print the EXACT error in your CMD/Terminal
+        print(f"DATABASE ERROR: {e}")
+        flash(f"Database Error: {str(e)}", "danger")
+        users = [] # Send empty list so template doesn't crash
+    
     finally:
-        try:
-            cursor.close()
-            conn.close()
-        except:
-            pass
+        if cursor: cursor.close()
+        if conn: conn.close()
 
     return render_template("admin/users.html", users=users, search=search, sort=sort)
 
@@ -541,32 +535,23 @@ def admin_users():
 @app.route('/admin/delete_user/<int:user_id>', methods=['POST'])
 @admin_required
 def delete_user(user_id):
+    conn = None
+    cursor = None
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
-
-        # Check if table exists
-        cursor.execute("SHOW TABLES LIKE 'userss'")
-        table_exists = cursor.fetchone()
-        if not table_exists:
-            flash("Users table does not exist.", "danger")
-            return redirect(url_for('admin_users'))
-
-        # Delete user
+        
+        # Using 'userss' table here as well
         cursor.execute("DELETE FROM userss WHERE id = %s", (user_id,))
         conn.commit()
-        flash("User deleted successfully!", "success")
-
+        
+        flash("User deleted successfully.", "success")
     except Exception as e:
-        print("Delete User Error:", e)
-        flash("Something went wrong while deleting user.", "danger")
-
+        print(f"DELETE ERROR: {e}")
+        flash("Could not delete user.", "danger")
     finally:
-        try:
-            cursor.close()
-            conn.close()
-        except:
-            pass
+        if cursor: cursor.close()
+        if conn: conn.close()
 
     return redirect(url_for('admin_users'))
 # ================= ADMIN LOGOUT =================
