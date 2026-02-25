@@ -150,6 +150,115 @@ def login():
                 conn.close()
 
     return render_template('login.html')
+
+from datetime import datetime, timedelta
+import secrets
+
+@app.route('/forgot-password', methods=['GET', 'POST'])
+def forgot_password():
+
+    if request.method == 'POST':
+        email = request.form.get('email')
+
+        if not email:
+            flash("Please enter your email address.", "danger")
+            return redirect(url_for('forgot_password'))
+
+        conn = None
+        try:
+            conn = get_db_connection()
+            cursor = conn.cursor(dictionary=True)
+
+            cursor.execute("SELECT * FROM userss WHERE email=%s", (email,))
+            user = cursor.fetchone()
+
+            if user:
+                # Generate secure token
+                token = secrets.token_urlsafe(32)
+                expiry = datetime.utcnow() + timedelta(minutes=15)
+
+                # Save token in DB
+                cursor.execute("""
+                    UPDATE userss 
+                    SET reset_token=%s, reset_token_expiry=%s 
+                    WHERE id=%s
+                """, (token, expiry, user['id']))
+                conn.commit()
+
+                reset_link = url_for('reset_password', token=token, _external=True)
+
+                # For now print link in console (email integration later)
+                print("Reset Link:", reset_link)
+
+                flash("Password reset link has been sent to your email.", "success")
+            else:
+                flash("Email not found in our records.", "danger")
+
+            cursor.close()
+
+        except Exception as e:
+            print("Forgot Password Error:", e)
+            flash("Something went wrong. Please try again.", "danger")
+
+        finally:
+            if conn:
+                conn.close()
+
+        return redirect(url_for('forgot_password'))
+
+    return render_template('forgot_password.html')
+@app.route('/reset-password/<token>', methods=['GET', 'POST'])
+def reset_password(token):
+
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    cursor.execute("""
+        SELECT * FROM userss
+        WHERE reset_token=%s AND reset_token_expiry > %s
+    """, (token, datetime.utcnow()))
+
+    user = cursor.fetchone()
+
+    if not user:
+        cursor.close()
+        conn.close()
+        flash("Reset link is invalid or expired.", "danger")
+        return redirect(url_for('login'))
+
+    if request.method == 'POST':
+        new_password = request.form.get('password')
+        confirm_password = request.form.get('confirm_password')
+
+        if not new_password or not confirm_password:
+            flash("Please fill all fields.", "danger")
+            return redirect(request.url)
+
+        if new_password != confirm_password:
+            flash("Passwords do not match.", "danger")
+            return redirect(request.url)
+
+        hashed_password = generate_password_hash(new_password)
+
+        cursor.execute("""
+            UPDATE userss 
+            SET password=%s,
+                reset_token=NULL,
+                reset_token_expiry=NULL
+            WHERE id=%s
+        """, (hashed_password, user['id']))
+        conn.commit()
+
+        cursor.close()
+        conn.close()
+
+        flash("Password reset successful! Please login.", "success")
+        return redirect(url_for('login'))
+
+    cursor.close()
+    conn.close()
+    return render_template('reset_password.html')
+
 @app.route('/dashboard')
 def dashboard():
     if 'loggedin' not in session or not session.get('id'):
@@ -434,7 +543,7 @@ def admin_dashboard():
 
 # ================= VIEW USERS =================
 @app.route('/admin/users')
-@admin_required   # make sure you have this decorator
+@admin_required
 def admin_users():
 
     search = request.args.get('search', '').strip()
@@ -443,35 +552,41 @@ def admin_users():
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
 
-    # Base Query
-    query = "SELECT id, username, email FROM userss"
-    params = []
+    try:
+        query = "SELECT id, username, email FROM userss"
+        params = []
 
-    # 🔍 Search Filter
-    if search:
-        query += " WHERE username LIKE %s OR email LIKE %s"
-        like_search = f"%{search}%"
-        params.extend([like_search, like_search])
+        # 🔍 Search filter
+        if search:
+            query += " WHERE username LIKE %s OR email LIKE %s"
+            like_search = f"%{search}%"
+            params.extend([like_search, like_search])
 
-    # 🔽 Sorting
-    if sort == "az":
-        query += " ORDER BY username ASC"
-    elif sort == "za":
-        query += " ORDER BY username DESC"
-    else:
-        query += " ORDER BY id DESC"   # latest first
+        # 🔽 Sorting
+        if sort == "az":
+            query += " ORDER BY username ASC"
+        elif sort == "za":
+            query += " ORDER BY username DESC"
+        else:
+            query += " ORDER BY id DESC"
 
-    cursor.execute(query, tuple(params))
-    users = cursor.fetchall()
+        cursor.execute(query, tuple(params))
+        users = cursor.fetchall()
 
-    cursor.close()
-    conn.close()
+    except Exception as e:
+        print("Admin Users Error:", e)
+        users = []
+
+    finally:
+        cursor.close()
+        conn.close()
 
     return render_template(
         "admin/users.html",
         users=users,
         search=search,
         sort=sort
+    
     )
        
 @app.route('/admin/delete_user/<int:user_id>', methods=['POST'])
@@ -481,13 +596,18 @@ def delete_user(user_id):
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    cursor.execute("DELETE FROM userss WHERE id = %s", (user_id,))
-    conn.commit()
+    try:
+        cursor.execute("DELETE FROM userss WHERE id = %s", (user_id,))
+        conn.commit()
+        flash("User deleted successfully!", "success")
 
-    cursor.close()
-    conn.close()
+    except Exception as e:
+        print("Delete Error:", e)
+        flash("Something went wrong.", "danger")
 
-    flash("User deleted successfully!", "success")
+    finally:
+        cursor.close()
+        conn.close()
 
     return redirect(url_for('admin_users'))
 # ================= ADMIN LOGOUT =================

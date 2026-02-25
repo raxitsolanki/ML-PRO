@@ -1,80 +1,91 @@
 {% extends "layout.html" %}
 {% block content %}
 
-<div class="auth-card max-w-md mx-auto">
+<div class="w-full max-w-md mx-auto px-2 sm:px-0">
+<div class="auth-card bg-white rounded-3xl shadow-xl border border-slate-100
+            p-6 sm:p-10 transition-all">
 
     <!-- HEADER -->
-    <div class="text-center mb-8">
-        <div class="bg-emerald-50 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm border border-emerald-100">
-            <i class="fa-solid fa-user-plus text-emerald-500 text-3xl"></i>
+    <div class="text-center mb-6 sm:mb-8">
+        <div class="bg-emerald-50 w-14 h-14 sm:w-16 sm:h-16 rounded-2xl 
+                    flex items-center justify-center mx-auto mb-4 
+                    shadow-sm border border-emerald-100">
+            <i class="fa-solid fa-user-plus text-emerald-500 text-2xl sm:text-3xl"></i>
         </div>
-        <h2 class="text-2xl font-extrabold text-slate-900 tracking-tight">
+
+        <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">
             Create Account
         </h2>
-        <p class="text-sm text-slate-500 mt-1 font-medium">
+
+        <p class="text-xs sm:text-sm text-slate-500 mt-1 font-medium">
             Join DPS and manage your health journey
         </p>
     </div>
 
-    <form action="{{ url_for('register') }}" method="POST" onsubmit="return validateForm()" class="space-y-4">
+    <form action="{{ url_for('register') }}" method="POST" 
+          onsubmit="return validateForm()" 
+          class="space-y-4 sm:space-y-5">
 
         <!-- USERNAME -->
         <div>
-            <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">
+            <label class="block text-[10px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">
                 Username
             </label>
             <div class="relative">
-                <i class="fa-solid fa-at absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                <i class="fa-solid fa-at absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
                 <input type="text" name="username" required minlength="3"
                     placeholder="Enter username"
-                    class="w-full pl-14 pr-4 py-4 rounded-2xl border border-slate-200
-                    text-slate-800 font-medium focus:ring-4 focus:ring-emerald-500/10 
+                    class="w-full pl-12 sm:pl-14 pr-4 py-3 sm:py-4 rounded-2xl border border-slate-200
+                    text-sm sm:text-base text-slate-800 font-medium
+                    focus:ring-4 focus:ring-emerald-500/10 
                     focus:border-emerald-500 focus:outline-none transition-all">
             </div>
         </div>
 
         <!-- EMAIL -->
         <div>
-            <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">
+            <label class="block text-[10px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">
                 Email Address
             </label>
             <div class="relative">
-                <i class="fa-solid fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                <i class="fa-solid fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
                 <input type="email" name="email" required
                     placeholder="Enter email address"
-                    class="w-full pl-14 pr-4 py-4 rounded-2xl border border-slate-200
-                    text-slate-800 font-medium focus:ring-4 focus:ring-emerald-500/10 
+                    class="w-full pl-12 sm:pl-14 pr-4 py-3 sm:py-4 rounded-2xl border border-slate-200
+                    text-sm sm:text-base text-slate-800 font-medium
+                    focus:ring-4 focus:ring-emerald-500/10 
                     focus:border-emerald-500 focus:outline-none transition-all">
             </div>
         </div>
 
-        <!-- PASSWORDS GRID -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- PASSWORD SECTION -->
+        <!-- Always single column for better mobile UX -->
+        <div class="space-y-4">
 
             <!-- PASSWORD -->
             <div>
-                <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">
+                <label class="block text-[10px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">
                     Password
                 </label>
 
                 <div class="relative">
-                    <i class="fa-solid fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                    <i class="fa-solid fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
 
                     <input id="password"
                         type="password"
                         name="password"
-                        required
-                        minlength="6"
+                        required minlength="6"
                         placeholder="••••••••"
                         oninput="validateForm()"
-                        class="w-full pl-14 pr-12 py-4 rounded-2xl border border-slate-200
-                               text-slate-800 font-medium focus:ring-4 focus:ring-emerald-500/10 
+                        class="w-full pl-12 sm:pl-14 pr-12 py-3 sm:py-4 rounded-2xl border border-slate-200
+                               text-sm sm:text-base text-slate-800 font-medium
+                               focus:ring-4 focus:ring-emerald-500/10 
                                focus:border-emerald-500 focus:outline-none transition-all">
 
                     <button type="button"
                         class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 transition"
                         onclick="togglePassword('password', this.querySelector('i'))">
-                        <i class="fa-solid fa-eye"></i>
+                        <i class="fa-solid fa-eye text-sm"></i>
                     </button>
                 </div>
 
@@ -86,27 +97,27 @@
 
             <!-- CONFIRM PASSWORD -->
             <div>
-                <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">
+                <label class="block text-[10px] sm:text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">
                     Confirm Password
                 </label>
 
                 <div class="relative">
-                    <i class="fa-solid fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                    <i class="fa-solid fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
 
                     <input id="confirm_password"
                         type="password"
-                        required
-                        minlength="6"
+                        required minlength="6"
                         placeholder="••••••••"
                         oninput="validateForm()"
-                        class="w-full pl-14 pr-12 py-4 rounded-2xl border border-slate-200
-                               text-slate-800 font-medium focus:ring-4 focus:ring-emerald-500/10 
+                        class="w-full pl-12 sm:pl-14 pr-12 py-3 sm:py-4 rounded-2xl border border-slate-200
+                               text-sm sm:text-base text-slate-800 font-medium
+                               focus:ring-4 focus:ring-emerald-500/10 
                                focus:border-emerald-500 focus:outline-none transition-all">
 
                     <button type="button"
                         class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 transition"
                         onclick="togglePassword('confirm_password', this.querySelector('i'))">
-                        <i class="fa-solid fa-eye"></i>
+                        <i class="fa-solid fa-eye text-sm"></i>
                     </button>
                 </div>
 
@@ -120,63 +131,23 @@
 
         <!-- SUBMIT -->
         <button type="submit"
-            class="w-full bg-slate-900 text-white py-3.5 rounded-xl text-xs font-bold
-            flex items-center justify-center gap-2 shadow-lg shadow-slate-100
-            hover:bg-emerald-600 transition-all active:scale-95 mt-2">
-            <i class="fa-solid fa-user-plus"></i>
+            class="w-full bg-slate-900 text-white py-3 sm:py-3.5 rounded-xl 
+                   text-xs sm:text-sm font-bold
+                   flex items-center justify-center gap-2
+                   shadow-lg shadow-slate-100
+                   hover:bg-emerald-600 transition-all active:scale-95 mt-2">
+            <i class="fa-solid fa-user-plus text-xs sm:text-sm"></i>
             Register Account
         </button>
     </form>
 
-    <p class="text-center text-sm text-slate-500 mt-8 font-medium">
+    <p class="text-center text-xs sm:text-sm text-slate-500 mt-6 sm:mt-8 font-medium">
         Already have an account?
         <a href="{{ url_for('login') }}"
             class="text-slate-900 font-bold hover:text-emerald-600 transition underline-offset-4 hover:underline">
             Sign In
         </a>
     </p>
+
 </div>
-
-<script>
-function togglePassword(fieldId, icon) {
-    const input = document.getElementById(fieldId);
-    if (!input || !icon) return;
-
-    if (input.type === "password") {
-        input.type = "text";
-        icon.classList.replace("fa-eye", "fa-eye-slash");
-    } else {
-        input.type = "password";
-        icon.classList.replace("fa-eye-slash", "fa-eye");
-    }
-}
-
-function validateForm() {
-    const password = document.getElementById('password');
-    const confirm = document.getElementById('confirm_password');
-    const passError = document.getElementById('passwordError');
-    const matchError = document.getElementById('confirmPasswordError');
-
-    const regex = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{6,}$/;
-
-    let valid = true;
-
-    if (!regex.test(password.value)) {
-        passError.classList.remove("hidden");
-        valid = false;
-    } else {
-        passError.classList.add("hidden");
-    }
-
-    if (password.value !== confirm.value) {
-        matchError.classList.remove("hidden");
-        valid = false;
-    } else {
-        matchError.classList.add("hidden");
-    }
-
-    return valid;
-}
-</script>
-
-{% endblock %}
+</div>
