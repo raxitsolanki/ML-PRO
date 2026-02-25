@@ -30,9 +30,7 @@ from flask import request, render_template, session, redirect, url_for
 from feature_extractor import extract_fingerprint_features
 import joblib
 from io import BytesIO
-from flask_mail import Mail, Message
-from itsdangerous import URLSafeTimedSerializer
-from flask import url_for
+
 
 
 # Load ML Model & Scaler
