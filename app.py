@@ -60,21 +60,7 @@ def get_db_connection():
     except Error as e:
         print("Database connection failed:", e)
         return None
-import os
-from flask_mail import Mail
 
-app.config['MAIL_SERVER'] = 'smtp.gmail.com'
-app.config['MAIL_PORT'] = 587
-app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USE_SSL'] = False
-
-app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
-app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
-app.config['MAIL_DEFAULT_SENDER'] = os.environ.get('MAIL_USERNAME')
-
-mail = Mail(app)
-
-mail = Mail(app)
 
 @app.route('/')
 def home():
@@ -169,61 +155,50 @@ def login():
 
     return render_template('login.html')
 
-@app.route('/forgot_password', methods=['GET', 'POST'])
+@app.route('/forgot-password', methods=['GET', 'POST'])
 def forgot_password():
     if request.method == 'POST':
-        email = request.form['email']
+        email = request.form.get('email')
 
-        user = User.query.filter_by(email=email).first()
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT * FROM userss WHERE email=%s", (email,))
+        user = cursor.fetchone()
+        cursor.close()
+        conn.close()
 
         if user:
-            token = serializer.dumps(email, salt='password-reset')
-
-            reset_link = url_for('reset_password', token=token, _external=True)
-
-            msg = Message(
-                subject="Password Reset Request",
-                recipients=[email]
-            )
-
-            msg.body = f"""
-Hello,
-
-Click the link below to reset your password:
-
-{reset_link}
-
-If you did not request this, ignore this email.
-"""
-
-            mail.send(msg)
-
-            flash("Reset link sent to your email.", "success")
-            return redirect(url_for('login'))
+            session['reset_email'] = email
+            return redirect(url_for('reset_password'))
         else:
-            flash("Email not found.", "danger")
+            flash("Email not found in users table!", "danger")
 
     return render_template('forgot_password.html')
 from werkzeug.security import generate_password_hash
 
-@app.route('/reset_password/<token>', methods=['GET', 'POST'])
-def reset_password(token):
-    try:
-        email = serializer.loads(token, salt='password-reset', max_age=3600)
-    except:
-        flash("Reset link expired or invalid.", "danger")
+@app.route('/reset-password', methods=['GET', 'POST'])
+def reset_password():
+    email = session.get('reset_email')
+
+    if not email:
         return redirect(url_for('forgot_password'))
 
-    user = User.query.filter_by(email=email).first()
-
     if request.method == 'POST':
-        new_password = request.form['password']
+        new_password = request.form.get('password')
         hashed_password = generate_password_hash(new_password)
 
-        user.password = hashed_password
-        db.session.commit()
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute(
+            "UPDATE userss SET password=%s WHERE email=%s",
+            (hashed_password, email)
+        )
+        conn.commit()
+        cursor.close()
+        conn.close()
 
-        flash("Password updated successfully.", "success")
+        session.pop('reset_email', None)
+        flash("Password updated successfully!", "success")
         return redirect(url_for('login'))
 
     return render_template('reset_password.html')
