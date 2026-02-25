@@ -483,26 +483,39 @@ def admin_dashboard():
 
 
 
-# ================= VIEW USERS =================
+from flask import Flask, render_template, request, redirect, url_for, flash
+import mysql.connector
+
+# Ensure your connection function is configured correctly
+def get_db_connection():
+    return mysql.connector.connect(
+        host="localhost",
+        user="root", 
+        password="your_password",
+        database="your_database_name"
+    )
+
 @app.route('/admin/users')
 @admin_required
 def admin_users():
     search = request.args.get('search', '').strip()
     sort = request.args.get('sort', 'latest')
     
+    # Initialize variables to prevent "UnboundLocalError" during a crash
     users = []
     conn = None
     cursor = None
 
     try:
         conn = get_db_connection()
-        # dictionary=True allows access like u['username'] in HTML
+        # dictionary=True is CRITICAL so you can use u['id'] in HTML
         cursor = conn.cursor(dictionary=True)
 
-        # Base Query using your table 'userss'
+        # Base query using your specific table 'userss'
         query = "SELECT id, username, email FROM userss"
         params = []
 
+        # Filter logic
         if search:
             query += " WHERE username LIKE %s OR email LIKE %s"
             like_pattern = f"%{search}%"
@@ -520,17 +533,19 @@ def admin_users():
         users = cursor.fetchall()
 
     except Exception as e:
-        # This will print the EXACT error in your CMD/Terminal
-        print(f"DATABASE ERROR: {e}")
-        flash(f"Database Error: {str(e)}", "danger")
-        users = [] # Send empty list so template doesn't crash
-    
+        # This will print the specific error (e.g., missing column) in your terminal
+        print(f"CRITICAL DATABASE ERROR: {e}")
+        flash("Error connecting to the database.", "danger")
+        users = [] # Fallback to empty list so the page still loads
+
     finally:
-        if cursor: cursor.close()
-        if conn: conn.close()
+        # Safely close everything
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
 
     return render_template("admin/users.html", users=users, search=search, sort=sort)
-
 
 @app.route('/admin/delete_user/<int:user_id>', methods=['POST'])
 @admin_required
@@ -541,11 +556,11 @@ def delete_user(user_id):
         conn = get_db_connection()
         cursor = conn.cursor()
         
-        # Using 'userss' table here as well
+        # Using 'userss' table
         cursor.execute("DELETE FROM userss WHERE id = %s", (user_id,))
         conn.commit()
         
-        flash("User deleted successfully.", "success")
+        flash("User deleted successfully!", "success")
     except Exception as e:
         print(f"DELETE ERROR: {e}")
         flash("Could not delete user.", "danger")
@@ -554,19 +569,6 @@ def delete_user(user_id):
         if conn: conn.close()
 
     return redirect(url_for('admin_users'))
-# ================= ADMIN LOGOUT =================
-@app.route('/admin/logout')
-@admin_required
-def admin_logout():
-    # Clear session
-    session.pop('admin_logged_in', None)
-    session.pop('admin_username', None)
-
-    # ✅ Flash logout toast message
-    
-
-    return redirect(url_for('admin_login'))
-
 
 # ============= Admin messages ====================
 @app.route('/admin/messages')
