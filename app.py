@@ -288,7 +288,7 @@ def prediction():
     # Fetch user info
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT username, email FROM users WHERE id=%s", (session['id'],))
+    cursor.execute("SELECT username, email FROM userss WHERE id=%s", (session['id'],))
     user = cursor.fetchone()
     cursor.close()
     conn.close()
@@ -303,7 +303,7 @@ def suggestion():
 
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT username, email FROM users WHERE id=%s", (session['id'],))
+    cursor.execute("SELECT username, email FROM userss WHERE id=%s", (session['id'],))
     user = cursor.fetchone()
     cursor.close()
     conn.close()
@@ -388,7 +388,7 @@ def profile():
 
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT username, email, created_at FROM users WHERE id=%s", (session['id'],))
+    cursor.execute("SELECT username, email, created_at FROM userss WHERE id=%s", (session['id'],))
     user = cursor.fetchone()
     cursor.close()
     conn.close()
@@ -457,7 +457,7 @@ def admin_dashboard():
     cursor = conn.cursor(dictionary=True)
 
     # Total Users
-    cursor.execute("SELECT COUNT(*) AS total_users FROM users")
+    cursor.execute("SELECT COUNT(*) AS total_users FROM userss")
     total_users = cursor.fetchone()['total_users']
 
     # Total Messages
