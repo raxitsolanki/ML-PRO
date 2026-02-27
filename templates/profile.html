@@ -54,8 +54,9 @@
   }
 </style>
 
-<div class="min-h-screen py-10 sm:py-16 px-4 sm:px-6 lg:px-8">
-  <div class="max-w-4xl mx-auto">
+<!-- MAIN WRAPPER (Footer Touch Fix Applied) -->
+<div class="min-h-screen flex flex-col justify-between py-10 sm:py-16 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-4xl mx-auto w-full">
 
     <!-- HEADER TITLE -->
     <div class="mb-8 sm:mb-10 text-center">
@@ -118,8 +119,6 @@
           </p>
         </div>
 
-       
-
         <!-- Local Time -->
         <div class="info-group p-5 rounded-2xl bg-white border border-slate-100">
           <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 block">
@@ -132,7 +131,12 @@
       </div>
 
     </div>
+
   </div>
+
+  <!-- Bottom Spacer (Prevents Footer Touch) -->
+  <div class="h-10 sm:h-16"></div>
+
 </div>
 
 <script>
