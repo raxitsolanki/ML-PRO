@@ -11,12 +11,12 @@
     --emerald: #10b981;
     --slate-bg: #f8fafc;
   }
-
+  
   body {
     font-family: 'Poppins', sans-serif;
     background-color: var(--slate-bg);
   }
-
+  
   .premium-card {
     background: #ffffff;
     border: 1px solid rgba(226, 232, 240, 0.8);
@@ -24,13 +24,13 @@
                 0 10px 10px -5px rgba(0, 0, 0, 0.02);
     border-radius: 2rem;
   }
-
+  
   .profile-header-gradient {
     background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
     position: relative;
     overflow: hidden;
   }
-
+  
   .profile-header-gradient::before {
     content: '';
     position: absolute;
@@ -41,66 +41,73 @@
     top: -50px;
     right: -50px;
   }
-
+  
   .info-group {
     transition: all 0.3s ease;
   }
-
+  
   .info-group:hover {
     background: white;
     transform: translateY(-3px);
     box-shadow: 0 10px 15px rgba(0,0,0,0.05);
   }
-
+  
   .glass-backdrop {
     background: rgba(15, 23, 42, 0.7);
     backdrop-filter: blur(8px);
   }
-
   
-  /* MOBILE RESPONSIVE IMPROVEMENT */
-@media (max-width: 768px) {
-
-  .profile-header-gradient {
-    flex-direction: column !important;
-    text-align: center !important;
+  /* MOBILE RESPONSIVE */
+  
+  @media (max-width: 768px) {
+  
+    .profile-header-gradient {
+      flex-direction: column !important;
+      text-align: center !important;
+      padding: 30px 20px !important;
+    }
+  
+    .profile-header-gradient button {
+      width: 100%;
+      margin-top: 12px;
+    }
+  
+    .premium-card {
+      border-radius: 1.5rem;
+    }
+  
+    #profileModal .modal-content {
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      border-radius: 1.5rem;
+    }
+  
+    #profileModal form .flex {
+      flex-direction: column;
+    }
+  
+    #profileModal form button {
+      width: 100%;
+      margin-top: 10px;
+      padding: 10px;
+    }
+  
+    h1 {
+      font-size: 1.9rem !important;
+    }
+  
+    h2 {
+      font-size: 1.4rem !important;
+    }
   }
-
-  .profile-header-gradient button {
-    width: 100%;
-    margin-top: 10px;
+  
+  @media (max-width: 480px) {
+    h1 {
+      font-size: 1.7rem !important;
+    }
   }
-
-  .premium-card {
-    border-radius: 1.5rem;
-  }
-
-  .info-group {
-    padding: 16px;
-  }
-
-  #profileModal .modal-content {
-    width: 100%;
-    border-radius: 1.5rem;
-  }
-}
-
-@media (max-width: 480px) {
-
-  h1 {
-    font-size: 1.8rem !important;
-  }
-
-  .profile-header-gradient {
-    padding: 25px !important;
-  }
-
-  .info-group p {
-    font-size: 16px;
-  }
-}
-  }
-</style>
+  </style>
 
 <div class="min-h-screen py-10 px-4 sm:px-6 lg:px-8">
   <div class="max-w-4xl mx-auto">
