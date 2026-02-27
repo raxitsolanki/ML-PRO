@@ -56,69 +56,84 @@ body {
 }
 </style>
 
-<div class="min-h-screen py-16 px-4 sm:px-6 lg:px-8">
+<div class="min-h-screen py-10 px-4 sm:px-6 lg:px-8">
   <div class="max-w-4xl mx-auto">
-    
+
+    <!-- Page Header -->
     <div class="mb-10 text-center">
-      <h1 class="text-4xl md:text-5xl font-extrabold text-[--navy] tracking-tight">
+      <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-[--navy] tracking-tight">
         Account <span class="text-[var(--emerald)]">Settings</span>
       </h1>
-      <p class="text-gray-500 text-lg md:text-xl max-w-2xl font-medium mx-auto mt-4">
+      <p class="text-gray-500 text-base sm:text-lg md:text-xl max-w-2xl font-medium mx-auto mt-4">
         Manage your personal information and security preferences.
       </p>
     </div>
 
-  
+    <!-- Profile Card -->
+    <div class="bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-100">
 
-    <div class="premium-card overflow-hidden">
-      
-      <div class="profile-header-gradient px-8 py-12 flex flex-col items-center sm:flex-row sm:justify-between sm:text-left text-center">
-        <div class="flex flex-col sm:flex-row items-center gap-6">
-          <div class="w-24 h-24 bg-white/10 backdrop-blur-md rounded-3xl border border-white/20 flex items-center justify-center shadow-2xl relative group">
-            <span class="text-4xl font-bold text-white uppercase">{{ user.username[0] }}</span>
-            <div class="absolute -bottom-2 -right-2 w-8 h-8 bg-[--emerald] rounded-xl border-4 border-[#1e293b] flex items-center justify-center">
-                <i class="fa-solid fa-check text-[10px] text-white"></i>
-            </div>
-          </div>
-          
-          <div>
-            <h2 class="text-2xl font-bold text-white tracking-wide">{{ user.username }}</h2>
-            <p class="text-emerald-400 font-medium flex items-center gap-2 justify-center sm:justify-start">
-              <i class="fa-solid fa-shield-halved text-xs"></i> Verified Account
-            </p>
-          </div>
-        </div>
-
-      
-      
-
-        <div class="info-group p-6 rounded-3xl bg-white/50 border border-slate-100">
-          <label class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-2 block">Email Address</label>
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-[--navy]">
-                <i class="fa-solid fa-envelope"></i>
-            </div>
-            <p class="text-lg font-bold text-[--navy]">{{ user.email }}</p>
-          </div>
-        </div>
-
+      <!-- Header -->
+      <div class="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white py-10 px-6 text-center">
         
+        <!-- Avatar -->
+        <div class="w-20 h-20 mx-auto rounded-2xl bg-white/20 backdrop-blur-md 
+                    flex items-center justify-center text-3xl font-bold uppercase shadow-md">
+          {{ user.username[0] }}
+        </div>
 
-        <div class="info-group p-6 rounded-3xl bg-white/50 border border-slate-100">
-          <label class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-2 block">Local System Time</label>
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-500">
-                <i class="fa-solid fa-clock"></i>
-            </div>
-            <p id="live-datetime" class="text-lg font-bold text-[--navy] tabular-nums"></p>
-          </div>
+        <h2 class="text-xl sm:text-2xl font-bold mt-4 break-words">
+          {{ user.username }}
+        </h2>
+
+        <p class="text-emerald-100 mt-2 text-sm">
+          Verified Account
+        </p>
+      </div>
+
+      <!-- Body -->
+      <div class="p-6 sm:p-8 grid grid-cols-1 sm:grid-cols-2 gap-5 bg-slate-50">
+
+        <!-- Username -->
+        <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
+          <label class="text-xs text-gray-400 uppercase tracking-wide">Username</label>
+          <p class="text-base sm:text-lg font-bold text-[--navy] break-words">
+            {{ user.username }}
+          </p>
+        </div>
+
+        <!-- Email -->
+        <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
+          <label class="text-xs text-gray-400 uppercase tracking-wide">Email</label>
+          <p class="text-base sm:text-lg font-bold text-[--navy] break-words">
+            {{ user.email }}
+          </p>
+        </div>
+
+      
+
+        <!-- Live Time -->
+        <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
+          <label class="text-xs text-gray-400 uppercase tracking-wide">Local Time</label>
+          <p id="live-datetime" class="text-base sm:text-lg font-bold text-[--navy]"></p>
         </div>
 
       </div>
+
     </div>
+
   </div>
 </div>
 
+<!-- Live Date Time Script -->
+<script>
+  function updateDateTime() {
+    const now = new Date();
+    document.getElementById("live-datetime").textContent =
+      now.toLocaleString();
+  }
+  updateDateTime();
+  setInterval(updateDateTime, 1000);
+</script>
 <script>
 function updateDateTime() {
   const now = new Date();
