@@ -393,8 +393,9 @@ def profile():
 
         # ✅ Email included + correct table name
         cursor.execute(
-            "SELECT username, email, created_at FROM userss WHERE id=%s",
-            (session['id'],)
+            "SELECT username, email FROM userss WHERE id=%s",
+        (session['id'],)
+          
         )
         user = cursor.fetchone()
 
