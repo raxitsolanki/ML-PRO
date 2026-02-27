@@ -57,12 +57,48 @@
     backdrop-filter: blur(8px);
   }
 
-  /* Mobile Modal Scroll Fix */
-  @media (max-width: 640px) {
-    #profileModal .modal-content {
-      max-height: 90vh;
-      overflow-y: auto;
-    }
+  
+  /* MOBILE RESPONSIVE IMPROVEMENT */
+@media (max-width: 768px) {
+
+  .profile-header-gradient {
+    flex-direction: column !important;
+    text-align: center !important;
+  }
+
+  .profile-header-gradient button {
+    width: 100%;
+    margin-top: 10px;
+  }
+
+  .premium-card {
+    border-radius: 1.5rem;
+  }
+
+  .info-group {
+    padding: 16px;
+  }
+
+  #profileModal .modal-content {
+    width: 100%;
+    border-radius: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+
+  h1 {
+    font-size: 1.8rem !important;
+  }
+
+  .profile-header-gradient {
+    padding: 25px !important;
+  }
+
+  .info-group p {
+    font-size: 16px;
+  }
+}
   }
 </style>
 

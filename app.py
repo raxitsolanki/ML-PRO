@@ -394,6 +394,33 @@ def profile():
     conn.close()
 
     return render_template('profile.html', user=user)
+@app.route("/update-username", methods=["POST"])
+@login_required
+def update_username():
+    try:
+        new_username = request.form.get("new_username")
+
+        if not new_username or len(new_username) < 3:
+            flash("Username must be at least 3 characters.", "danger")
+            return redirect(url_for("profile"))
+
+        # Check if username already exists
+        existing = User.query.filter_by(username=new_username).first()
+        if existing:
+            flash("Username already taken.", "danger")
+            return redirect(url_for("profile"))
+
+        current_user.username = new_username
+        db.session.commit()
+
+        flash("Username updated successfully!", "success")
+        return redirect(url_for("profile"))
+
+    except Exception as e:
+        db.session.rollback()
+        print(e)   # IMPORTANT: See terminal error
+        flash("Something went wrong.", "danger")
+        return redirect(url_for("profile"))
 
 
 # ================= LOGOUT =================
