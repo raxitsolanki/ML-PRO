@@ -42,10 +42,10 @@
 }
 </style>
 
-<div class="flex-1 bg-slate-50 premium-font py-12 px-4 sm:px-6 lg:px-12 mobile-padding">
+<div class="flex-1 premium-font px-4 sm:px-6 lg:px-12 py-12">
 
 <!-- ================= HEADER ================= -->
-<div class="text-center max-w-2xl mx-auto mb-12 animate-fade-in">
+<div class="text-center max-w-2xl mx-auto mb-14 animate-fade-in">
 
   <span class="inline-flex items-center gap-2 text-emerald-600 font-bold text-xs uppercase tracking-[0.4em] mb-3">
     <i class="fa-solid fa-fingerprint"></i>
@@ -63,40 +63,37 @@
 </div>
 
 <!-- ================= SWITCH BUTTON ================= -->
-<div class="max-w-4xl mx-auto mb-8 flex justify-center sm:justify-end animate-fade-in">
 
-  <div class="bg-white border border-slate-200 rounded-[2.2rem] 
-              shadow-xl shadow-slate-200/40 px-4 sm:px-6 py-4 
-              flex flex-col sm:flex-row items-center gap-4 mobile-card">
+<div class="max-w-4xl mx-auto mb-10">
 
-      <div class="text-center sm:text-right">
-        <p class="text-[11px] font-black uppercase tracking-[0.3em] text-slate-800 flex items-center justify-center sm:justify-end gap-2">
-          Standard Mode
-          <i class="fa-solid fa-arrow-right text-[10px] text-slate-500 transition-transform"></i>
-        </p>
+  <div class="bg-white border border-emerald-100 rounded-3xl shadow-lg p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
 
-        <p class="text-xs text-slate-400 font-medium">
-          Clinical prediction based diagnosis
-        </p>
+      <div class="text-center sm:text-left">
+          <p class="text-emerald-600 font-bold tracking-widest text-xs uppercase">
+            Standard Mode
+          </p>
+          <p class="text-slate-500 text-sm">
+            Clinical prediction based diagnosis
+          </p>
       </div>
 
       <a href="{{ url_for('prediction') }}"
          class="group relative px-6 sm:px-8 py-4 sm:py-5 
-                bg-slate-900 text-white 
-                rounded-[2rem] font-black text-[11px]
-                tracking-[0.3em] uppercase 
-                shadow-2xl shadow-slate-400/40
-                flex items-center gap-3
-                hover:bg-slate-800 transition-all
-                hover:-translate-y-1 active:scale-95 mobile-btn">
-
-          <i class="fa-solid fa-microscope text-xl 
-                    group-hover:scale-110 transition-transform"></i>
-          <span>Clinical Prediction</span>
+         bg-slate-900 text-white 
+         rounded-[2rem] font-black text-[11px]
+         tracking-[0.3em] uppercase 
+         shadow-2xl shadow-slate-400/40
+         flex items-center gap-3
+         hover:bg-slate-800 transition-all
+         hover:-translate-y-1 active:scale-95 mobile-btn">
+         <i class="fa-solid fa-microscope"></i>
+          Clinical Prediction
       </a>
 
   </div>
+
 </div>
+
 
 <!-- ================= FORM ================= -->
 <div class="max-w-4xl mx-auto animate-fade-in">
