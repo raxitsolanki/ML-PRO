@@ -1,5 +1,4 @@
 {% extends "layout_app.html" %}
-
 {% block title %}Diagnostic Prediction - DSP Health{% endblock %}
 
 {% block content %}
@@ -9,195 +8,165 @@
 
 .premium-font { font-family: 'Plus Jakarta Sans', sans-serif; }
 
-/* Smooth Fade-in */
+/* Smooth Fade */
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
 }
 .animate-fade-in { animation: fadeIn 0.6s ease-out forwards; }
 
-/* ✅ FIX: Footer spacing correction */
-.page-wrapper {
-    min-height: calc(100vh - 160px);
-}
-
-/* ✅ Mobile Improvements */
+/* Mobile Improvements */
 @media (max-width: 768px) {
-
-    .page-wrapper {
-        padding-top: 1.5rem !important;
-        padding-bottom: 3rem !important;
-    }
-
     form {
         padding: 1.5rem !important;
         border-radius: 2rem !important;
     }
-
-    .rounded-\[3\.5rem\] {
-        border-radius: 2rem !important;
-    }
-
-    button[type="submit"] {
-        padding-top: 1.3rem !important;
-        padding-bottom: 1.3rem !important;
-    }
 }
 </style>
 
-<div class="bg-slate-50 premium-font page-wrapper px-4 sm:px-6 lg:px-12 py-10 md:py-14">
+<div class="flex-1 premium-font px-4 sm:px-6 lg:px-12 py-12">
 
     <!-- Header -->
-    <div class="text-center max-w-2xl mx-auto mb-12 animate-fade-in">
+    <div class="text-center max-w-2xl mx-auto mb-14 animate-fade-in">
+
         <span class="inline-flex items-center gap-2 text-emerald-600 font-bold text-xs uppercase tracking-[0.4em] mb-3">
             <i class="fa-solid fa-robot text-[12px]"></i>
-            REPORT AI Intelligence
+            REPORT AI INTELLIGENCE
         </span>
 
-        <h1 class="text-3xl sm:text-4xl md:text-5xl font-black text-slate-900 mb-4">
+        <h1 class="text-4xl md:text-5xl font-black text-slate-900 mb-4">
             Report-Based <span class="text-emerald-500">Prediction</span>
         </h1>
 
-        <p class="text-slate-500 font-medium text-sm sm:text-lg">
-            Enter patient clinical metrics for a high-precision, real-time machine learning diagnosis.
+        <p class="text-slate-500 font-medium text-sm md:text-lg">
+            Enter patient clinical metrics for high-precision AI diagnosis.
         </p>
+
     </div>
 
-    <!-- Advanced Mode Button -->
-    <div class="max-w-4xl mx-auto mb-8 px-4 sm:px-0">
+    <!-- Advanced Mode -->
+    <div class="max-w-4xl mx-auto mb-10">
 
-        <div class="bg-white border border-emerald-100 
-                    rounded-3xl shadow-lg 
-                    p-4 sm:p-6 
-                    flex flex-col sm:flex-row 
-                    items-center justify-between gap-4">
-    
-            <!-- TEXT AREA -->
+        <div class="bg-white border border-emerald-100 rounded-3xl shadow-lg p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+
             <div class="text-center sm:text-left">
-    
-                <p class="text-emerald-600 font-bold tracking-widest text-xs sm:text-sm uppercase">
+                <p class="text-emerald-600 font-bold tracking-widest text-xs uppercase">
                     Advanced Mode →
                 </p>
-    
-                <p class="text-slate-500 text-xs sm:text-sm">
+                <p class="text-slate-500 text-sm">
                     Biometric Prediction Based Diagnosis
                 </p>
-    
             </div>
-    
-            <!-- BUTTON -->
+
             <a href="{{ url_for('finger_prediction') }}"
-               class="w-full sm:w-auto text-center 
-                      px-6 py-3 
-                      bg-emerald-600 text-white 
-                      rounded-2xl font-bold text-sm 
-                      tracking-widest shadow-lg 
-                      hover:bg-emerald-500 transition-all 
-                      active:scale-95 
-                      flex items-center justify-center gap-2">
-    
+               class="w-full sm:w-auto text-center px-6 py-3 bg-emerald-600 text-white rounded-2xl font-bold text-sm tracking-widest shadow-lg hover:bg-emerald-500 transition-all active:scale-95 flex items-center justify-center gap-2">
                 <i class="fa-solid fa-fingerprint"></i>
                 FINGERPRINT AI
-    
             </a>
-    
+
         </div>
-    
+
     </div>
+
     <!-- FORM -->
     <div class="max-w-4xl mx-auto">
+
         <form action="{{ url_for('prediction') }}" method="POST"
-              class="bg-white rounded-[2.5rem] shadow-2xl shadow-slate-200/60 p-8 md:p-12 border border-slate-100 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 animate-fade-in">
+              class="bg-white rounded-[2.5rem] shadow-2xl shadow-slate-200/60 p-10 border border-slate-100 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 animate-fade-in">
 
             <!-- Gender -->
-            <div class="space-y-2">
-                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Gender Identity</label>
-                <select name="gender" class="w-full py-3.5 rounded-2xl border-2 border-slate-100 bg-slate-50 text-sm font-semibold text-slate-700 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/5 outline-none transition-all" required>
-                    <option value="">Select Gender</option>
+            <div>
+                <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Gender</label>
+                <select name="gender" class="w-full py-3 rounded-2xl border-2 border-slate-100 bg-slate-50 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 outline-none" required>
+                    <option value="">Select</option>
                     <option value="0">Female</option>
                     <option value="1">Male</option>
                 </select>
             </div>
 
             <!-- Age -->
-            <div class="space-y-2">
-                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Patient Age</label>
+            <div>
+                <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Age</label>
                 <input type="number" name="age" min="1" max="120"
-                       class="w-full py-3.5 rounded-2xl border-2 border-slate-100 bg-slate-50 text-sm font-semibold text-slate-700 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/5 outline-none transition-all" required>
+                       class="w-full py-3 rounded-2xl border-2 border-slate-100 bg-slate-50 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 outline-none" required>
             </div>
 
             <!-- Hypertension -->
-            <div class="space-y-2">
-                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Hypertension</label>
-                <select name="hypertension" class="w-full py-3.5 rounded-2xl border-2 border-slate-100 bg-slate-50 text-sm font-semibold text-slate-700 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/5 outline-none transition-all" required>
-                    <option value="0">No History</option>
-                    <option value="1">Has Hypertension</option>
+            <div>
+                <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Hypertension</label>
+                <select name="hypertension" class="w-full py-3 rounded-2xl border-2 border-slate-100 bg-slate-50 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 outline-none">
+                    <option value="0">No</option>
+                    <option value="1">Yes</option>
                 </select>
             </div>
 
-            <!-- Heart Disease -->
-            <div class="space-y-2">
-                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Heart Disease</label>
-                <select name="heart_disease" class="w-full py-3.5 rounded-2xl border-2 border-slate-100 bg-slate-50 text-sm font-semibold text-slate-700 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/5 outline-none transition-all" required>
-                    <option value="0">No History</option>
-                    <option value="1">Has Heart Disease</option>
+            <!-- Heart -->
+            <div>
+                <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Heart Disease</label>
+                <select name="heart_disease" class="w-full py-3 rounded-2xl border-2 border-slate-100 bg-slate-50 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 outline-none">
+                    <option value="0">No</option>
+                    <option value="1">Yes</option>
                 </select>
             </div>
 
             <!-- Smoking -->
-            <div class="space-y-2">
-                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Smoking History</label>
-                <select name="smoking" class="w-full py-3.5 rounded-2xl border-2 border-slate-100 bg-slate-50 text-sm font-semibold text-slate-700 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/5 outline-none transition-all" required>
-                    <option value="0">Never Smoked</option>
-                    <option value="1">Former Smoker</option>
-                    <option value="2">Current Smoker</option>
+            <div>
+                <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Smoking</label>
+                <select name="smoking" class="w-full py-3 rounded-2xl border-2 border-slate-100 bg-slate-50 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 outline-none">
+                    <option value="0">Never</option>
+                    <option value="1">Former</option>
+                    <option value="2">Current</option>
                 </select>
             </div>
 
             <!-- BMI -->
-            <div class="space-y-2">
-                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Body Mass Index (BMI)</label>
-                <input type="number" name="bmi" step="0.1"
-                       class="w-full py-3.5 rounded-2xl border-2 border-slate-100 bg-slate-50 text-sm font-semibold text-slate-700 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/5 outline-none transition-all" required>
+            <div>
+                <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">BMI</label>
+                <input type="number" step="0.1" name="bmi"
+                       class="w-full py-3 rounded-2xl border-2 border-slate-100 bg-slate-50 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 outline-none" required>
             </div>
 
             <!-- HbA1c -->
-            <div class="space-y-2">
-                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">HbA1c Level</label>
-                <input type="number" name="hba1c" step="0.1"
-                       class="w-full py-3.5 rounded-2xl border-2 border-slate-100 bg-slate-50 text-sm font-semibold text-slate-700 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/5 outline-none transition-all" required>
+            <div>
+                <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">HbA1c</label>
+                <input type="number" step="0.1" name="hba1c"
+                       class="w-full py-3 rounded-2xl border-2 border-slate-100 bg-slate-50 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 outline-none" required>
             </div>
 
             <!-- Glucose -->
-            <div class="space-y-2">
-                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Blood Glucose</label>
+            <div>
+                <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Glucose</label>
                 <input type="number" name="glucose"
-                       class="w-full py-3.5 rounded-2xl border-2 border-slate-100 bg-slate-50 text-sm font-semibold text-slate-700 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/5 outline-none transition-all" required>
+                       class="w-full py-3 rounded-2xl border-2 border-slate-100 bg-slate-50 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 outline-none" required>
             </div>
 
             <!-- Submit -->
             <div class="md:col-span-2 pt-8">
                 <button type="submit"
-                        class="w-full bg-slate-900 text-white py-5 rounded-[2rem] font-black text-sm tracking-[0.3em] shadow-xl hover:bg-emerald-600 transition-all active:scale-95 uppercase">
+                        class="w-full bg-slate-900 text-white py-5 rounded-3xl font-black tracking-widest hover:bg-emerald-600 transition-all active:scale-95 uppercase">
                     Generate Report Diagnosis
                 </button>
             </div>
 
         </form>
+
     </div>
 
-    <!-- Prediction Result -->
+    <!-- RESULT -->
     {% if prediction %}
-    <div class="mt-14 max-w-4xl mx-auto pb-10 animate-fade-in">
-        <div class="bg-white rounded-[2.5rem] shadow-xl p-8 md:p-12 text-center border {% if 'NOT' in prediction %}border-emerald-100{% else %}border-red-100{% endif %}">
-            
-            <h2 class="text-3xl md:text-5xl font-black text-slate-900 mb-6">
+    <div class="mt-16 mb-20 max-w-4xl mx-auto animate-fade-in">
+
+        <div class="bg-white rounded-3xl shadow-xl p-10 text-center border border-emerald-100">
+
+            <h2 class="text-4xl font-black text-slate-900 mb-8">
                 {{ prediction }}
             </h2>
 
             <div class="flex flex-wrap justify-center gap-5">
+
+                <!-- ALWAYS EMERALD -->
                 <a href="{{ url_for('suggestion') }}"
-                   class="px-8 py-4 {% if 'NOT' in prediction %}bg-emerald-600{% else %}bg-red-600{% endif %} text-white rounded-2xl font-bold text-xs tracking-widest hover:scale-105 transition-all">
+                   class="px-8 py-4 bg-emerald-500 text-white rounded-2xl font-bold text-xs tracking-widest hover:bg-emerald-600 transition-all hover:scale-105">
                     VIEW HEALTH SUGGESTIONS
                 </a>
 
@@ -206,8 +175,11 @@
                    class="px-8 py-4 bg-slate-900 text-white rounded-2xl font-bold text-xs tracking-widest hover:bg-slate-800 transition-all">
                     DOWNLOAD REPORT
                 </a>
+
             </div>
+
         </div>
+
     </div>
     {% endif %}
 
