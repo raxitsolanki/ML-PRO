@@ -2,152 +2,154 @@
 {% block title %}Profile - DSP Health{% endblock %}
 
 {% block content %}
-
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
-:root {
-  --navy: #1e293b;
-  --emerald: #10b981;
-  --slate-bg: #f8fafc;
-}
+  :root {
+    --navy: #1e293b;
+    --emerald: #10b981;
+    --slate-bg: #f8fafc;
+  }
 
-body {
-  font-family: 'Poppins', sans-serif;
-  background-color: var(--slate-bg);
-}
+  body {
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--slate-bg);
+  }
 
-.profile-card {
-  background: #ffffff;
-  border-radius: 2rem;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.04),
-              0 10px 10px -5px rgba(0, 0, 0, 0.02);
-  overflow: hidden;
-}
+  .premium-card {
+    background: #ffffff;
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.04),
+                0 10px 10px -5px rgba(0, 0, 0, 0.02);
+    border-radius: 2rem;
+  }
 
-.profile-header {
-  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
-  padding: 40px 20px;
-  text-align: center;
-}
+  .profile-header-gradient {
+    background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+    position: relative;
+    overflow: hidden;
+  }
 
-.profile-avatar {
-  width: 90px;
-  height: 90px;
-  background: rgba(255,255,255,0.1);
-  border-radius: 25px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 20px auto;
-  border: 1px solid rgba(255,255,255,0.2);
-}
+  .profile-header-gradient::before {
+    content: '';
+    position: absolute;
+    width: 160px;
+    height: 160px;
+    background: rgba(16, 185, 129, 0.1);
+    border-radius: 50%;
+    top: -40px;
+    right: -40px;
+  }
 
-.profile-info-box {
-  background: white;
-  padding: 20px;
-  border-radius: 1rem;
-  transition: 0.3s;
-}
+  .info-group {
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+  }
 
-.profile-info-box:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 10px 15px rgba(0,0,0,0.05);
-}
+  .info-group:hover {
+    background: white;
+    border-color: #e2e8f0;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+  }
 </style>
 
-<div class="min-h-screen py-10 px-4 sm:px-6 lg:px-8">
+<div class="min-h-screen py-10 sm:py-16 px-4 sm:px-6 lg:px-8">
   <div class="max-w-4xl mx-auto">
 
-    <!-- Page Header -->
-    <div class="mb-10 text-center">
+    <!-- HEADER TITLE -->
+    <div class="mb-8 sm:mb-10 text-center">
       <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold text-[--navy] tracking-tight">
         Account <span class="text-[var(--emerald)]">Settings</span>
       </h1>
-      <p class="text-gray-500 text-base sm:text-lg md:text-xl max-w-2xl font-medium mx-auto mt-4">
+      <p class="text-gray-500 text-sm sm:text-lg max-w-2xl mx-auto mt-3">
         Manage your personal information and security preferences.
       </p>
     </div>
 
-    <!-- Profile Card -->
-    <div class="bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-100">
+    <!-- CARD -->
+    <div class="premium-card overflow-hidden">
 
-      <!-- Header -->
-      <div class="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white py-10 px-6 text-center">
-        
-        <!-- Avatar -->
-        <div class="w-20 h-20 mx-auto rounded-2xl bg-white/20 backdrop-blur-md 
-                    flex items-center justify-center text-3xl font-bold uppercase shadow-md">
-          {{ user.username[0] }}
+      <!-- PROFILE HEADER -->
+      <div class="profile-header-gradient px-6 sm:px-8 py-10 sm:py-12 flex flex-col items-center text-center sm:text-left sm:flex-row sm:justify-between">
+
+        <div class="flex flex-col sm:flex-row items-center gap-5">
+          
+          <!-- Avatar -->
+          <div class="w-20 h-20 sm:w-24 sm:h-24 bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 flex items-center justify-center shadow-xl relative">
+            <span class="text-3xl sm:text-4xl font-bold text-white uppercase">
+              {{ user.username[0] }}
+            </span>
+          </div>
+
+          <!-- Name -->
+          <div>
+            <h2 class="text-xl sm:text-2xl font-bold text-white tracking-wide">
+              {{ user.username }}
+            </h2>
+            <p class="text-emerald-400 text-sm font-medium">
+              Verified Account
+            </p>
+          </div>
         </div>
 
-        <h2 class="text-xl sm:text-2xl font-bold mt-4 break-words">
-          {{ user.username }}
-        </h2>
-
-        <p class="text-emerald-100 mt-2 text-sm">
-          Verified Account
-        </p>
       </div>
 
-      <!-- Body -->
-      <div class="p-6 sm:p-8 grid grid-cols-1 sm:grid-cols-2 gap-5 bg-slate-50">
+      <!-- INFO SECTION -->
+      <div class="p-6 sm:p-10 grid grid-cols-1 sm:grid-cols-2 gap-5 bg-slate-50/50">
 
         <!-- Username -->
-        <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
-          <label class="text-xs text-gray-400 uppercase tracking-wide">Username</label>
+        <div class="info-group p-5 rounded-2xl bg-white border border-slate-100">
+          <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 block">
+            Username
+          </label>
           <p class="text-base sm:text-lg font-bold text-[--navy] break-words">
             {{ user.username }}
           </p>
         </div>
 
         <!-- Email -->
-        <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
-          <label class="text-xs text-gray-400 uppercase tracking-wide">Email</label>
+        <div class="info-group p-5 rounded-2xl bg-white border border-slate-100">
+          <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 block">
+            Email Address
+          </label>
           <p class="text-base sm:text-lg font-bold text-[--navy] break-words">
             {{ user.email }}
           </p>
         </div>
 
-      
+       
 
-        <!-- Live Time -->
-        <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
-          <label class="text-xs text-gray-400 uppercase tracking-wide">Local Time</label>
-          <p id="live-datetime" class="text-base sm:text-lg font-bold text-[--navy]"></p>
+        <!-- Local Time -->
+        <div class="info-group p-5 rounded-2xl bg-white border border-slate-100">
+          <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 block">
+            Local System Time
+          </label>
+          <p id="live-datetime" class="text-base sm:text-lg font-bold text-[--navy] tabular-nums">
+          </p>
         </div>
 
       </div>
 
     </div>
-
   </div>
 </div>
 
-<!-- Live Date Time Script -->
 <script>
   function updateDateTime() {
     const now = new Date();
-    document.getElementById("live-datetime").textContent =
-      now.toLocaleString();
-  }
-  updateDateTime();
-  setInterval(updateDateTime, 1000);
-</script>
-<script>
-function updateDateTime() {
-  const now = new Date();
-  document.getElementById('live-datetime').textContent =
-    now.toLocaleTimeString('en-IN', {
+    const options = {
       hour: '2-digit',
       minute: '2-digit',
       second: '2-digit',
       hour12: true
-    });
-}
+    };
+    const timeStr = now.toLocaleTimeString('en-IN', options);
+    document.getElementById('live-datetime').textContent = timeStr;
+  }
 
-setInterval(updateDateTime, 1000);
-updateDateTime();
+  setInterval(updateDateTime, 1000);
+  updateDateTime();
 </script>
 
 {% endblock %}
