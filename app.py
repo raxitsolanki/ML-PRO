@@ -384,123 +384,33 @@ def contactus():
 # ================= PROFILE PAGE =================
 @app.route('/profile')
 def profile():
-    if 'loggedin' not in session:
+    if 'loggedin' not in session or 'id' not in session:
         return redirect(url_for('login'))
 
-    conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
 
-    # ✅ Email removed + table name corrected
-    cursor.execute(
-        "SELECT username, created_at FROM userss WHERE id=%s",
-        (session['id'],)
-    )
-    user = cursor.fetchone()
+        # ✅ Email included + correct table name
+        cursor.execute(
+            "SELECT username, email, created_at FROM userss WHERE id=%s",
+            (session['id'],)
+        )
+        user = cursor.fetchone()
 
-    cursor.close()
-    conn.close()
-
-    return render_template('profile.html', user=user)
-
-
-# ================= UPDATE USERNAME =================
-@app.route('/update-username', methods=['POST'])
-def update_username():
-    if 'loggedin' not in session:
-        return redirect(url_for('login'))
-
-    new_username = request.form.get('new_username', '').strip()
-
-    if not new_username:
-        flash("Username cannot be empty!", "error")
-        return redirect(url_for('profile'))
-
-    conn = get_db_connection()
-    cursor = conn.cursor()
-
-    # Optional: prevent duplicate usernames
-    cursor.execute(
-        "SELECT id FROM userss WHERE username=%s AND id!=%s",
-        (new_username, session['id'])
-    )
-    existing = cursor.fetchone()
-
-    if existing:
         cursor.close()
         conn.close()
-        flash("Username already taken!", "error")
-        return redirect(url_for('profile'))
 
-    # ✅ Update username in userss table
-    cursor.execute(
-        "UPDATE userss SET username=%s WHERE id=%s",
-        (new_username, session['id'])
-    )
+        # ✅ If user not found (safety check)
+        if not user:
+            session.clear()
+            return redirect(url_for('login'))
 
-    conn.commit()
-    cursor.close()
-    conn.close()
+        return render_template('profile.html', user=user)
 
-    flash("Username updated successfully!", "success")
-    return redirect(url_for('profile'))
-
-
-# ================= UPDATE PASSWORD =================
-@app.route('/update-password', methods=['POST'])
-def update_password():
-    if 'loggedin' not in session:
-        return redirect(url_for('login'))
-
-    new_password = request.form.get('new_password', '').strip()
-    confirm_password = request.form.get('confirm_password', '').strip()
-
-    # 1️⃣ Required fields check
-    if not new_password or not confirm_password:
-        flash("Please fill all fields!", "error")
-        return redirect(url_for('profile'))
-
-    # 2️⃣ Password match check
-    if new_password != confirm_password:
-        flash("Passwords do not match!", "error")
-        return redirect(url_for('profile'))
-
-    # 3️⃣ Strength validation
-    import re
-    errors = []
-
-    if len(new_password) < 6:
-        errors.append("Minimum 6 characters")
-    if not re.search(r"[A-Z]", new_password):
-        errors.append("At least 1 uppercase letter")
-    if not re.search(r"[a-z]", new_password):
-        errors.append("At least 1 lowercase letter")
-    if not re.search(r"[0-9]", new_password):
-        errors.append("At least 1 number")
-    if not re.search(r"[@$!%*?&]", new_password):
-        errors.append("At least 1 special character (@$!%*?&)")
-
-    if errors:
-        flash("Password must contain: " + ", ".join(errors), "error")
-        return redirect(url_for('profile'))
-
-    # 4️⃣ Update password in userss table
-    hashed = generate_password_hash(new_password)
-
-    conn = get_db_connection()
-    cursor = conn.cursor()
-
-    cursor.execute(
-        "UPDATE userss SET password=%s WHERE id=%s",
-        (hashed, session['id'])
-    )
-
-    conn.commit()
-    cursor.close()
-    conn.close()
-
-    flash("Password updated successfully!", "success")
-    return redirect(url_for('profile'))
-
+    except Exception as e:
+        print("Profile Error:", e)
+        return "Something went wrong", 500
 # ================= LOGOUT =================
 @app.route('/logout')
 def logout():
