@@ -56,59 +56,66 @@ body {
 }
 </style>
 
-<div class="min-h-screen py-10 px-4">
-  <div class="max-w-3xl mx-auto">
+<div class="min-h-screen py-16 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-4xl mx-auto">
+    
+    <div class="mb-10 text-center">
+      <h1 class="text-4xl md:text-5xl font-extrabold text-[--navy] tracking-tight">
+        Account <span class="text-[var(--emerald)]">Settings</span>
+      </h1>
+      <p class="text-gray-500 text-lg md:text-xl max-w-2xl font-medium mx-auto mt-4">
+        Manage your personal information and security preferences.
+      </p>
+    </div>
 
-    <div class="profile-card">
+  
 
-      <!-- Header -->
-      <div class="profile-header text-white">
-        <div class="profile-avatar">
-          <span class="text-3xl font-bold uppercase">
-            {{ user.username[0] }}
-          </span>
+    <div class="premium-card overflow-hidden">
+      
+      <div class="profile-header-gradient px-8 py-12 flex flex-col items-center sm:flex-row sm:justify-between sm:text-left text-center">
+        <div class="flex flex-col sm:flex-row items-center gap-6">
+          <div class="w-24 h-24 bg-white/10 backdrop-blur-md rounded-3xl border border-white/20 flex items-center justify-center shadow-2xl relative group">
+            <span class="text-4xl font-bold text-white uppercase">{{ user.username[0] }}</span>
+            <div class="absolute -bottom-2 -right-2 w-8 h-8 bg-[--emerald] rounded-xl border-4 border-[#1e293b] flex items-center justify-center">
+                <i class="fa-solid fa-check text-[10px] text-white"></i>
+            </div>
+          </div>
+          
+          <div>
+            <h2 class="text-2xl font-bold text-white tracking-wide">{{ user.username }}</h2>
+            <p class="text-emerald-400 font-medium flex items-center gap-2 justify-center sm:justify-start">
+              <i class="fa-solid fa-shield-halved text-xs"></i> Verified Account
+            </p>
+          </div>
         </div>
 
-        <h2 class="text-2xl font-bold">
-          {{ user.username }}
-        </h2>
+      
+      
 
-        <p class="text-emerald-400 mt-2 text-sm">
-          Verified Account
-        </p>
-      </div>
-
-      <!-- Body -->
-      <div class="p-8 grid grid-cols-1 md:grid-cols-2 gap-6 bg-slate-50">
-
-        <!-- Username -->
-        <div class="profile-info-box">
-          <label class="text-xs text-gray-400 uppercase">Username</label>
-          <p class="text-lg font-bold text-[--navy]">
-            {{ user.username }}
-          </p>
+        <div class="info-group p-6 rounded-3xl bg-white/50 border border-slate-100">
+          <label class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-2 block">Email Address</label>
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-[--navy]">
+                <i class="fa-solid fa-envelope"></i>
+            </div>
+            <p class="text-lg font-bold text-[--navy]">{{ user.email }}</p>
+          </div>
         </div>
 
-        <!-- Email -->
-        <div class="profile-info-box">
-          <label class="text-xs text-gray-400 uppercase">Email</label>
-          <p class="text-lg font-bold text-[--navy] break-words">
-            {{ user.email }}
-          </p>
-        </div>
-
-        <!-- Member Since -->
         
 
-        <!-- Live Time -->
-        <div class="profile-info-box">
-          <label class="text-xs text-gray-400 uppercase">Local Time</label>
-          <p id="live-datetime" class="text-lg font-bold text-[--navy]"></p>
+        <div class="info-group p-6 rounded-3xl bg-white/50 border border-slate-100">
+          <label class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-2 block">Local System Time</label>
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-500">
+                <i class="fa-solid fa-clock"></i>
+            </div>
+            <p id="live-datetime" class="text-lg font-bold text-[--navy] tabular-nums"></p>
+          </div>
         </div>
 
       </div>
     </div>
-
   </div>
 </div>
 
