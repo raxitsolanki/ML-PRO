@@ -934,7 +934,7 @@ def download_report(user_id):
     cursor = conn.cursor(dictionary=True)
 
     # ---------- USER INFO ----------
-    cursor.execute("SELECT username, email FROM users WHERE id=%s", (user_id,))
+    cursor.execute("SELECT username, email FROM userss WHERE id=%s", (user_id,))
     user = cursor.fetchone()
 
     # ---------- LATEST PREDICTION ----------
