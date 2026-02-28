@@ -675,6 +675,9 @@ def delete_message(id):
 # ----------------------------
 # Admin Prediction Page
 # ----------------------------
+# ----------------------------
+# Admin Prediction Page
+# ----------------------------
 @app.route('/admin/prediction')
 @admin_required
 def admin_prediction():
@@ -697,7 +700,7 @@ def admin_prediction():
             p.created_at,
             u.email
         FROM predictions p
-        LEFT JOIN users u ON u.id = p.user_id
+        LEFT JOIN userss u ON u.id = p.user_id
         ORDER BY p.created_at DESC
         """
 
@@ -716,33 +719,49 @@ def admin_prediction():
 
     except Exception as e:
         print("ERROR IN ADMIN PREDICTION:", e)
-        return "Internal Server Error - Check Logs"
-
-
+        return "Internal Server Error"
+# ----------------------------
+# Delete Prediction
+# ----------------------------
 # ----------------------------
 # Delete Prediction
 # ----------------------------
 @app.route('/admin/prediction/delete/<int:id>', methods=['POST'])
 @admin_required
 def delete_prediction(id):
+    conn = None
+    cursor = None
+
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
 
-        cursor.execute("DELETE FROM predictions WHERE id=%s", (id,))
-        conn.commit()
+        # Check if record exists first
+        cursor.execute("SELECT id FROM predictions WHERE id = %s", (id,))
+        prediction = cursor.fetchone()
 
-        cursor.close()
-        conn.close()
+        if not prediction:
+            flash("Prediction not found.", "danger")
+            return redirect(url_for('admin_prediction'))
+
+        # Delete record
+        cursor.execute("DELETE FROM predictions WHERE id = %s", (id,))
+        conn.commit()
 
         flash("Prediction deleted successfully.", "success")
         return redirect(url_for('admin_prediction'))
 
     except Exception as e:
         print("DELETE ERROR:", e)
-        return "Delete Failed"
+        flash("Something went wrong while deleting.", "danger")
+        return redirect(url_for('admin_prediction'))
 
-        
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
 @app.route('/admin/user-analytics')
 @admin_required
 def admin_user_analytics():
