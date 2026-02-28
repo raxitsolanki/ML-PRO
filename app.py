@@ -427,9 +427,11 @@ def logout():
 @app.route('/admin/login', methods=['GET', 'POST'])
 def admin_login():
     error = None
+
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
+
         try:
             conn = get_db_connection()
             cursor = conn.cursor(dictionary=True)
@@ -441,18 +443,18 @@ def admin_login():
             if admin and admin['password'] == password:
                 session['admin_logged_in'] = True
                 session['admin_username'] = admin['username']
-                # ✅ Flash success message
                 flash("Welcome to Admin Panel!", "success")
                 return redirect(url_for('admin_dashboard'))
             else:
                 error = "Invalid username or password"
 
         except Exception as e:
-            error = "Something went wrong: " + str(e)
+            error = "Database Error: " + str(e)
 
     return render_template('admin/admin_login.html', error=error)
 
-# ================= ADMIN AUTH DECORATOR =================
+
+# ================= ADMIN REQUIRED DECORATOR =================
 def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -465,28 +467,32 @@ def admin_required(f):
 
 # ================= ADMIN DASHBOARD =================
 @app.route('/admin/dashboard')
+@admin_required
 def admin_dashboard():
-    if 'admin_logged_in' not in session:
-        return redirect(url_for('admin_login'))
 
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
 
-    # Total Users
+    # Total Users (userss table)
     cursor.execute("SELECT COUNT(*) AS total_users FROM userss")
-    total_users = cursor.fetchone()['total_users']
+    result = cursor.fetchone()
+    total_users = result['total_users'] if result else 0
 
     # Total Messages
     cursor.execute("SELECT COUNT(*) AS total_messages FROM contact_messages")
-    total_messages = cursor.fetchone()['total_messages']
+    result = cursor.fetchone()
+    total_messages = result['total_messages'] if result else 0
 
+    # Total Predictions
     cursor.execute("""
         SELECT 
-            (SELECT COUNT(*) FROM predictions) +
-            (SELECT COUNT(*) FROM finger_predictions)
+            COALESCE((SELECT COUNT(*) FROM predictions),0) +
+            COALESCE((SELECT COUNT(*) FROM finger_predictions),0)
             AS total_prediction
     """)
-    total_prediction = cursor.fetchone()['total_prediction']
+    result = cursor.fetchone()
+    total_prediction = result['total_prediction'] if result else 0
+
     cursor.close()
     conn.close()
 
@@ -494,9 +500,8 @@ def admin_dashboard():
         'admin/admin_dashboard.html',
         total_users=total_users,
         total_messages=total_messages,
-        total_prediction=total_prediction  # future use / predictions placeholder
+        total_prediction=total_prediction
     )
-
 
 
 
