@@ -567,6 +567,12 @@ def delete_user(id):
     flash("User deleted successfully", "success")
     return redirect(url_for('admin_users')
     )
+@app.route('/admin/logout')
+def admin_logout():
+    session.pop('admin_logged_in', None)
+    session.pop('admin_username', None)
+    flash("Logged out successfully", "success")
+    return redirect(url_for('admin_login'))
 
 # ============= Admin messages ====================
 @app.route('/admin/messages')
