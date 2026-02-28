@@ -741,6 +741,8 @@ def delete_prediction(id):
     except Exception as e:
         print("DELETE ERROR:", e)
         return "Delete Failed"
+
+        
 @app.route('/admin/user-analytics')
 @admin_required
 def admin_user_analytics():
