@@ -1,51 +1,57 @@
 {% extends "admin/admin_layout.html" %}
 {% block content %}
 
-<h1 class="text-3xl font-bold mb-6">User Analytics</h1>
-<!-- PREMIUM ANALYTICS FILTER -->
-<div class="bg-white/80 backdrop-blur-md border border-gray-200 p-6 rounded-2xl shadow-lg mb-6">
+<div class="px-4 sm:px-6 lg:px-8 py-6">
+
+<h1 class="text-2xl sm:text-3xl font-bold mb-6 text-center sm:text-left">
+  User Analytics
+</h1>
+
+<!-- FILTER SECTION -->
+<div class="bg-white border border-gray-200 p-5 rounded-2xl shadow mb-6">
 
   <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
 
-    <!-- Left Side -->
+    <!-- Left Info -->
     <div>
       <h2 class="text-lg font-semibold text-gray-800">Filter</h2>
       <p class="text-sm text-gray-500">
-        Total Users: 
+        Total Users:
         <span class="font-semibold text-blue-600">{{ users|length }}</span>
       </p>
     </div>
 
     <!-- Filter Form -->
-    <form method="GET" class="flex flex-col md:flex-row items-center gap-3 w-full lg:w-auto">
+    <form method="GET"
+          class="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3 w-full lg:w-auto">
 
       <!-- Search -->
-      <div class="relative w-full md:w-72">
+      <div class="relative w-full sm:w-64">
         <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-gray-400 text-sm"></i>
         <input type="text"
                name="search"
                value="{{ search }}"
                placeholder="Search username or email..."
-               class="w-full pl-9 pr-4 py-2 rounded-xl border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+               class="w-full pl-9 pr-4 py-2 rounded-xl border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
       </div>
 
       <!-- Sort -->
       <select name="sort"
-              class="px-4 py-2 rounded-xl border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
-              <option value="latest" {% if sort=='latest' %}selected{% endif %}>Latest</option>
-              <option value="az" {% if sort=='az' %}selected{% endif %}>A - Z</option>
-              <option value="za" {% if sort=='za' %}selected{% endif %}>Z - A</option>
+              class="px-4 py-2 rounded-xl border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <option value="latest" {% if sort=='latest' %}selected{% endif %}>Latest</option>
+        <option value="az" {% if sort=='az' %}selected{% endif %}>A - Z</option>
+        <option value="za" {% if sort=='za' %}selected{% endif %}>Z - A</option>
       </select>
 
       <!-- Apply -->
       <button type="submit"
-              class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-5 py-2 rounded-xl text-sm font-medium shadow-md hover:scale-105 transition">
-        <i class="fa-solid fa-filter mr-1"></i> Apply
+              class="bg-blue-600 text-white px-5 py-2 rounded-xl text-sm font-medium hover:bg-blue-700 transition">
+        Apply
       </button>
 
       <!-- Reset -->
       <a href="{{ url_for('admin_user_analytics') }}"
-         class="bg-gray-200 text-gray-700 px-4 py-2 rounded-xl text-sm hover:bg-gray-300 transition">
+         class="bg-gray-200 text-gray-700 px-4 py-2 rounded-xl text-sm text-center hover:bg-gray-300 transition">
         Reset
       </a>
 
@@ -54,46 +60,68 @@
 </div>
 
 
-<!-- Responsive wrapper -->
-<div class="overflow-x-auto rounded-lg shadow-md">
-  <table class="min-w-full divide-y divide-gray-200 bg-white">
-    <thead class="bg-gray-200">
-      <tr class="text-left text-xs md:text-sm uppercase tracking-wider">
-        <th class="px-3 py-2">ID</th>
-        <th class="px-3 py-2">Username</th>
-        <th class="px-3 py-2">Email</th>
-        <th class="px-3 py-2">Action</th>
+<!-- DESKTOP TABLE -->
+<div class="hidden md:block bg-white rounded-2xl shadow overflow-hidden">
+  <table class="min-w-full divide-y divide-gray-200">
+    <thead class="bg-gray-100">
+      <tr class="text-left text-sm uppercase tracking-wider text-gray-600">
+        <th class="px-4 py-3">ID</th>
+        <th class="px-4 py-3">Username</th>
+        <th class="px-4 py-3">Email</th>
+        <th class="px-4 py-3">Action</th>
       </tr>
     </thead>
 
     <tbody class="divide-y divide-gray-200">
       {% for u in users %}
-      <tr class="hover:bg-gray-50 text-xs md:text-sm">
-        <td class="px-3 py-2 whitespace-nowrap">{{ u.id }}</td>
-        <td class="px-3 py-2 whitespace-nowrap">{{ u.username }}</td>
-        <td class="px-3 py-2 whitespace-nowrap">{{ u.email }}</td>
-        <td class="px-3 py-2 whitespace-nowrap">
-            <a href="{{ url_for('admin_user_detail', user_id=u.id) }}"
-            class="inline-flex items-center justify-center gap-2 
-                   bg-indigo-600 text-white 
-                   px-4 py-1.5 
-                   rounded-md 
-                   shadow-sm 
-                   hover:bg-indigo-700 
-                   hover:shadow-md 
-                   transition-all duration-200 
-                   text-xs md:text-sm 
-                   font-medium">
-           <i class="fa-solid fa-eye text-xs"></i>
-           View
-         </a>
-         
-         
+      <tr class="hover:bg-gray-50 text-sm">
+        <td class="px-4 py-3">{{ u.id }}</td>
+        <td class="px-4 py-3">{{ u.username }}</td>
+        <td class="px-4 py-3 break-all">{{ u.email }}</td>
+        <td class="px-4 py-3">
+          <a href="{{ url_for('admin_user_detail', user_id=u.id) }}"
+             class="inline-flex items-center gap-2 bg-indigo-600 text-white px-4 py-1.5 rounded-lg text-sm hover:bg-indigo-700 transition">
+            <i class="fa-solid fa-eye text-xs"></i>
+            View
+          </a>
         </td>
       </tr>
       {% endfor %}
     </tbody>
   </table>
+</div>
+
+
+<!-- MOBILE CARD VIEW -->
+<div class="md:hidden space-y-4">
+  {% for u in users %}
+  <div class="bg-white p-4 rounded-2xl shadow border border-gray-200">
+
+    <div class="flex justify-between items-center mb-2">
+      <span class="text-xs text-gray-500">ID</span>
+      <span class="font-semibold text-sm">{{ u.id }}</span>
+    </div>
+
+    <div class="mb-2">
+      <p class="text-xs text-gray-500">Username</p>
+      <p class="font-medium text-sm">{{ u.username }}</p>
+    </div>
+
+    <div class="mb-3">
+      <p class="text-xs text-gray-500">Email</p>
+      <p class="text-sm break-all">{{ u.email }}</p>
+    </div>
+
+    <a href="{{ url_for('admin_user_detail', user_id=u.id) }}"
+       class="w-full inline-flex justify-center items-center gap-2 bg-indigo-600 text-white py-2 rounded-xl text-sm font-medium hover:bg-indigo-700 transition">
+      <i class="fa-solid fa-eye text-xs"></i>
+      View Details
+    </a>
+
+  </div>
+  {% endfor %}
+</div>
+
 </div>
 
 {% endblock %}

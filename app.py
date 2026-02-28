@@ -767,14 +767,14 @@ def delete_prediction(id):
 def admin_user_analytics():
 
     search = request.args.get('search', '').strip()
-    sort = request.args.get('sort', 'latest')
+    sort = request.args.get('sort', 'az')
 
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
 
     query = """
-        SELECT id, username, email, created_at
-        FROM users
+        SELECT id, username, email
+        FROM userss
     """
 
     conditions = []
@@ -788,15 +788,13 @@ def admin_user_analytics():
     if conditions:
         query += " WHERE " + " AND ".join(conditions)
 
-    # 🎯 Sorting
+    # 🎯 Sorting (created_at removed)
     if sort == "az":
         query += " ORDER BY username ASC"
     elif sort == "za":
         query += " ORDER BY username DESC"
-    elif sort == "latest":
-        query += " ORDER BY created_at DESC"
     else:
-        query += " ORDER BY username ASC"
+        query += " ORDER BY id DESC"   # fallback latest by id
 
     cursor.execute(query, values)
     users = cursor.fetchall()
@@ -810,7 +808,6 @@ def admin_user_analytics():
         search=search,
         sort=sort
     )
-
 @app.route('/admin/user-analytics/<int:user_id>')
 @admin_required
 def admin_user_detail(user_id):
