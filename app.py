@@ -667,59 +667,7 @@ def delete_message(id):
     flash("Message deleted successfully", "success")
     return redirect(url_for('admin_messages'))
 
-@app.route('/admin/message-ready/<int:id>', methods=['POST'])
-def mark_message_ready(id):
-    if 'admin_logged_in' not in session:
-        return redirect(url_for('admin_login'))
 
-    conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
-
-    # Get user message
-    cursor.execute("SELECT * FROM contact_messages WHERE id=%s", (id,))
-    msg = cursor.fetchone()
-
-    if not msg:
-        flash("Message not found", "danger")
-        return redirect(url_for('admin_messages'))
-
-    # Email to user
-    subject = "DPS Support Team"
-    message = f"""
-    <h3 style="color:#5b21b6;">Diabetes Prediction System</h3>
-    <p>Hi <b>{msg['name']}</b>,</p>
-
-    <p>Your message has been reviewed by our admin team.</p>
-
-    <p><b>Subject:</b> {msg['subject']}</p>
-    <p><b>Your Message:</b><br>{msg['message']}</p>
-
-    <p>We will contact you shortly if needed.</p>
-
-    <p style="color:#5b21b6;"><b>– DPS Support Team</b></p>
-    """
-
-    try:
-        send_email(msg['email'], subject, message)
-
-        # Update status
-        cursor.execute("""
-            UPDATE contact_messages 
-            SET status='sent', is_read=1 
-            WHERE id=%s
-        """, (id,))
-        conn.commit()
-
-        flash("Email sent to user successfully!", "success")
-
-    except Exception as e:
-        print(e)
-        flash("Email sending failed", "danger")
-
-    cursor.close()
-    conn.close()
-
-    return redirect(url_for('admin_messages'))
 @app.route('/admin/prediction')
 @admin_required
 def admin_prediction():
