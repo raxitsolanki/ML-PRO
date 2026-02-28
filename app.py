@@ -672,60 +672,75 @@ def delete_message(id):
 
     flash("Message deleted successfully", "success")
     return redirect(url_for('admin_messages'))
+# ----------------------------
+# Admin Prediction Page
+# ----------------------------
 @app.route('/admin/prediction')
 @admin_required
 def admin_prediction():
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
 
-    conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
+        query = """
+        SELECT 
+            p.id,
+            p.gender,
+            p.age,
+            p.hypertension,
+            p.heart_disease,
+            p.smoking,
+            p.bmi,
+            p.hba1c,
+            p.glucose,
+            p.result,
+            p.created_at,
+            u.email
+        FROM predictions p
+        LEFT JOIN users u ON u.id = p.user_id
+        ORDER BY p.created_at DESC
+        """
 
-    cursor.execute("""
-    SELECT 
-        p.id, 
-        p.gender, 
-        p.age, 
-        p.hypertension, 
-        p.heart_disease, 
-        p.smoking, 
-        p.bmi, 
-        p.hba1c, 
-        p.glucose, 
-        p.result, 
-        p.created_at,
-        u.email
-    FROM predictions p
-    LEFT JOIN users u ON u.id = p.user_id
-    ORDER BY p.created_at DESC
-    """)
+        cursor.execute(query)
+        predictions = cursor.fetchall()
+        total_count = len(predictions)
 
-    predictions = cursor.fetchall()
+        cursor.close()
+        conn.close()
 
-    total_count = len(predictions)   # 👈 ADD THIS
+        return render_template(
+            'admin/admin_prediction.html',
+            predictions=predictions,
+            total_count=total_count
+        )
 
-    cursor.close()
-    conn.close()
-
-    return render_template(
-        'admin/admin_prediction.html',
-        predictions=predictions,
-        total_count=total_count   # 👈 PASS TO TEMPLATE
-    )
+    except Exception as e:
+        print("ERROR IN ADMIN PREDICTION:", e)
+        return "Internal Server Error - Check Logs"
 
 
 # ----------------------------
-# Delete a prediction
+# Delete Prediction
 # ----------------------------
 @app.route('/admin/prediction/delete/<int:id>', methods=['POST'])
 @admin_required
 def delete_prediction(id):
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    cursor.execute("DELETE FROM predictions WHERE id=%s", (id,))
-    conn.commit()
-    cursor.close()
-    conn.close()
-    flash("Prediction deleted successfully.", "success")
-    return redirect(url_for('admin_prediction'))
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        cursor.execute("DELETE FROM predictions WHERE id=%s", (id,))
+        conn.commit()
+
+        cursor.close()
+        conn.close()
+
+        flash("Prediction deleted successfully.", "success")
+        return redirect(url_for('admin_prediction'))
+
+    except Exception as e:
+        print("DELETE ERROR:", e)
+        return "Delete Failed"
 @app.route('/admin/user-analytics')
 @admin_required
 def admin_user_analytics():
