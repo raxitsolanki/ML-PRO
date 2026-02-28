@@ -466,7 +466,7 @@ def admin_required(f):
 
 
 # ================= ADMIN DASHBOARD =================
-@@app.route('/admin/dashboard')
+@app.route('/admin/dashboard')
 def admin_dashboard():
     if 'admin_logged_in' not in session:
         return redirect(url_for('admin_login'))
