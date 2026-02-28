@@ -1,14 +1,14 @@
 {% extends "admin/admin_layout.html" %}
 {% block content %}
 
-<div class="px-4 sm:px-6 lg:px-8 py-6">
+<div class="min-h-screen px-4 sm:px-6 lg:px-8 py-6 pb-20">
 
 <h1 class="text-2xl sm:text-3xl font-bold mb-6 text-center sm:text-left">
   User Analytics
 </h1>
 
 <!-- FILTER SECTION -->
-<div class="bg-white border border-gray-200 p-5 rounded-2xl shadow mb-6">
+<div class="bg-white border border-gray-200 p-5 rounded-2xl shadow mb-8">
 
   <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
 
@@ -61,7 +61,7 @@
 
 
 <!-- DESKTOP TABLE -->
-<div class="hidden md:block bg-white rounded-2xl shadow overflow-hidden">
+<div class="hidden md:block bg-white rounded-2xl shadow overflow-hidden mb-10">
   <table class="min-w-full divide-y divide-gray-200">
     <thead class="bg-gray-100">
       <tr class="text-left text-sm uppercase tracking-wider text-gray-600">
@@ -93,7 +93,7 @@
 
 
 <!-- MOBILE CARD VIEW -->
-<div class="md:hidden space-y-4">
+<div class="md:hidden space-y-4 mb-10">
   {% for u in users %}
   <div class="bg-white p-4 rounded-2xl shadow border border-gray-200">
 
