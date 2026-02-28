@@ -518,17 +518,15 @@ def admin_users():
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
 
-    # ✅ Only existing columns
+    # Base Query
     query = "SELECT id, username, email FROM userss"
-
     conditions = []
     values = []
 
-    # 🔎 Search
+    # 🔎 Search Filter
     if search:
         conditions.append("(username LIKE %s OR email LIKE %s)")
-        values.append(f"%{search}%")
-        values.append(f"%{search}%")
+        values.extend([f"%{search}%", f"%{search}%"])
 
     if conditions:
         query += " WHERE " + " AND ".join(conditions)
@@ -553,9 +551,16 @@ def admin_users():
         search=search,
         sort=sort
     )
+from flask import session
+
 @app.route('/admin/delete-user/<int:id>', methods=['POST'])
 @admin_required
 def delete_user(id):
+
+    if id == session.get("admin_id"):
+        flash("You cannot delete yourself!", "danger")
+        return redirect(url_for('admin_users'))
+
     conn = get_db_connection()
     cursor = conn.cursor()
 
