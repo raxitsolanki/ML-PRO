@@ -2,49 +2,54 @@
 
 {% block content %}
 
-<h1 class="text-2xl md:text-3xl font-bold mb-6 text-center md:text-left">
-  Admin Dashboard
-</h1>
+<!-- OUTER WRAPPER (Fix Mobile Zoom + Proper Padding) -->
+<div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
 
-<!-- STATS CARDS -->
-<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+  <!-- Title -->
+  <h1 class="text-2xl md:text-3xl font-bold mb-6 text-gray-800 text-center md:text-left">
+    Admin Dashboard
+  </h1>
 
-  <div class="bg-white shadow rounded-2xl p-5 hover:shadow-lg transition">
-      <h2 class="text-gray-500 text-sm">Total Users</h2>
-      <p class="text-3xl md:text-4xl font-bold text-violet-700 mt-2">
-          {{ total_users }}
-      </p>
-  </div>
+  <!-- STATS CARDS -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
 
-  <div class="bg-white shadow rounded-2xl p-5 hover:shadow-lg transition">
-      <h2 class="text-gray-500 text-sm">Total Messages</h2>
-      <p class="text-3xl md:text-4xl font-bold text-green-600 mt-2">
-          {{ total_messages }}
-      </p>
-  </div>
-
-  <div class="bg-white shadow rounded-2xl p-5 hover:shadow-lg transition">
-      <h2 class="text-gray-500 text-sm">Total Predictions</h2>
-      <p class="text-3xl md:text-4xl font-bold text-pink-600 mt-2">
-          {{ total_prediction }}
-      </p>
-  </div>
-
-</div>
-
-
-<!-- OVERVIEW CHART SECTION -->
-<div class="bg-white shadow rounded-2xl p-5 mt-8">
-
-    <!-- Title clearly visible -->
-    <h2 class="text-gray-700 font-semibold text-base md:text-lg mb-4">
-        Dashboard Overview
-    </h2>
-
-    <!-- Responsive Chart Wrapper -->
-    <div class="relative w-full h-64 sm:h-72 md:h-80 lg:h-96">
-        <canvas id="overviewChart"></canvas>
+    <div class="bg-white shadow rounded-2xl p-5">
+        <h2 class="text-gray-500 text-sm">Total Users</h2>
+        <p class="text-3xl md:text-4xl font-bold text-violet-700 mt-2 break-words">
+            {{ total_users }}
+        </p>
     </div>
+
+    <div class="bg-white shadow rounded-2xl p-5">
+        <h2 class="text-gray-500 text-sm">Total Messages</h2>
+        <p class="text-3xl md:text-4xl font-bold text-green-600 mt-2 break-words">
+            {{ total_messages }}
+        </p>
+    </div>
+
+    <div class="bg-white shadow rounded-2xl p-5">
+        <h2 class="text-gray-500 text-sm">Total Predictions</h2>
+        <p class="text-3xl md:text-4xl font-bold text-pink-600 mt-2 break-words">
+            {{ total_prediction }}
+        </p>
+    </div>
+
+  </div>
+
+
+  <!-- OVERVIEW CHART SECTION -->
+  <div class="bg-white shadow rounded-2xl p-4 sm:p-6 mt-8">
+
+      <h2 class="text-gray-700 font-semibold text-base md:text-lg mb-4">
+          Dashboard Overview
+      </h2>
+
+      <!-- Important: relative + fixed height -->
+      <div class="relative w-full h-60 sm:h-72 md:h-80">
+          <canvas id="overviewChart" class="w-full h-full"></canvas>
+      </div>
+
+  </div>
 
 </div>
 
@@ -55,17 +60,17 @@ const ctx = document.getElementById('overviewChart');
 
 if (ctx) {
 
-    const gradientCtx = ctx.getContext('2d');
+    const chartCtx = ctx.getContext('2d');
 
-    const userGradient = gradientCtx.createLinearGradient(0, 0, 0, 400);
+    const userGradient = chartCtx.createLinearGradient(0, 0, 0, 400);
     userGradient.addColorStop(0, '#8b5cf6');
     userGradient.addColorStop(1, '#5b21b6');
 
-    const messageGradient = gradientCtx.createLinearGradient(0, 0, 0, 400);
+    const messageGradient = chartCtx.createLinearGradient(0, 0, 0, 400);
     messageGradient.addColorStop(0, '#34d399');
     messageGradient.addColorStop(1, '#059669');
 
-    const predictionGradient = gradientCtx.createLinearGradient(0, 0, 0, 400);
+    const predictionGradient = chartCtx.createLinearGradient(0, 0, 0, 400);
     predictionGradient.addColorStop(0, '#f472b6');
     predictionGradient.addColorStop(1, '#db2777');
 
@@ -84,13 +89,15 @@ if (ctx) {
                     messageGradient,
                     predictionGradient
                 ],
-                borderRadius: 12,
-                barThickness: 'flex'
+                borderRadius: 10
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            layout: {
+                padding: 10
+            },
             plugins: {
                 legend: { display: false }
             },
@@ -98,12 +105,12 @@ if (ctx) {
                 y: {
                     beginAtZero: true,
                     ticks: {
-                        font: { size: 12 }
+                        font: { size: 11 }
                     }
                 },
                 x: {
                     ticks: {
-                        font: { size: 12 }
+                        font: { size: 11 }
                     }
                 }
             }
