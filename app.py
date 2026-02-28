@@ -512,14 +512,13 @@ def admin_users():
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
 
-    query = """
-        SELECT id, username, email, is_verified, created_at
-        FROM userss
-    """
+    # ✅ Only existing columns
+    query = "SELECT id, username, email FROM userss"
 
     conditions = []
     values = []
 
+    # 🔎 Search
     if search:
         conditions.append("(username LIKE %s OR email LIKE %s)")
         values.append(f"%{search}%")
@@ -528,12 +527,11 @@ def admin_users():
     if conditions:
         query += " WHERE " + " AND ".join(conditions)
 
+    # 🔤 Sorting
     if sort == "az":
         query += " ORDER BY username ASC"
     elif sort == "za":
         query += " ORDER BY username DESC"
-    elif sort == "latest":
-        query += " ORDER BY created_at DESC"
     else:
         query += " ORDER BY id DESC"
 
@@ -549,31 +547,20 @@ def admin_users():
         search=search,
         sort=sort
     )
-
-
-# ================= DELETE USER =================
 @app.route('/admin/delete-user/<int:id>', methods=['POST'])
 @admin_required
 def delete_user(id):
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    cursor.execute("DELETE FROM userss WHERE id=%s", (id,))
+    cursor.execute("DELETE FROM userss WHERE id = %s", (id,))
     conn.commit()
 
     cursor.close()
     conn.close()
 
-    flash("User deleted successfully", "success")
-    return redirect(url_for('admin_users')
-    )
-@app.route('/admin/logout')
-def admin_logout():
-    session.pop('admin_logged_in', None)
-    session.pop('admin_username', None)
-    flash("Logged out successfully", "success")
-    return redirect(url_for('admin_login'))
-
+    flash("User deleted successfully!", "success")
+    return redirect(url_for('admin_users'))
 # ============= Admin messages ====================
 @app.route('/admin/messages')
 @admin_required
