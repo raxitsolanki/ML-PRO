@@ -77,8 +77,8 @@
           {% for u in users %}
           <tr class="hover:bg-gray-50">
 
-            <td class="px-4 py-3 text-black font-medium">
-              {{ u.id if u.id is defined else u['id'] }}
+            <td class="px-4 py-3">
+              {{ u.id if u.id is defined else u['id']}}
             </td>
 
             <td class="px-4 py-3 font-medium">
