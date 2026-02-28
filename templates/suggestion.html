@@ -55,10 +55,10 @@
         to { opacity: 1; transform: scale(1) translateY(0); }
     }
     /* Hide scrollbar for tabs */
+/* Hide scrollbar */
 .scrollbar-hide::-webkit-scrollbar {
     display: none;
 }
-
 /* Lock body scroll when modal open */
 body.modal-open {
     overflow: hidden;
@@ -67,26 +67,34 @@ body.modal-open {
 
 <div class="min-h-screen bg-[--soft-bg] px-4 sm:px-6 md:px-10 py-10 md:py-14">
     <div class="max-w-7xl mx-auto mb-12">
-        <h1 class="text-3xl sm:text-4xl md:text-6xl font-black text-[--navy] mb-4 tracking-tight leading-tight">
-            Health <span class="text-[--green]">Suggestions</span>
+        <h1 class="text-4xl md:text-6xl font-black text-[--navy] mb-4 tracking-tight">
+            Health <span class="text-[--emerald]">Suggestions</span>
+            
         </h1>
-        
-        <p class="text-gray-500 text-base sm:text-lg md:text-xl max-w-2xl font-medium">
+        <p class="text-gray-500 text-lg md:text-xl max-w-2xl font-medium">
             Personalized lifestyle adjustments and medical insights to keep your health on track.
         </p>
     </div>
 
     <div class="max-w-7xl mx-auto mb-10">
-        <div class="flex overflow-x-auto scrollbar-hide bg-white p-2 rounded-[25px] shadow-sm border border-gray-100 w-full sm:w-auto">
+        <div class="flex overflow-x-auto whitespace-nowrap bg-white p-2 rounded-[25px] shadow-sm border border-gray-100">
+    
+            <!-- Diabetes Tab -->
             <button id="diabetes-tab"
-                class="tab-btn active-tab flex-shrink-0 px-6 sm:px-8 py-3 rounded-[20px] font-bold text-xs sm:text-sm uppercase tracking-wider">
+                class="tab-btn active-tab min-w-max px-6 sm:px-8 py-3 rounded-[20px]
+                       font-bold text-xs sm:text-sm uppercase tracking-wider
+                       bg-indigo-600 text-white transition-all duration-200">
                 Diabetes Care
             </button>
     
+            <!-- General Wellness Tab -->
             <button id="nondiabetes-tab"
-                class="tab-btn flex-shrink-0 px-6 sm:px-8 py-3 rounded-[20px] font-bold text-xs sm:text-sm uppercase tracking-wider text-gray-400">
+                class="tab-btn min-w-max px-6 sm:px-8 py-3 rounded-[20px]
+                       font-bold text-xs sm:text-sm uppercase tracking-wider
+                       text-gray-500 hover:text-indigo-600 transition-all duration-200">
                 General Wellness
             </button>
+    
         </div>
     </div>
     
@@ -329,39 +337,48 @@ body.modal-open {
 </div>
 <!-- ================= DETAILS MODAL ================= -->
 <div id="detailsModal"
-     class="fixed inset-0 bg-[#0f172a]/80 backdrop-blur-md hidden items-end sm:items-center justify-center z-[100] transition-all duration-300">
+     class="fixed inset-0 bg-[#0f172a]/80 backdrop-blur-md hidden
+            flex items-center justify-center z-[100] p-4 sm:p-6">
 
     <!-- Modal Container -->
-    <div class="bg-white w-full sm:max-w-2xl rounded-t-[2rem] sm:rounded-[2.5rem] shadow-2xl overflow-hidden animate-fade-in
-                max-h-[95vh] flex flex-col">
+    <div class="bg-white w-full max-w-lg sm:max-w-2xl
+                rounded-3xl shadow-2xl overflow-hidden
+                max-h-[90vh] flex flex-col
+                transform transition-all duration-300 scale-95 opacity-0"
+         id="modalBox">
 
         <!-- Top Gradient -->
-        <div class="h-2 w-full bg-gradient-to-r from-emerald-400 via-[--navy] to-indigo-500"></div>
+        <div class="h-2 w-full bg-gradient-to-r from-emerald-400 via-indigo-600 to-indigo-500"></div>
 
-        <!-- Content -->
-        <div class="p-6 sm:p-10 flex flex-col h-full">
+        <!-- Content Wrapper -->
+        <div class="p-6 sm:p-10 flex flex-col flex-1 overflow-hidden">
 
-            <!-- Close Button -->
+            <!-- Header -->
             <div class="flex justify-between items-start mb-6">
                 <h3 id="modalTitle"
-                    class="text-2xl sm:text-3xl font-extrabold text-[--navy] leading-tight">
+                    class="text-2xl sm:text-3xl font-extrabold text-slate-800 leading-tight">
                 </h3>
 
                 <button onclick="closeModal()"
-                        class="w-9 h-9 flex items-center justify-center rounded-full bg-slate-100 text-gray-500 hover:bg-red-50 hover:text-red-500 transition">
+                        class="w-9 h-9 flex items-center justify-center rounded-full
+                               bg-slate-100 text-gray-500
+                               hover:bg-red-50 hover:text-red-500 transition">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
 
             <!-- Scrollable Content -->
             <div id="modalContent"
-                 class="text-gray-600 text-sm sm:text-base leading-relaxed space-y-4 overflow-y-auto pr-2 custom-scrollbar flex-1">
+                 class="text-gray-600 text-sm sm:text-base leading-relaxed
+                        space-y-4 overflow-y-auto pr-2 flex-1">
             </div>
 
             <!-- Bottom Button -->
             <div class="mt-6">
                 <button onclick="closeModal()"
-                        class="w-full py-3 sm:py-4 bg-slate-100 text-[--navy] font-bold rounded-xl hover:bg-slate-200 transition">
+                        class="w-full py-3 sm:py-4 bg-slate-100
+                               text-slate-800 font-bold rounded-xl
+                               hover:bg-slate-200 transition">
                     Close Window
                 </button>
             </div>
@@ -369,7 +386,6 @@ body.modal-open {
         </div>
     </div>
 </div>
-
 <!-- Tab Switching JS -->
 <script>
     // Tab Switching Logic
@@ -665,26 +681,55 @@ const nonDiabetesData = {
 /* ================= UPDATED OPEN FUNCTION ================= */
 function openAbout(type) {
 
+    const modal = document.getElementById("detailsModal");
+    const modalBox = document.getElementById("modalBox");
+    const title = document.getElementById("modalTitle");
+    const content = document.getElementById("modalContent");
+
+    // Reset content first
+    title.innerText = "";
+    content.innerHTML = "";
+
+    // Diabetes data
     if (typeof aboutData !== "undefined" && aboutData[type]) {
-        document.getElementById("modalTitle").innerText = aboutData[type].title;
-        document.getElementById("modalContent").innerHTML = aboutData[type].content;
-    }
-    else if (nonDiabetesData[type]) {
-        document.getElementById("modalTitle").innerText = nonDiabetesData[type].title;
-        document.getElementById("modalContent").innerHTML = nonDiabetesData[type].content;
+        title.innerText = aboutData[type].title;
+        content.innerHTML = aboutData[type].content;
+    } 
+    // Non-diabetes data
+    else if (typeof nonDiabetesData !== "undefined" && nonDiabetesData[type]) {
+        title.innerText = nonDiabetesData[type].title;
+        content.innerHTML = nonDiabetesData[type].content;
     }
 
-    document.getElementById("detailsModal").classList.remove("hidden");
-    document.get.getElementById("detailsModal").classList.add("flex");
+    // Show modal
+    modal.classList.remove("hidden");
+    modal.classList.add("flex");
 
-    document.body.classList.add("modal-open");
+    // Smooth animation
+    setTimeout(() => {
+        modalBox.classList.remove("scale-95", "opacity-0");
+        modalBox.classList.add("scale-100", "opacity-100");
+    }, 10);
+
+    // Prevent background scroll
+    document.body.classList.add("overflow-hidden");
 }
 
 function closeModal() {
-    document.getElementById("detailsModal").classList.add("hidden");
-    document.getElementById("detailsModal").classList.remove("flex");
 
-    document.body.classList.remove("modal-open");
+    const modal = document.getElementById("detailsModal");
+    const modalBox = document.getElementById("modalBox");
+
+    // Reverse animation
+    modalBox.classList.add("scale-95", "opacity-0");
+
+    setTimeout(() => {
+        modal.classList.add("hidden");
+        modal.classList.remove("flex");
+    }, 200);
+
+    // Enable scroll again
+    document.body.classList.remove("overflow-hidden");
 }
 </script>
 
