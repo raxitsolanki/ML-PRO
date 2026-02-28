@@ -610,12 +610,18 @@ def admin_messages():
         query += " WHERE " + " AND ".join(conditions)
 
     # 🎯 SORTING LOGIC
-    # unread first, pending first always
-    query += " ORDER BY is_read ASC, status ASC"
+    # Unread first (0), then pending first
+    query += """
+        ORDER BY 
+            is_read ASC,
+            CASE 
+                WHEN status = 'pending' THEN 0
+                WHEN status = 'resolved' THEN 1
+                ELSE 2
+            END
+    """
 
-    if sort == "latest":
-        query += ", created_at DESC"
-    elif sort == "oldest":
+    if sort == "oldest":
         query += ", created_at ASC"
     else:
         query += ", created_at DESC"
@@ -632,8 +638,6 @@ def admin_messages():
         search=search,
         sort=sort
     )
-
-
 @app.route('/admin/message-read/<int:id>')
 @admin_required
 def mark_message_read(id):
@@ -651,23 +655,23 @@ def mark_message_read(id):
     conn.close()
 
     return redirect(url_for('admin_messages'))
-
 @app.route('/admin/delete-message/<int:id>', methods=['POST'])
 @admin_required
 def delete_message(id):
     conn = get_db_connection()
     cursor = conn.cursor()
 
-    cursor.execute("DELETE FROM contact_messages WHERE id=%s", (id,))
-    conn.commit()
+    cursor.execute(
+        "DELETE FROM contact_messages WHERE id = %s",
+        (id,)
+    )
 
+    conn.commit()
     cursor.close()
     conn.close()
 
     flash("Message deleted successfully", "success")
     return redirect(url_for('admin_messages'))
-
-
 @app.route('/admin/prediction')
 @admin_required
 def admin_prediction():
