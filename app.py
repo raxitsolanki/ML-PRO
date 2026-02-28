@@ -463,6 +463,12 @@ def admin_required(f):
             return redirect(url_for('admin_login'))
         return f(*args, **kwargs)
     return decorated_function
+@app.route('/admin/logout')
+def admin_logout():
+    session.pop('admin_logged_in', None)
+    session.pop('admin_username', None)
+    flash("Logged out successfully", "success")
+    return redirect(url_for('admin_login'))
 
 
 # ================= ADMIN DASHBOARD =================
