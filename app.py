@@ -503,7 +503,47 @@ def admin_dashboard():
         total_prediction=total_prediction
     )
 
+@app.route('/admin/users')
+@admin_required
+def admin_users():
+    search = request.args.get('search', '')
+    sort = request.args.get('sort', 'latest')
 
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    query = "SELECT * FROM userss"
+    conditions = []
+    values = []
+
+    # 🔎 Search filter
+    if search:
+        conditions.append("(username LIKE %s OR email LIKE %s)")
+        values.extend([f"%{search}%", f"%{search}%"])
+
+    if conditions:
+        query += " WHERE " + " AND ".join(conditions)
+
+    # 🔃 Sorting
+    if sort == "az":
+        query += " ORDER BY username ASC"
+    elif sort == "za":
+        query += " ORDER BY username DESC"
+    else:
+        query += " ORDER BY id DESC"
+
+    cursor.execute(query, values)
+    users = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    return render_template(
+        "admin/admin_users.html",
+        users=users,
+        search=search,
+        sort=sort
+    )
 
 # ============= Admin messages ====================
 @app.route('/admin/messages')
