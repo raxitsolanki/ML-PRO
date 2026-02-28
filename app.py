@@ -466,32 +466,29 @@ def admin_required(f):
 
 
 # ================= ADMIN DASHBOARD =================
-@app.route('/admin/dashboard')
-@admin_required
+@@app.route('/admin/dashboard')
 def admin_dashboard():
+    if 'admin_logged_in' not in session:
+        return redirect(url_for('admin_login'))
 
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
 
-    # Total Users (userss table)
+    # Total Users (UPDATED TABLE NAME)
     cursor.execute("SELECT COUNT(*) AS total_users FROM userss")
-    result = cursor.fetchone()
-    total_users = result['total_users'] if result else 0
+    total_users = cursor.fetchone()['total_users']
 
     # Total Messages
     cursor.execute("SELECT COUNT(*) AS total_messages FROM contact_messages")
-    result = cursor.fetchone()
-    total_messages = result['total_messages'] if result else 0
+    total_messages = cursor.fetchone()['total_messages']
 
-    # Total Predictions
     cursor.execute("""
         SELECT 
-            COALESCE((SELECT COUNT(*) FROM predictions),0) +
-            COALESCE((SELECT COUNT(*) FROM finger_predictions),0)
+            (SELECT COUNT(*) FROM predictions) +
+            (SELECT COUNT(*) FROM finger_predictions)
             AS total_prediction
     """)
-    result = cursor.fetchone()
-    total_prediction = result['total_prediction'] if result else 0
+    total_prediction = cursor.fetchone()['total_prediction']
 
     cursor.close()
     conn.close()
@@ -503,32 +500,40 @@ def admin_dashboard():
         total_prediction=total_prediction
     )
 
+
+# ================= VIEW USERS =================
 @app.route('/admin/users')
 @admin_required
 def admin_users():
-    search = request.args.get('search', '')
+
+    search = request.args.get('search', '').strip()
     sort = request.args.get('sort', 'latest')
 
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
 
-    query = "SELECT * FROM userss"
+    query = """
+        SELECT id, username, email, is_verified, created_at
+        FROM userss
+    """
+
     conditions = []
     values = []
 
-    # 🔎 Search filter
     if search:
         conditions.append("(username LIKE %s OR email LIKE %s)")
-        values.extend([f"%{search}%", f"%{search}%"])
+        values.append(f"%{search}%")
+        values.append(f"%{search}%")
 
     if conditions:
         query += " WHERE " + " AND ".join(conditions)
 
-    # 🔃 Sorting
     if sort == "az":
         query += " ORDER BY username ASC"
     elif sort == "za":
         query += " ORDER BY username DESC"
+    elif sort == "latest":
+        query += " ORDER BY created_at DESC"
     else:
         query += " ORDER BY id DESC"
 
@@ -539,10 +544,28 @@ def admin_users():
     conn.close()
 
     return render_template(
-        "admin/admin_users.html",
+        'admin/admin_users.html',
         users=users,
         search=search,
         sort=sort
+    )
+
+
+# ================= DELETE USER =================
+@app.route('/admin/delete-user/<int:id>', methods=['POST'])
+@admin_required
+def delete_user(id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("DELETE FROM userss WHERE id=%s", (id,))
+    conn.commit()
+
+    cursor.close()
+    conn.close()
+
+    flash("User deleted successfully", "success")
+    return redirect(url_for('admin_users')
     )
 
 # ============= Admin messages ====================
