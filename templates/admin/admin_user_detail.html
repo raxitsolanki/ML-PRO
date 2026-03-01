@@ -1,36 +1,35 @@
 {% extends "admin/admin_layout.html" %}
 {% block content %}
 
-<!-- MAIN WRAPPER (Prevents Footer Touch) -->
-<div class="min-h-screen pb-24 px-4 sm:px-6 lg:px-8">
+<div class="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6">
 
-<!-- ================= ADMIN HEADER CARD ================= -->
-<div class="bg-white border border-slate-200 rounded-2xl shadow-md p-6 mb-8">
-    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+<!-- ================= HEADER ================= -->
+<div class="bg-white border border-slate-200 rounded-2xl shadow-sm p-5 sm:p-6 mb-8">
+    <div class="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
 
         <div>
-            <h1 class="text-2xl lg:text-3xl font-bold text-slate-800">
+            <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold text-slate-800 break-words">
                 {{ user.username }}
             </h1>
-            <p class="text-sm text-slate-500 mt-1">
+            <p class="text-xs sm:text-sm text-slate-500 mt-1">
                 User Activity Dashboard Overview
             </p>
         </div>
 
-        <div class="flex flex-wrap items-center gap-3">
+        <div class="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
 
             <a href="{{ url_for('export_user_activity_pdf', user_id=user.id) }}"
-               class="inline-flex items-center gap-2
+               class="w-full sm:w-auto text-center inline-flex justify-center items-center gap-2
                       bg-gradient-to-r from-purple-600 to-indigo-600
-                      text-white px-5 py-2.5 rounded-xl
-                      shadow-lg hover:from-purple-700 hover:to-indigo-700
+                      text-white px-4 py-2.5 rounded-xl
+                      shadow-md hover:from-purple-700 hover:to-indigo-700
                       transition text-sm font-semibold">
                 <i class="fa-solid fa-file-pdf"></i>
-                Export Full Predictions PDF
+                Export PDF
             </a>
 
             <a href="{{ request.referrer or url_for('admin_user_analytics') }}"
-               class="inline-flex items-center gap-2
+               class="w-full sm:w-auto text-center inline-flex justify-center items-center gap-2
                       bg-slate-100 text-slate-700
                       px-4 py-2.5 rounded-xl
                       hover:bg-slate-200 transition text-sm font-medium">
@@ -41,40 +40,43 @@
     </div>
 </div>
 
-<!-- ================= STATS CARDS ================= -->
-<div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 mb-10">
+<!-- ================= STATS ================= -->
+<div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 mb-10">
 
-    <!-- Card Example -->
-    <div class="bg-white border rounded-2xl p-6 shadow-sm hover:shadow-lg transition">
-        <h2 class="text-slate-500 text-sm font-semibold">Total Messages</h2>
-        <p class="text-3xl font-bold mt-4">{{ messages }}</p>
+    <!-- Messages -->
+    <div class="bg-white border rounded-2xl p-5 shadow-sm hover:shadow-md transition">
+        <h2 class="text-slate-500 text-xs sm:text-sm font-semibold">Total Messages</h2>
+        <p class="text-2xl sm:text-3xl font-bold mt-3">{{ messages }}</p>
         <button onclick="openModal('messagesModal')"
             class="mt-4 w-full bg-[#5b21b6] text-white py-2 rounded-xl text-sm font-semibold hover:bg-[#4c1d95] transition">
             View Details
         </button>
     </div>
 
-    <div class="bg-white border rounded-2xl p-6 shadow-sm hover:shadow-lg transition">
-        <h2 class="text-emerald-600 text-sm font-semibold">Reports Predictions</h2>
-        <p class="text-3xl font-bold mt-4 text-emerald-700">{{ clinical }}</p>
+    <!-- Reports -->
+    <div class="bg-white border rounded-2xl p-5 shadow-sm hover:shadow-md transition">
+        <h2 class="text-emerald-600 text-xs sm:text-sm font-semibold">Reports</h2>
+        <p class="text-2xl sm:text-3xl font-bold mt-3 text-emerald-700">{{ clinical }}</p>
         <button onclick="openModal('clinicalModal')"
             class="mt-4 w-full bg-[#5b21b6] text-white py-2 rounded-xl text-sm font-semibold hover:bg-[#4c1d95] transition">
             View Details
         </button>
     </div>
 
-    <div class="bg-white border rounded-2xl p-6 shadow-sm hover:shadow-lg transition">
-        <h2 class="text-cyan-600 text-sm font-semibold">Fingerprint Predictions</h2>
-        <p class="text-3xl font-bold mt-4 text-cyan-700">{{ finger }}</p>
+    <!-- Finger -->
+    <div class="bg-white border rounded-2xl p-5 shadow-sm hover:shadow-md transition">
+        <h2 class="text-cyan-600 text-xs sm:text-sm font-semibold">Fingerprint</h2>
+        <p class="text-2xl sm:text-3xl font-bold mt-3 text-cyan-700">{{ finger }}</p>
         <button onclick="openModal('fingerModal')"
             class="mt-4 w-full bg-[#5b21b6] text-white py-2 rounded-xl text-sm font-semibold hover:bg-[#4c1d95] transition">
             View Details
         </button>
     </div>
 
-    <div class="bg-gradient-to-r from-[#5b21b6] to-[#7c3aed] text-white rounded-2xl p-6 shadow-md hover:shadow-xl transition">
-        <h2 class="text-sm font-semibold">Total Prediction Activity</h2>
-        <p class="text-3xl font-bold mt-4">{{ total_predictions }}</p>
+    <!-- Total -->
+    <div class="bg-gradient-to-r from-[#5b21b6] to-[#7c3aed] text-white rounded-2xl p-5 shadow-md hover:shadow-lg transition">
+        <h2 class="text-xs sm:text-sm font-semibold">Total Activity</h2>
+        <p class="text-2xl sm:text-3xl font-bold mt-3">{{ total_predictions }}</p>
         <button onclick="openModal('combinedModal')"
             class="mt-4 w-full bg-white text-[#5b21b6] py-2 rounded-xl text-sm font-semibold hover:bg-gray-100 transition">
             View Details
@@ -85,39 +87,44 @@
 
 <!-- ================= GRAPH ================= -->
 <div class="bg-white shadow rounded-2xl p-4 sm:p-6 mb-10">
-    <h2 class="text-lg sm:text-xl font-bold mb-6">Prediction Activity Graph</h2>
-    <div class="h-64 sm:h-80">
-        <canvas id="activityChart"></canvas>
+    <h2 class="text-base sm:text-lg font-bold mb-4">Prediction Activity Graph</h2>
+
+    <div class="w-full overflow-x-auto">
+        <div class="min-w-[300px] h-64 sm:h-80">
+            <canvas id="activityChart"></canvas>
+        </div>
     </div>
 </div>
 
-</div> <!-- END MAIN WRAPPER -->
+</div>
 
-<!-- ================= MODAL TEMPLATE (Reusable Structure) ================= -->
 
+<!-- ================= MODAL MACRO ================= -->
 {% macro modalWrapper(id, title) %}
-<div id="{{ id }}" 
+<div id="{{ id }}"
      class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden
-            items-center justify-center z-50 p-4">
+            items-center justify-center z-50 p-3">
 
-    <div class="bg-white w-full max-w-4xl rounded-2xl shadow-2xl
-                max-h-[90vh] flex flex-col">
+    <div class="bg-white w-full max-w-4xl rounded-2xl shadow-xl
+                max-h-[90vh] flex flex-col overflow-hidden">
 
-        <div class="bg-[#5b21b6] text-white px-6 py-4 flex justify-between items-center">
-            <h3 class="font-semibold text-sm sm:text-base">{{ title }}</h3>
-            <button onclick="closeModal('{{ id }}')">
+        <div class="bg-[#5b21b6] text-white px-4 py-3 flex justify-between items-center">
+            <h3 class="font-semibold text-sm sm:text-base truncate">{{ title }}</h3>
+            <button onclick="closeModal('{{ id }}')" class="text-white">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
 
-        <div class="p-4 sm:p-6 overflow-y-auto flex-1">
+        <div class="p-4 overflow-y-auto flex-1 text-sm">
             {{ caller() }}
         </div>
     </div>
 </div>
 {% endmacro %}
 
-<!-- Messages Modal -->
+
+<!-- ================= MODALS ================= -->
+
 {% call modalWrapper('messagesModal','User Messages') %}
 {% for msg in messages_list %}
 <div class="border rounded-xl p-4 mb-3">
@@ -132,7 +139,6 @@
 {% endfor %}
 {% endcall %}
 
-<!-- Clinical Modal -->
 {% call modalWrapper('clinicalModal','Reports Predictions') %}
 {% for c in clinical_list %}
 <div class="border rounded-xl p-4 mb-4">
@@ -150,7 +156,6 @@
 {% endfor %}
 {% endcall %}
 
-<!-- Finger Modal -->
 {% call modalWrapper('fingerModal','Fingerprint Predictions') %}
 {% for f in finger_list %}
 <div class="border rounded-xl p-4 mb-4">
@@ -168,7 +173,6 @@
 {% endfor %}
 {% endcall %}
 
-<!-- Combined Modal -->
 {% call modalWrapper('combinedModal','All Predictions') %}
 {% for item in combined_list %}
 <div class="border rounded-xl p-4 mb-3 flex justify-between items-center">
@@ -192,6 +196,7 @@ bg-gray-100 text-gray-600
 <p>No records found.</p>
 {% endfor %}
 {% endcall %}
+
 
 <!-- ================= JS ================= -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -229,7 +234,13 @@ fill: true
 },
 options: {
 responsive: true,
-maintainAspectRatio: false
+maintainAspectRatio: false,
+plugins: {
+legend: { display: true }
+},
+scales: {
+y: { beginAtZero: true }
+}
 }
 });
 </script>
