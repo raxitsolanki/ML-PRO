@@ -138,67 +138,89 @@
 </section>
 
 </main>
-<!-- Feature Modal -->
+
 <!-- Feature Modal -->
 <div id="featureModal" 
-     class="fixed inset-0 bg-[#0f172a]/80 backdrop-blur-md hidden items-center justify-center z-[100] p-4 transition-all duration-300">
-    
-  <div class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-2xl overflow-hidden relative animate-fade-in border border-white/20">
-        
-    <div class="h-2 w-full bg-gradient-to-r from-emerald-400 via-[--navy] to-indigo-500"></div>
+     class="fixed inset-0 bg-[#0f172a]/80 backdrop-blur-md hidden
+            flex items-center justify-center
+            z-[100] p-4 sm:p-6 transition-all duration-300">
 
-    <div class="p-8 md:p-12">
+  <!-- Modal Box -->
+  <div id="featureModalBox"
+       class="bg-white rounded-3xl shadow-2xl
+              w-full max-w-lg sm:max-w-2xl
+              max-h-[90vh] flex flex-col
+              overflow-hidden relative
+              transform scale-95 opacity-0
+              transition-all duration-300">
+
+    <!-- Top Gradient -->
+    <div class="h-2 w-full bg-gradient-to-r from-emerald-400 via-indigo-600 to-indigo-500"></div>
+
+    <!-- Content Wrapper -->
+    <div class="p-6 sm:p-10 flex flex-col flex-1 overflow-hidden relative">
+
+      <!-- Close Button -->
       <button onclick="closeFeatureModal()" 
-              class="absolute top-8 right-8 w-10 h-10 flex items-center justify-center rounded-full bg-slate-50 text-gray-400 hover:bg-red-50 hover:text-red-500 transition-all group">
-        <i class="fa-solid fa-xmark text-xl"></i>
+              class="absolute top-4 right-4 sm:top-6 sm:right-6
+                     w-9 h-9 flex items-center justify-center
+                     rounded-full bg-slate-100 text-gray-400
+                     hover:bg-red-50 hover:text-red-500 transition">
+        <i class="fa-solid fa-xmark text-lg"></i>
       </button>
 
-      <div class="mb-8">
-        <h3 id="featureTitle" class="text-3xl md:text-4xl font-extrabold text-[--navy] tracking-tight"></h3>
-        <div class="h-1 w-20 bg-emerald-500 mt-3 rounded-full"></div>
+      <!-- Title -->
+      <div class="mb-6 sm:mb-8">
+        <h3 id="featureTitle"
+            class="text-2xl sm:text-3xl md:text-4xl
+                   font-extrabold text-slate-800 tracking-tight">
+        </h3>
+        <div class="h-1 w-16 sm:w-20 bg-emerald-500 mt-3 rounded-full"></div>
       </div>
 
+      <!-- Scrollable Content -->
       <div id="featureContent" 
-           class="text-gray-600 text-lg leading-relaxed space-y-4 max-h-[55vh] overflow-y-auto pr-4">
+           class="text-gray-600 text-sm sm:text-base md:text-lg
+                  leading-relaxed space-y-4
+                  overflow-y-auto pr-2 sm:pr-4 flex-1">
       </div>
 
       <!-- Action Buttons -->
-      <div class="mt-10 grid grid-cols-1 md:grid-cols-2 gap-4">
-        
-        <!-- Normal Feature Button -->
+      <div class="mt-6 sm:mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+        <!-- Feature Link -->
         <a id="featureLink"
-           class="text-center py-4 bg-[var(--sidebar-bg)] text-white font-bold text-lg rounded-2xl hover:bg-black transition-all hidden">
+           class="hidden text-center py-3 sm:py-4
+                  bg-black text-white
+                  font-bold rounded-xl
+                  hover:bg-gray-900 transition">
            Go to Feature
         </a>
 
-        <!-- Report Download Button -->
+        <!-- Download Report -->
         <a id="downloadReportBtn"
-        href="{{ url_for('download_current_report', user_id=session['id']) }}"
-        class="w-full text-center py-4
-               bg-black text-white
-               font-bold text-lg
-               rounded-2xl
-               hover:bg-gray-900
-               transition-all duration-200
-               flex items-center justify-center gap-3
-               shadow-lg shadow-black/20">
-     
-        <i class="fa-solid fa-file-pdf text-emerald-500 text-xl"></i>
-        <span>Download Medical Report</span>
-     </a>
-     
+           href="{{ url_for('download_current_report', user_id=session['id']) }}"
+           class="w-full text-center py-3 sm:py-4
+                  bg-black text-white
+                  font-bold rounded-xl
+                  hover:bg-gray-900 transition
+                  flex items-center justify-center gap-2">
+          <i class="fa-solid fa-file-pdf text-emerald-500"></i>
+          <span>Download Medical Report</span>
+        </a>
 
-
-
+        <!-- Close Button -->
         <button onclick="closeFeatureModal()" 
-                class="py-4 bg-slate-100 text-[--navy] font-bold text-lg rounded-2xl hover:bg-slate-200 transition-all">
+                class="py-3 sm:py-4 bg-slate-100
+                       text-slate-800 font-bold
+                       rounded-xl hover:bg-slate-200 transition">
           Close
         </button>
+
       </div>
     </div>
   </div>
 </div>
-
 
 
 <div id="detailsModal" 
@@ -344,42 +366,68 @@ const featureData = {
     
   };
   
+
   function openFeatureModal(feature) {
-    const data = featureData[feature];
-  
-    const title = document.getElementById("featureTitle");
-    const content = document.getElementById("featureContent");
-    const linkBtn = document.getElementById("featureLink");
-    const downloadBtn = document.getElementById("downloadReportBtn");
-  
-    // Set text
-    title.innerText = data.title;
-    content.innerHTML = data.content;
-  
-    // Hide both buttons first
-    linkBtn.classList.add("hidden");
-    downloadBtn.classList.add("hidden");
-  
-    // Show correct button
-    if (feature === "Reports") {
-      downloadBtn.classList.remove("hidden");
-    } else {
-      linkBtn.href = data.link;
-      linkBtn.classList.remove("hidden");
+    
+        // Safety check
+        if (!featureData || !featureData[feature]) return;
+    
+        const data = featureData[feature];
+    
+        const modal = document.getElementById("featureModal");
+        const modalBox = document.getElementById("featureModalBox");
+    
+        const title = document.getElementById("featureTitle");
+        const content = document.getElementById("featureContent");
+        const linkBtn = document.getElementById("featureLink");
+        const downloadBtn = document.getElementById("downloadReportBtn");
+    
+        // Set content
+        title.innerText = data.title || "";
+        content.innerHTML = data.content || "";
+    
+        // Hide both buttons first
+        linkBtn.classList.add("hidden");
+        downloadBtn.classList.add("hidden");
+    
+        // Show correct button
+        if (feature === "Reports") {
+            downloadBtn.classList.remove("hidden");
+        } else if (data.link) {
+            linkBtn.href = data.link;
+            linkBtn.classList.remove("hidden");
+        }
+    
+        // Show modal
+        modal.classList.remove("hidden");
+    
+        // Animation
+        setTimeout(() => {
+            modalBox.classList.remove("scale-95", "opacity-0");
+            modalBox.classList.add("scale-100", "opacity-100");
+        }, 10);
+    
+        // Prevent background scroll
+        document.body.classList.add("overflow-hidden");
     }
-  
-    // Show modal
-    const modal = document.getElementById("featureModal");
-    modal.classList.remove("hidden");
-    modal.classList.add("flex");
-  }
-  
-  function closeFeatureModal() {
-    const modal = document.getElementById("featureModal");
-    modal.classList.add("hidden");
-    modal.classList.remove("flex");
-  }
-  
+    
+    
+    function closeFeatureModal() {
+    
+        const modal = document.getElementById("featureModal");
+        const modalBox = document.getElementById("featureModalBox");
+    
+        // Reverse animation
+        modalBox.classList.add("scale-95", "opacity-0");
+    
+        setTimeout(() => {
+            modal.classList.add("hidden");
+        }, 200);
+    
+        // Enable scroll again
+        document.body.classList.remove("overflow-hidden");
+    }
+    
   
   
 </script>

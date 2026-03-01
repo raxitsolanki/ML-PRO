@@ -821,7 +821,7 @@ def admin_user_detail(user_id):
         # =========================
         cursor.execute("""
             SELECT id, username, email
-            FROM users
+            FROM userss
             WHERE id = %s
         """, (user_id,))
         user = cursor.fetchone()
@@ -831,7 +831,7 @@ def admin_user_detail(user_id):
             return redirect(url_for('admin_user_analytics'))
 
         # =========================
-        # 2️⃣ USER MESSAGES (ALL COLUMNS)
+        # 2️⃣ USER MESSAGES
         # =========================
         cursor.execute("""
             SELECT id, name, email, subject,
@@ -846,7 +846,7 @@ def admin_user_detail(user_id):
         total_messages = len(messages_list)
 
         # =========================
-        # 3️⃣ CLINICAL PREDICTIONS (ALL COLUMNS)
+        # 3️⃣ CLINICAL PREDICTIONS
         # =========================
         cursor.execute("""
             SELECT id, gender, age, hypertension,
@@ -862,7 +862,7 @@ def admin_user_detail(user_id):
         total_clinical = len(clinical_list)
 
         # =========================
-        # 4️⃣ FINGER PREDICTIONS (ALL COLUMNS)
+        # 4️⃣ FINGER PREDICTIONS
         # =========================
         cursor.execute("""
             SELECT id, gender, age, smoking,
@@ -883,11 +883,7 @@ def admin_user_detail(user_id):
         # 5️⃣ VALUE MAPPING
         # =========================
         def gender_label(val):
-            if val == 1:
-                return "Male"
-            elif val == 0:
-                return "Female"
-            return "Unknown"
+            return "Male" if val == 1 else "Female" if val == 0 else "Unknown"
 
         def yes_no(val):
             return "Yes" if val == 1 else "No"
@@ -912,17 +908,17 @@ def admin_user_detail(user_id):
 
         # Apply mapping to clinical
         for c in clinical_list:
-            c['gender_label'] = gender_label(c['gender'])
-            c['hypertension_label'] = yes_no(c['hypertension'])
-            c['heart_label'] = yes_no(c['heart_disease'])
-            c['smoking_label'] = smoking_label(c['smoking'])
+            c['gender_label'] = gender_label(c.get('gender'))
+            c['hypertension_label'] = yes_no(c.get('hypertension'))
+            c['heart_label'] = yes_no(c.get('heart_disease'))
+            c['smoking_label'] = smoking_label(c.get('smoking'))
             c['type'] = "Report"
 
         # Apply mapping to finger
         for f in finger_list:
-            f['gender_label'] = gender_label(f['gender'])
-            f['smoking_label'] = smoking_label(f['smoking'])
-            f['pattern_label'] = pattern_label(f['pattern_type'])
+            f['gender_label'] = gender_label(f.get('gender'))
+            f['smoking_label'] = smoking_label(f.get('smoking'))
+            f['pattern_label'] = pattern_label(f.get('pattern_type'))
             f['type'] = "Finger"
 
         # =========================
@@ -984,32 +980,57 @@ def admin_user_detail(user_id):
 
 @app.route('/report/download/<int:user_id>')
 def download_report(user_id):
+
+    # --------- LOGIN CHECK ----------
     if 'loggedin' not in session:
         return redirect(url_for('login'))
+
+    # Optional: Prevent downloading other user's report
+    if session.get('id') != user_id:
+        flash("Unauthorized access", "danger")
+        return redirect(url_for('dashboard'))
 
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
 
-    # ---------- USER INFO ----------
-    cursor.execute("SELECT username, email FROM userss WHERE id=%s", (user_id,))
-    user = cursor.fetchone()
+    try:
+        # ---------- USER INFO ----------
+        cursor.execute(
+            "SELECT username, email FROM userss WHERE id = %s",
+            (user_id,)
+        )
+        user = cursor.fetchone()
 
-    # ---------- LATEST PREDICTION ----------
-    cursor.execute("""
-        SELECT *
-        FROM predictions
-        WHERE user_id=%s
-        ORDER BY created_at DESC
-        LIMIT 1
-    """, (user_id,))
-    pred = cursor.fetchone()
+        # ---------- LATEST PREDICTION ----------
+        cursor.execute("""
+            SELECT *
+            FROM predictions
+            WHERE user_id = %s
+            ORDER BY created_at DESC
+            LIMIT 1
+        """, (user_id,))
+        pred = cursor.fetchone()
 
-    cursor.close()
-    conn.close()
+        if not user or not pred:
+            flash("No report data found", "warning")
+            return redirect(url_for('dashboard'))
 
-    if not user or not pred:
-        flash("No report data found", "warning")
-        return redirect(url_for('dashboard'))
+    finally:
+        cursor.close()
+        conn.close()
+
+    # ---------- VALUE MAPPING ----------
+    def yes_no(val):
+        return "Yes" if val == 1 else "No"
+
+    def smoking_label(val):
+        if val == 0:
+            return "Non-Smoker"
+        elif val == 1:
+            return "Former Smoker"
+        elif val == 2:
+            return "Current Smoker"
+        return "Unknown"
 
     # ---------- PDF SETUP ----------
     buffer = io.BytesIO()
@@ -1024,11 +1045,10 @@ def download_report(user_id):
 
     styles = getSampleStyleSheet()
 
-    # Custom styles
     styles.add(ParagraphStyle(
         name='HeaderTitle',
         fontSize=20,
-        textColor=colors.HexColor("#065f46"),  # Emerald dark green
+        textColor=colors.HexColor("#065f46"),
         spaceAfter=12,
         fontName='Helvetica-Bold'
     ))
@@ -1040,47 +1060,52 @@ def download_report(user_id):
         spaceAfter=20
     ))
 
-    styles.add(ParagraphStyle(
-        name='Footer',
-        fontSize=9,
-        textColor=colors.grey,
-        alignment=1  # center
-    ))
-
     elements = []
 
     # ---------- HEADER ----------
-    elements.append(Paragraph("Diabetes Prediction Medical Report", styles['HeaderTitle']))
-    elements.append(Paragraph("Generated using AI & Clinical Analytics", styles['SubTitle']))
+    elements.append(Paragraph(
+        "Diabetes Prediction Medical Report",
+        styles['HeaderTitle']
+    ))
+    elements.append(Paragraph(
+        "Generated using AI & Clinical Analytics",
+        styles['SubTitle']
+    ))
     elements.append(Spacer(1, 20))
 
     # ---------- USER INFO ----------
-    report_date = pred['created_at'].strftime("%d-%b-%Y %H:%M") if hasattr(pred['created_at'], 'strftime') else pred['created_at']
+    report_date = (
+        pred['created_at'].strftime("%d-%b-%Y %H:%M")
+        if hasattr(pred['created_at'], 'strftime')
+        else pred['created_at']
+    )
+
     patient_info = f"""
-    <b>Patient Name:</b> {user['username']}<br/>
-    <b>Email:</b> {user['email']}<br/>
+    <b>Patient Name:</b> {user.get('username')}<br/>
+    <b>Email:</b> {user.get('email')}<br/>
     <b>Report Date:</b> {report_date}<br/>
     <b>Assessment Type:</b> Report-Based Diabetes Prediction
     """
+
     elements.append(Paragraph(patient_info, styles['Normal']))
     elements.append(Spacer(1, 25))
 
     # ---------- MEDICAL DATA TABLE ----------
     data_table = [
         ["Clinical Metric", "Observed Value"],
-        ["Age", pred["age"]],
-        ["BMI", pred["bmi"]],
-        ["Glucose", pred["glucose"]],
-        ["HbA1c", pred["hba1c"]],
-        ["Hypertension", "Yes" if pred["hypertension"] else "No"],
-        ["Heart Disease", "Yes" if pred["heart_disease"] else "No"],
-        ["Smoking", pred["smoking"]],
-        ["Prediction Result", pred["result"]],
+        ["Age", pred.get("age")],
+        ["BMI", pred.get("bmi")],
+        ["Glucose", pred.get("glucose")],
+        ["HbA1c", pred.get("hba1c")],
+        ["Hypertension", yes_no(pred.get("hypertension"))],
+        ["Heart Disease", yes_no(pred.get("heart_disease"))],
+        ["Smoking", smoking_label(pred.get("smoking"))],
+        ["Prediction Result", pred.get("result")],
     ]
 
     table = Table(data_table, colWidths=[220, 240])
     table.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#064e3b")),  # Emerald header
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#064e3b")),
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
         ('FONT', (0, 0), (-1, 0), 'Helvetica-Bold'),
         ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
@@ -1096,32 +1121,33 @@ def download_report(user_id):
     # ---------- MEDICAL NOTE ----------
     note_text = """
     <b>Clinical Interpretation:</b><br/>
-    This Report-based assessment uses predictive analytics based on clinical parameters to estimate 
-    diabetes risk. The report is for informational purposes only and does not replace professional 
-    medical advice.
+    This assessment uses predictive analytics based on clinical parameters 
+    to estimate diabetes risk. This report is for informational purposes only 
+    and does not replace professional medical advice.
     """
+
     elements.append(Paragraph(note_text, styles['Normal']))
     elements.append(Spacer(1, 25))
+
     elements.append(Paragraph(
-    "<b>Authorized Medical Officer</b><br/>Dr. AI Clinical System<br/>DSP Health",
-    styles['Normal']
+        "<b>Authorized Medical Officer</b><br/>Dr. AI Clinical System<br/>DSP Health",
+        styles['Normal']
     ))
 
     elements.append(Spacer(1, 40))
 
     elements.append(Paragraph(
-     "Signature: _______________________________",
-    styles['Normal']
+        "Signature: _______________________________",
+        styles['Normal']
     ))
 
     elements.append(Spacer(1, 25))
-    
 
-    # ---------- FOOTER ----------
     elements.append(Paragraph(
-    "DSP Health AI • Secure Medical Intelligence Platform",
-    styles['Italic']
+        "DSP Health AI • Secure Medical Intelligence Platform",
+        styles['Italic']
     ))
+
     # ---------- BUILD PDF ----------
     pdf.build(elements)
     buffer.seek(0)
@@ -1132,10 +1158,6 @@ def download_report(user_id):
         download_name=f"{user['username']}_diabetes_report.pdf",
         mimetype="application/pdf"
     )
-
-
-
-
 # ---------------- LOAD FINGERPRINT MODEL ----------------
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -1250,17 +1272,22 @@ def download_finger_report(user_id):
     if 'loggedin' not in session:
         return redirect(url_for('login'))
 
+    # Optional: prevent other users downloading someone else's report
+    if session.get('role') != 'admin' and session.get('id') != user_id:
+        return "Unauthorized access", 403
+
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
 
     cursor.execute("""
         SELECT fp.*, u.username, u.email
         FROM finger_predictions fp
-        JOIN users u ON u.id = fp.user_id
+        JOIN userss u ON u.id = fp.user_id
         WHERE fp.user_id = %s
         ORDER BY fp.created_at DESC
         LIMIT 1
     """, (user_id,))
+
     report = cursor.fetchone()
 
     cursor.close()
@@ -1269,7 +1296,7 @@ def download_finger_report(user_id):
     if not report:
         return "No fingerprint report found", 404
 
-    # ---------- PDF SETUP ----------
+    # ---------------- PDF SETUP ----------------
     buffer = io.BytesIO()
     pdf = SimpleDocTemplate(
         buffer,
@@ -1283,7 +1310,7 @@ def download_finger_report(user_id):
     styles = getSampleStyleSheet()
     elements = []
 
-    # ---------- CUSTOM STYLES ----------
+    # ---------------- CUSTOM STYLES ----------------
     styles.add(ParagraphStyle(
         name='HeaderTitle',
         fontSize=20,
@@ -1299,9 +1326,7 @@ def download_finger_report(user_id):
         spaceAfter=20
     ))
 
-   
-
-    # ---------- HEADER ----------
+    # ---------------- HEADER ----------------
     elements.append(Paragraph(
         "Fingerprint-Based Diabetes Risk Medical Report",
         styles['HeaderTitle']
@@ -1314,29 +1339,29 @@ def download_finger_report(user_id):
 
     elements.append(Spacer(1, 20))
 
-    # ---------- PATIENT INFO ----------
+    # ---------------- PATIENT INFO ----------------
     patient_info = f"""
-    <b>Patient Name:</b> {report['username']}<br/>
-    <b>Email:</b> {report['email']}<br/>
-    <b>Report Date:</b> {report['created_at']}<br/>
+    <b>Patient Name:</b> {report.get('username','N/A')}<br/>
+    <b>Email:</b> {report.get('email','N/A')}<br/>
+    <b>Report Date:</b> {report.get('created_at','N/A')}<br/>
     <b>Assessment Type:</b> Fingerprint-Based AI Diagnosis
     """
 
     elements.append(Paragraph(patient_info, styles['Normal']))
     elements.append(Spacer(1, 25))
 
-    # ---------- MEDICAL DATA TABLE ----------
+    # ---------------- MEDICAL DATA TABLE ----------------
     data_table = [
         ["Clinical Metric", "Observed Value"],
-        ["Age", report["age"]],
-        ["BMI", report["bmi"]],
-        ["Glucose Level", report["glucose"]],
-        ["HbA1c", report["hba1c"]],
-        ["Smoking Status", report["smoking"]],
-        ["Ridge Density", report["ridge_density"]],
-        ["Pattern Complexity", report["complexity_score"]],
-        ["Fingerprint Pattern Type", report["pattern_type"]],
-        ["Final Risk Assessment", report["result"]],
+        ["Age", report.get("age", "N/A")],
+        ["BMI", report.get("bmi", "N/A")],
+        ["Glucose Level", report.get("glucose", "N/A")],
+        ["HbA1c", report.get("hba1c", "N/A")],
+        ["Smoking Status", report.get("smoking_label", report.get("smoking", "N/A"))],
+        ["Ridge Density", report.get("ridge_density", "N/A")],
+        ["Pattern Complexity", report.get("complexity_score", "N/A")],
+        ["Fingerprint Pattern Type", report.get("pattern_label", report.get("pattern_type", "N/A"))],
+        ["Final Risk Assessment", report.get("result", "N/A")],
     ]
 
     table = Table(data_table, colWidths=[220, 240])
@@ -1354,40 +1379,42 @@ def download_finger_report(user_id):
     elements.append(table)
     elements.append(Spacer(1, 30))
 
-    # ---------- MEDICAL NOTE ----------
+    # ---------------- MEDICAL NOTE ----------------
     elements.append(Paragraph(
         """
         <b>Clinical Interpretation:</b><br/>
-        This fingerprint-based assessment uses biometric ridge analysis combined with
-        metabolic indicators to estimate diabetes risk. The result is intended for
-        preventive screening and should not replace professional medical diagnosis.
+        This fingerprint-based assessment combines biometric ridge analysis 
+        with metabolic indicators to estimate diabetes risk probability.
+        This report is for preventive screening purposes only and does not 
+        replace professional medical consultation.
         """,
         styles['Normal']
     ))
 
-    elements.append(Spacer(1, 25))
-    # ---------------- DOCTOR SIGNATURE ----------------
+    elements.append(Spacer(1, 30))
+
+    # ---------------- SIGNATURE ----------------
     elements.append(Paragraph(
-    "<b>Authorized Medical Officer</b><br/>Dr. AI Clinical System<br/>DSP Health",
-    styles['Normal']
+        "<b>Authorized Medical Officer</b><br/>Dr. AI Clinical System<br/>DSP Health",
+        styles['Normal']
     ))
 
     elements.append(Spacer(1, 40))
 
     elements.append(Paragraph(
-     "Signature: ___________________________",
-     styles['Normal']
+        "Signature: ___________________________",
+        styles['Normal']
     ))
 
-    elements.append(Spacer(1, 25))
-   
-    # ---------- FOOTER ----------
+    elements.append(Spacer(1, 30))
+
+    # ---------------- FOOTER ----------------
     elements.append(Paragraph(
         "DSP Health AI • Secure Medical Intelligence Platform",
         styles['Italic']
     ))
 
-    # ---------- BUILD PDF ----------
+    # ---------------- BUILD PDF ----------------
     pdf.build(elements)
     buffer.seek(0)
 
@@ -1397,8 +1424,6 @@ def download_finger_report(user_id):
         download_name="Fingerprint_Diabetes_Medical_Report.pdf",
         mimetype="application/pdf"
     )
-
-
 @app.route('/download_current_report/<int:user_id>')
 def download_current_report(user_id):
     if 'loggedin' not in session:
