@@ -14,35 +14,38 @@
 
     <style>
         body {
-            background: #f8fafc;
+            background: #f1f5f9;
         }
 
         .animate-fade-in {
-            animation: fadeIn 0.6s ease-in-out;
+            animation: fadeIn 0.5s ease-in-out;
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-8px); }
+            from { opacity: 0; transform: translateY(-6px); }
             to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
 
-<body class="min-h-screen flex items-center justify-center px-4 py-8">
+<body class="min-h-screen flex items-center justify-center px-4">
 
-<!-- ================= WRAPPER ================= -->
+<!-- OUTER CONTAINER (Prevents squeezing on short screens) -->
 <div class="w-full max-w-md">
 
-    <!-- ================= LOGIN CARD ================= -->
-    <div class="bg-white rounded-2xl shadow-2xl p-6 sm:p-8">
+    <!-- LOGIN CARD -->
+    <div class="bg-white rounded-2xl shadow-xl
+                p-6 sm:p-8
+                my-8">
 
         <!-- HEADER -->
-        <div class="text-center mb-6 sm:mb-8">
-            <div class="bg-purple-100 w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <i class="fa-solid fa-heart-pulse text-[#5b21b6] text-2xl sm:text-3xl"></i>
+        <div class="text-center mb-6">
+            <div class="bg-purple-100 w-14 h-14 sm:w-16 sm:h-16 rounded-full
+                        flex items-center justify-center mx-auto mb-4">
+                <i class="fa-solid fa-heart-pulse text-[#5b21b6] text-xl sm:text-2xl"></i>
             </div>
 
-            <h2 class="text-xl sm:text-2xl font-bold text-gray-900">
+            <h2 class="text-lg sm:text-2xl font-bold text-gray-900">
                 DPS Admin Panel Login
             </h2>
 
@@ -51,12 +54,12 @@
             </p>
         </div>
 
-        <!-- ADMIN FORM -->
-        <form action="{{ url_for('admin_login') }}" method="POST" class="space-y-5">
+        <!-- FORM -->
+        <form action="{{ url_for('admin_login') }}" method="POST" class="space-y-4">
 
             <!-- USERNAME -->
             <div>
-                <label class="block text-xs font-bold text-gray-600 uppercase mb-2 ml-1">
+                <label class="block text-xs font-semibold text-gray-600 uppercase mb-2">
                     Admin Username
                 </label>
 
@@ -69,13 +72,14 @@
                            placeholder="Enter admin username"
                            class="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-300
                                   text-sm focus:ring-2 focus:ring-[#5b21b6]
+                                  focus:border-[#5b21b6]
                                   outline-none transition">
                 </div>
             </div>
 
             <!-- PASSWORD -->
             <div>
-                <label class="block text-xs font-bold text-gray-600 uppercase mb-2 ml-1">
+                <label class="block text-xs font-semibold text-gray-600 uppercase mb-2">
                     Password
                 </label>
 
@@ -89,6 +93,7 @@
                            placeholder="Enter admin password"
                            class="w-full pl-10 pr-10 py-2.5 rounded-lg border border-gray-300
                                   text-sm focus:ring-2 focus:ring-[#5b21b6]
+                                  focus:border-[#5b21b6]
                                   outline-none transition">
 
                     <i id="toggleIcon"
@@ -97,17 +102,17 @@
                 </div>
             </div>
 
-            <!-- BUTTON -->
+            <!-- LOGIN BUTTON -->
             <button type="submit"
                     class="w-full bg-[#5b21b6] hover:bg-[#4c1d95]
-                           text-white font-bold py-2.5 rounded-lg
+                           text-white font-semibold py-2.5 rounded-lg
                            flex items-center justify-center gap-2
                            shadow-md hover:shadow-lg transition text-sm">
                 <i class="fa-solid fa-right-to-bracket"></i>
                 Login as Admin
             </button>
 
-            <!-- ERROR -->
+            <!-- ERROR MESSAGE -->
             {% if error %}
             <div class="bg-red-100 text-red-700 px-4 py-2 rounded-lg text-sm font-semibold animate-fade-in text-center">
                 <i class="fa-solid fa-circle-exclamation mr-2"></i>
@@ -117,12 +122,12 @@
 
         </form>
 
-        <!-- USER PANEL LINK -->
+        <!-- BACK BUTTON -->
         <div class="text-center border-t border-gray-200 pt-5 mt-6">
             <a href="{{ url_for('login') }}"
                class="w-full flex items-center justify-center gap-2
                       bg-gray-100 border border-gray-300 hover:bg-gray-200
-                      text-gray-800 font-semibold px-4 py-2 rounded-lg shadow transition text-sm">
+                      text-gray-800 font-medium px-4 py-2 rounded-lg transition text-sm">
                 <i class="fa-solid fa-arrow-left"></i>
                 Back to User Panel
             </a>
@@ -136,7 +141,6 @@
     </div>
 </div>
 
-<!-- SCRIPT -->
 <script>
 function togglePassword() {
     const input = document.getElementById('admin_password');

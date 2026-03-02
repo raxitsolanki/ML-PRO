@@ -1,13 +1,13 @@
 {% extends "admin/admin_layout.html" %}
 {% block content %}
 
-<div class="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6">
+<div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
 
 <!-- ================= HEADER ================= -->
 <div class="bg-white border border-slate-200 rounded-2xl shadow-sm p-5 sm:p-6 mb-8">
-    <div class="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+    <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
 
-        <div>
+        <div class="text-center lg:text-left">
             <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold text-slate-800 break-words">
                 {{ user.username }}
             </h1>
@@ -40,40 +40,27 @@
     </div>
 </div>
 
-<!-- ================= STATS ================= -->
+
+<!-- ================= STATS CARDS ================= -->
 <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5 mb-10">
 
-    <!-- Messages -->
+    <!-- Card Template -->
+    {% macro statCard(title, value, colorClass, modalId) %}
     <div class="bg-white border rounded-2xl p-5 shadow-sm hover:shadow-md transition">
-        <h2 class="text-slate-500 text-xs sm:text-sm font-semibold">Total Messages</h2>
-        <p class="text-2xl sm:text-3xl font-bold mt-3">{{ messages }}</p>
-        <button onclick="openModal('messagesModal')"
+        <h2 class="text-xs sm:text-sm font-semibold {{ colorClass }}">{{ title }}</h2>
+        <p class="text-2xl sm:text-3xl font-bold mt-3">{{ value }}</p>
+        <button onclick="openModal('{{ modalId }}')"
             class="mt-4 w-full bg-[#5b21b6] text-white py-2 rounded-xl text-sm font-semibold hover:bg-[#4c1d95] transition">
             View Details
         </button>
     </div>
+    {% endmacro %}
 
-    <!-- Reports -->
-    <div class="bg-white border rounded-2xl p-5 shadow-sm hover:shadow-md transition">
-        <h2 class="text-emerald-600 text-xs sm:text-sm font-semibold">Reports</h2>
-        <p class="text-2xl sm:text-3xl font-bold mt-3 text-emerald-700">{{ clinical }}</p>
-        <button onclick="openModal('clinicalModal')"
-            class="mt-4 w-full bg-[#5b21b6] text-white py-2 rounded-xl text-sm font-semibold hover:bg-[#4c1d95] transition">
-            View Details
-        </button>
-    </div>
+    {{ statCard('Total Messages', messages, 'text-slate-500', 'messagesModal') }}
+    {{ statCard('Reports', clinical, 'text-emerald-600', 'clinicalModal') }}
+    {{ statCard('Fingerprint', finger, 'text-cyan-600', 'fingerModal') }}
 
-    <!-- Finger -->
-    <div class="bg-white border rounded-2xl p-5 shadow-sm hover:shadow-md transition">
-        <h2 class="text-cyan-600 text-xs sm:text-sm font-semibold">Fingerprint</h2>
-        <p class="text-2xl sm:text-3xl font-bold mt-3 text-cyan-700">{{ finger }}</p>
-        <button onclick="openModal('fingerModal')"
-            class="mt-4 w-full bg-[#5b21b6] text-white py-2 rounded-xl text-sm font-semibold hover:bg-[#4c1d95] transition">
-            View Details
-        </button>
-    </div>
-
-    <!-- Total -->
+    <!-- Total Card -->
     <div class="bg-gradient-to-r from-[#5b21b6] to-[#7c3aed] text-white rounded-2xl p-5 shadow-md hover:shadow-lg transition">
         <h2 class="text-xs sm:text-sm font-semibold">Total Activity</h2>
         <p class="text-2xl sm:text-3xl font-bold mt-3">{{ total_predictions }}</p>
@@ -85,12 +72,15 @@
 
 </div>
 
+
 <!-- ================= GRAPH ================= -->
 <div class="bg-white shadow rounded-2xl p-4 sm:p-6 mb-10">
-    <h2 class="text-base sm:text-lg font-bold mb-4">Prediction Activity Graph</h2>
+    <h2 class="text-base sm:text-lg font-bold mb-4 text-center sm:text-left">
+        Prediction Activity Graph
+    </h2>
 
     <div class="w-full overflow-x-auto">
-        <div class="min-w-[300px] h-64 sm:h-80">
+        <div class="min-w-[280px] h-64 sm:h-80">
             <canvas id="activityChart"></canvas>
         </div>
     </div>
@@ -103,14 +93,14 @@
 {% macro modalWrapper(id, title) %}
 <div id="{{ id }}"
      class="fixed inset-0 bg-black/60 backdrop-blur-sm hidden
-            items-center justify-center z-50 p-3">
+            items-center justify-center z-50 p-4">
 
     <div class="bg-white w-full max-w-4xl rounded-2xl shadow-xl
                 max-h-[90vh] flex flex-col overflow-hidden">
 
         <div class="bg-[#5b21b6] text-white px-4 py-3 flex justify-between items-center">
             <h3 class="font-semibold text-sm sm:text-base truncate">{{ title }}</h3>
-            <button onclick="closeModal('{{ id }}')" class="text-white">
+            <button onclick="closeModal('{{ id }}')" class="text-white text-lg">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
@@ -127,9 +117,9 @@
 
 {% call modalWrapper('messagesModal','User Messages') %}
 {% for msg in messages_list %}
-<div class="border rounded-xl p-4 mb-3">
+<div class="border rounded-xl p-4 mb-3 bg-slate-50">
 <p><strong>Subject:</strong> {{ msg.subject }}</p>
-<p><strong>Message:</strong> {{ msg.message }}</p>
+<p class="mt-2"><strong>Message:</strong> {{ msg.message }}</p>
 <p class="text-xs text-gray-500 mt-2">
 {{ msg.created_at }} | Status: {{ msg.status }}
 </p>
@@ -139,10 +129,11 @@
 {% endfor %}
 {% endcall %}
 
+
 {% call modalWrapper('clinicalModal','Reports Predictions') %}
 {% for c in clinical_list %}
-<div class="border rounded-xl p-4 mb-4">
-<div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+<div class="border rounded-xl p-4 mb-4 bg-slate-50">
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
 <p><strong>Result:</strong> {{ c.result }}</p>
 <p><strong>Date:</strong> {{ c.created_at }}</p>
 <p><strong>Age:</strong> {{ c.age }}</p>
@@ -156,10 +147,11 @@
 {% endfor %}
 {% endcall %}
 
+
 {% call modalWrapper('fingerModal','Fingerprint Predictions') %}
 {% for f in finger_list %}
-<div class="border rounded-xl p-4 mb-4">
-<div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+<div class="border rounded-xl p-4 mb-4 bg-slate-50">
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
 <p><strong>Result:</strong> {{ f.result }}</p>
 <p><strong>Date:</strong> {{ f.created_at }}</p>
 <p><strong>Age:</strong> {{ f.age }}</p>
@@ -173,9 +165,10 @@
 {% endfor %}
 {% endcall %}
 
+
 {% call modalWrapper('combinedModal','All Predictions') %}
 {% for item in combined_list %}
-<div class="border rounded-xl p-4 mb-3 flex justify-between items-center">
+<div class="border rounded-xl p-4 mb-3 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 bg-slate-50">
 <div>
 <p class="font-semibold text-sm">{{ item.result }}</p>
 <p class="text-xs text-gray-500">{{ item.created_at }}</p>
@@ -235,12 +228,8 @@ fill: true
 options: {
 responsive: true,
 maintainAspectRatio: false,
-plugins: {
-legend: { display: true }
-},
-scales: {
-y: { beginAtZero: true }
-}
+plugins: { legend: { display: true }},
+scales: { y: { beginAtZero: true }}
 }
 });
 </script>
