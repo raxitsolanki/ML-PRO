@@ -27,7 +27,7 @@
                 Export
             </a>
 
-            <a href="{{ url_for('admin_users') }}"
+            <a href="{{ url_for('admin_user_analytics') }}"
                class="w-full sm:w-auto inline-flex justify-center items-center gap-2
                       bg-slate-100 text-slate-700
                       px-3 py-1.5 rounded-md
@@ -71,8 +71,8 @@
 {% endmacro %}
 
 {{ statCard('Messages', messages, 'text-slate-500', 'messagesModal') }}
-{{ statCard('Reports', clinical, 'text-emerald-600', 'clinicalModal') }}
-{{ statCard('Fingerprint', finger, 'text-cyan-600', 'fingerModal') }}
+{{ statCard('Reports', clinical, 'text-slate-500', 'clinicalModal') }}
+{{ statCard('Fingerprint', finger, 'text-slate-500', 'fingerModal') }}
 
 <div class="bg-gradient-to-r from-purple-600 to-indigo-600
             text-white rounded-lg p-2.5 sm:p-3 shadow-sm
