@@ -1176,96 +1176,100 @@ def finger_prediction():
     if 'loggedin' not in session:
         return redirect(url_for('login'))
 
-    # ---------- PAGE LOAD (GET) ----------
+    # ================= GET =================
     if request.method == 'GET':
         return render_template('finger_prediction.html')
 
-    # ---------- FORM SUBMIT (POST) ----------
-    gender   = int(request.form['gender'])
-    age      = int(request.form['age'])
-    smoking  = int(request.form['smoking'])
-    bmi      = float(request.form['bmi'])
-    hba1c    = float(request.form['hba1c'])
-    glucose  = float(request.form['glucose'])
+    try:
+        # ================= FORM DATA =================
+        gender   = int(request.form.get('gender', 0))
+        age      = int(request.form.get('age', 0))
+        smoking  = int(request.form.get('smoking', 0))
+        bmi      = float(request.form.get('bmi', 0))
+        hba1c    = float(request.form.get('hba1c', 0))
+        glucose  = float(request.form.get('glucose', 0))
 
-    # ---------- IMAGE ----------
-    file = request.files.get('fingerprint')
-    if not file or file.filename == '':
-        return "Fingerprint image is required", 400
+        # ================= IMAGE =================
+        file = request.files.get('fingerprint')
+        if not file or file.filename == '':
+            return "Fingerprint image is required", 400
 
-    upload_folder = app.config.get(
-        'UPLOAD_FOLDER',
-        'static/uploads/fingerprints'
-    )
-    os.makedirs(upload_folder, exist_ok=True)
+        upload_folder = app.config.get(
+            'UPLOAD_FOLDER',
+            'static/uploads/fingerprints'
+        )
+        os.makedirs(upload_folder, exist_ok=True)
 
-    filename = f"{uuid.uuid4().hex}_{secure_filename(file.filename)}"
-    fingerprint_image = os.path.join(upload_folder, filename)
-    file.save(fingerprint_image)
+        filename = f"{uuid.uuid4().hex}_{secure_filename(file.filename)}"
+        fingerprint_image = os.path.join(upload_folder, filename)
+        file.save(fingerprint_image)
 
-    # ---------- FEATURE EXTRACTION ----------
-    fp = extract_fingerprint_features(fingerprint_image)
+        # ================= FEATURE EXTRACTION =================
+        fp = extract_fingerprint_features(fingerprint_image)
 
-    ridge_density    = float(fp['ridge_density'])
-    complexity_score = float(fp['complexity_score'])
-    pattern_type     = int(fp['pattern_type'])
+        ridge_density    = float(fp['ridge_density'])
+        complexity_score = float(fp['complexity_score'])
+        pattern_type     = int(fp['pattern_type'])
 
-    # ---------- MODEL INPUT ----------
-    model_input = np.array([[
-        gender,
-        age,
-        smoking,
-        bmi,
-        hba1c,
-        glucose,
-        ridge_density,
-        complexity_score,
-        pattern_type
-    ]])
+        # ================= MODEL INPUT =================
+        model_input = np.array([[
+            gender,
+            age,
+            smoking,
+            bmi,
+            hba1c,
+            glucose,
+            ridge_density,
+            complexity_score,
+            pattern_type
+        ]])
 
-    pred = int(finger_model.predict(model_input)[0])
+        pred = int(finger_model.predict(model_input)[0])
 
-    result_map = {
-        0: "LOW DIABETES RISK",
-        1: "MEDIUM DIABETES RISK",
-        2: "HIGH DIABETES RISK"
-    }
-    result = result_map.get(pred, "UNKNOWN")
+        result_map = {
+            0: "LOW DIABETES RISK",
+            1: "MEDIUM DIABETES RISK",
+            2: "HIGH DIABETES RISK"
+        }
+        result = result_map.get(pred, "UNKNOWN")
 
-    # ---------- DATABASE ----------
-    # ---------- DATABASE ----------
-    conn = get_db_connection()
-    cursor = conn.cursor()
+        # ================= DATABASE =================
+        conn = get_db_connection()
+        cursor = conn.cursor()
 
-    cursor.execute("""
-    INSERT INTO finger_predictions
-    (user_id, gender, age, smoking, bmi, hba1c, glucose,
-     ridge_density, complexity_score, pattern_type,
-     result, fingerprint_image)
-    VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
-     """, (
-    session['id'],
-    gender,
-    age,
-    smoking,
-    bmi,
-    hba1c,
-    glucose,
-    ridge_density,
-    complexity_score,
-    pattern_type,
-    result,
-    fingerprint_image
-    ))
+        cursor.execute("""
+            INSERT INTO finger_predictions
+            (user_id, gender, age, smoking, bmi, hba1c, glucose,
+             ridge_density, complexity_score, pattern_type,
+             result, fingerprint_image)
+            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+        """, (
+            session['id'],   # Make sure this exists in login session
+            gender,
+            age,
+            smoking,
+            bmi,
+            hba1c,
+            glucose,
+            ridge_density,
+            complexity_score,
+            pattern_type,
+            result,
+            fingerprint_image
+        ))
 
-    conn.commit()
-    cursor.close()
-    conn.close()
+        conn.commit()
+        cursor.close()
+        conn.close()
 
-    return render_template(
-        'finger_prediction.html',
-        finger_prediction=result
-    )
+        return render_template(
+            'finger_prediction.html',
+            finger_prediction=result
+        )
+
+    except Exception as e:
+        print("ERROR IN FINGER PREDICTION:", str(e))
+        return "Internal Server Error - Check logs", 500
 @app.route('/download_finger_report/<int:user_id>')
 def download_finger_report(user_id):
 
