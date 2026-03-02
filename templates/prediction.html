@@ -74,72 +74,92 @@
         <form action="{{ url_for('prediction') }}" method="POST"
               class="bg-white rounded-[2.5rem] shadow-2xl shadow-slate-200/60 p-10 border border-slate-100 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 animate-fade-in">
 
-            <!-- Gender -->
-            <div>
-                <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Gender</label>
-                <select name="gender" class="w-full py-3 rounded-2xl border-2 border-slate-100 bg-slate-50 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 outline-none" required>
+              <div>
+                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Gender</label>
+                <div class="relative mt-2">
+                  <i class="fa-solid fa-venus-mars absolute left-4 top-1/2 -translate-y-1/2 text-slate-300"></i>
+                  <select name="gender" required
+                    class="w-full pl-11 pr-4 py-3 rounded-xl bg-slate-50 border-2 border-slate-100 font-semibold focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 outline-none">
                     <option value="">Select</option>
                     <option value="0">Female</option>
                     <option value="1">Male</option>
-                </select>
-            </div>
+                  </select>
+                </div>
+              </div>
+              
 
-            <!-- Age -->
-            <div>
-                <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Age</label>
-                <input type="number" name="age" min="1" max="120"
-                       class="w-full py-3 rounded-2xl border-2 border-slate-100 bg-slate-50 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 outline-none" required>
-            </div>
+              <div>
+                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Age</label>
+                <div class="relative mt-2">
+                  <i class="fa-solid fa-calendar-day absolute left-4 top-1/2 -translate-y-1/2 text-slate-300"></i>
+                  <input type="number" name="age" min="1" max="120" required
+                    class="w-full pl-11 pr-4 py-3 rounded-xl bg-slate-50 border-2 border-slate-100 font-semibold focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 outline-none">
+                </div>
+              </div>
 
             <!-- Hypertension -->
             <div>
-                <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Hypertension</label>
-                <select name="hypertension" class="w-full py-3 rounded-2xl border-2 border-slate-100 bg-slate-50 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 outline-none">
+                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Hypertension</label>
+                <div class="relative mt-2">
+                    <i class="fa-solid fa-smoking absolute left-4 top-1/2 -translate-y-1/2 text-slate-300"></i>
+                <select name="hypertension" class="w-full pl-11 pr-4 py-3 rounded-xl bg-slate-50 border-2 border-slate-100 font-semibold focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 outline-none">
                     <option value="0">No</option>
                     <option value="1">Yes</option>
                 </select>
             </div>
+        </div>
 
             <!-- Heart -->
             <div>
-                <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Heart Disease</label>
-                <select name="heart_disease" class="w-full py-3 rounded-2xl border-2 border-slate-100 bg-slate-50 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 outline-none">
+                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Heart Disease</label>
+                <div class="relative mt-2">
+                    <i class="fa-solid fa-smoking absolute left-4 top-1/2 -translate-y-1/2 text-slate-300"></i>
+                <select name="heart_disease"class="w-full pl-11 pr-4 py-3 rounded-xl bg-slate-50 border-2 border-slate-100 font-semibold focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 outline-none">
                     <option value="0">No</option>
                     <option value="1">Yes</option>
                 </select>
             </div>
+        </div>
 
-            <!-- Smoking -->
             <div>
-                <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Smoking</label>
-                <select name="smoking" class="w-full py-3 rounded-2xl border-2 border-slate-100 bg-slate-50 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 outline-none">
+                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Smoking</label>
+                <div class="relative mt-2">
+                  <i class="fa-solid fa-smoking absolute left-4 top-1/2 -translate-y-1/2 text-slate-300"></i>
+                  <select name="smoking" required
+                    class="w-full pl-11 pr-4 py-3 rounded-xl bg-slate-50 border-2 border-slate-100 font-semibold focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 outline-none">
                     <option value="0">Never</option>
                     <option value="1">Former</option>
                     <option value="2">Current</option>
-                </select>
-            </div>
+                  </select>
+                </div>
+              </div>
 
             <!-- BMI -->
             <div>
-                <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">BMI</label>
-                <input type="number" step="0.1" name="bmi"
-                       class="w-full py-3 rounded-2xl border-2 border-slate-100 bg-slate-50 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 outline-none" required>
-            </div>
-
-            <!-- HbA1c -->
-            <div>
-                <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">HbA1c</label>
-                <input type="number" step="0.1" name="hba1c"
-                       class="w-full py-3 rounded-2xl border-2 border-slate-100 bg-slate-50 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 outline-none" required>
-            </div>
-
+                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">BMI</label>
+                <div class="relative mt-2">
+                  <i class="fa-solid fa-weight-scale absolute left-4 top-1/2 -translate-y-1/2 text-slate-300"></i>
+                  <input type="number" step="0.1" name="bmi" required
+                    class="w-full pl-11 pr-4 py-3 rounded-xl bg-slate-50 border-2 border-slate-100 font-semibold focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 outline-none">
+                </div>
+              </div>
+              <div>
+                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">HbA1c</label>
+                <div class="relative mt-2">
+                  <i class="fa-solid fa-vial absolute left-4 top-1/2 -translate-y-1/2 text-slate-300"></i>
+                  <input type="number" step="0.1" name="hba1c" required 
+                    class="w-full pl-11 pr-4 py-3 rounded-xl bg-slate-50 border-2 border-slate-100 font-semibold focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 outline-none">
+                </div>
+              </div>
             <!-- Glucose -->
             <div>
-                <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Glucose</label>
-                <input type="number" name="glucose"
-                       class="w-full py-3 rounded-2xl border-2 border-slate-100 bg-slate-50 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 outline-none" required>
-            </div>
-
+                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Glucose</label>
+                <div class="relative mt-2">
+                  <i class="fa-solid fa-gauge-high absolute left-4 top-1/2 -translate-y-1/2 text-slate-300"></i>
+                  <input type="number" name="glucose" required
+                    class="w-full pl-11 pr-4 py-3 rounded-xl bg-slate-50 border-2 border-slate-100 font-semibold focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 outline-none">
+                </div>
+              </div>
             <!-- Submit -->
             <div class="md:col-span-2 pt-8">
                
