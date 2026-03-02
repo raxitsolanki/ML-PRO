@@ -1,161 +1,184 @@
 {% extends "admin/admin_layout.html" %}
 {% block content %}
 
-<div class="px-4 sm:px-6 lg:px-8 py-6">
+<div class="px-4 sm:px-6 lg:px-8 py-6 pb-20">
 
-    <!-- ================= HEADER ================= -->
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+<!-- ================= HEADER ================= -->
+<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
 
-        <h1 class="text-xl sm:text-2xl font-bold">
-            Fingerprint Predictions
-        </h1>
+    <h1 class="text-xl sm:text-2xl font-bold">
+        Fingerprint Predictions
+    </h1>
 
-        <a href="{{ url_for('admin_prediction') }}"
-           class="w-full sm:w-auto text-center inline-flex items-center justify-center gap-2 
-                  bg-gray-200 text-gray-800 px-4 py-2 rounded-lg 
-                  hover:bg-gray-300 transition text-sm font-semibold">
-            <i class="fa-solid fa-arrow-left"></i>
-            Back to Report Data
-        </a>
+    <a href="{{ url_for('admin_prediction') }}"
+       class="w-full sm:w-auto text-center inline-flex items-center justify-center gap-2 
+              bg-gray-200 text-gray-800 px-4 py-2 rounded-lg 
+              hover:bg-gray-300 transition text-sm font-semibold">
+        <i class="fa-solid fa-arrow-left"></i>
+        Back to Report Data
+    </a>
+</div>
+
+
+<!-- ================= DESKTOP TABLE ================= -->
+<div class="hidden lg:block bg-white rounded-xl shadow border border-gray-200 overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="min-w-[1200px] w-full text-[11px]">
+            <thead class="bg-gray-100">
+                <tr class="text-left uppercase tracking-tight font-bold text-gray-800 whitespace-nowrap">
+                    <th class="px-3 py-3">ID</th>
+                    <th class="px-3 py-3">Email</th>
+                    <th class="px-3 py-3">Gender</th>
+                    <th class="px-3 py-3">Age</th>
+                    <th class="px-3 py-3">Smoking</th>
+                    <th class="px-3 py-3">BMI</th>
+                    <th class="px-3 py-3">HbA1c</th>
+                    <th class="px-3 py-3">Glucose</th>
+                    <th class="px-3 py-3">Ridge</th>
+                    <th class="px-3 py-3">Complexity</th>
+                    <th class="px-3 py-3">Pattern</th>
+                    <th class="px-3 py-3">Result</th>
+                    <th class="px-3 py-3">Image</th>
+                    <th class="px-3 py-3">Date</th>
+                    <th class="px-3 py-3 text-center">Action</th>
+                </tr>
+            </thead>
+
+            <tbody class="divide-y divide-gray-100">
+                {% for p in predictions %}
+                <tr class="hover:bg-gray-50 whitespace-nowrap">
+                    <td class="px-3 py-2">{{ p.id }}</td>
+                    <td class="px-3 py-2">{{ p.email }}</td>
+                    <td class="px-3 py-2">{% if p.gender == 1 %}M{% else %}F{% endif %}</td>
+                    <td class="px-3 py-2">{{ p.age }}</td>
+                    <td class="px-3 py-2">
+                        {% if p.smoking == 0 %}Never
+                        {% elif p.smoking == 1 %}Former
+                        {% else %}Current{% endif %}
+                    </td>
+                    <td class="px-3 py-2 font-semibold">{{ p.bmi }}</td>
+                    <td class="px-3 py-2">{{ p.hba1c }}</td>
+                    <td class="px-3 py-2">{{ p.glucose }}</td>
+                    <td class="px-3 py-2">{{ p.ridge_density }}</td>
+                    <td class="px-3 py-2">{{ p.complexity_score }}</td>
+                    <td class="px-3 py-2">{{ p.pattern_type }}</td>
+
+                    <td class="px-3 py-2">
+                        <span class="px-2 py-1 rounded-full text-[9px] font-bold
+                            {% if 'LOW' in p.result %}
+                                bg-emerald-100 text-emerald-800
+                            {% elif 'MEDIUM' in p.result %}
+                                bg-yellow-100 text-yellow-800
+                            {% else %}
+                                bg-red-100 text-red-700
+                            {% endif %}">
+                            {{ p.result }}
+                        </span>
+                    </td>
+
+                    <td class="px-3 py-2">
+                        {% if p.fingerprint_image %}
+                            <img src="{{ url_for('static', filename=p.fingerprint_image) }}"
+                                 class="w-10 h-10 object-cover rounded border">
+                        {% else %}-{% endif %}
+                    </td>
+
+                    <td class="px-3 py-2 text-gray-500">
+                        {{ p.created_at.strftime('%Y-%m-%d %H:%M') if p.created_at else '-' }}
+                    </td>
+
+                    <td class="px-3 py-2 text-center">
+                        <form action="{{ url_for('delete_finger_prediction', id=p.id) }}"
+                              method="POST"
+                              onsubmit="return confirm('Delete this fingerprint record?')">
+                            <button type="submit"
+                                    class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-700 text-[10px]">
+                                Delete
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
+</div>
 
 
-    <!-- ================= TABLE ================= -->
-    <div class="bg-white rounded-xl shadow border border-gray-200 overflow-hidden">
 
-        <div class="overflow-x-auto">
-            <table class="min-w-[1200px] w-full text-[11px]">
+<!-- ================= MOBILE CARD VIEW ================= -->
+<div class="lg:hidden space-y-4">
 
-                <thead class="bg-gray-100 sticky top-0 z-10">
-                    <tr class="text-left uppercase tracking-tight font-bold text-gray-800 whitespace-nowrap">
-                        <th class="px-3 py-3">ID</th>
-                        <th class="px-3 py-3">Email</th>
-                        <th class="px-3 py-3">Gender</th>
-                        <th class="px-3 py-3">Age</th>
-                        <th class="px-3 py-3">Smoking</th>
-                        <th class="px-3 py-3">BMI</th>
-                        <th class="px-3 py-3">HbA1c</th>
-                        <th class="px-3 py-3">Glucose</th>
-                        <th class="px-3 py-3">Ridge</th>
-                        <th class="px-3 py-3">Complexity</th>
-                        <th class="px-3 py-3">Pattern</th>
-                        <th class="px-3 py-3">Result</th>
-                        <th class="px-3 py-3">Image</th>
-                        <th class="px-3 py-3">Date</th>
-                        <th class="px-3 py-3 text-center">Action</th>
-                    </tr>
-                </thead>
+    {% for p in predictions %}
+    <div class="bg-white p-4 rounded-2xl shadow border border-gray-200">
 
-                <tbody class="divide-y divide-gray-100">
-
-                    {% for p in predictions %}
-                    <tr class="hover:bg-gray-50 transition whitespace-nowrap">
-
-                        <td class="px-3 py-2 font-semibold text-gray-700">
-                            {{ p.id }}
-                        </td>
-
-                        <td class="px-3 py-2">
-                            {{ p.email }}
-                        </td>
-
-                        <td class="px-3 py-2">
-                            {% if p.gender == 1 %} M {% else %} F {% endif %}
-                        </td>
-
-                        <td class="px-3 py-2">{{ p.age }}</td>
-
-                        <td class="px-3 py-2">
-                            {% if p.smoking == 0 %} Never
-                            {% elif p.smoking == 1 %} Former
-                            {% else %} Current
-                            {% endif %}
-                        </td>
-
-                        <td class="px-3 py-2 font-semibold">{{ p.bmi }}</td>
-                        <td class="px-3 py-2">{{ p.hba1c }}</td>
-                        <td class="px-3 py-2">{{ p.glucose }}</td>
-                        <td class="px-3 py-2">{{ p.ridge_density }}</td>
-                        <td class="px-3 py-2">{{ p.complexity_score }}</td>
-                        <td class="px-3 py-2">{{ p.pattern_type }}</td>
-
-                        <!-- RESULT -->
-                        <td class="px-3 py-2">
-                            <span class="px-2 py-1 rounded-full font-bold text-[9px]
-                                {% if 'LOW' in p.result %}
-                                    bg-emerald-100 text-emerald-800 border border-emerald-200
-                                {% elif 'MEDIUM' in p.result %}
-                                    bg-yellow-100 text-yellow-800 border border-yellow-200
-                                {% else %}
-                                    bg-red-100 text-red-700 border border-red-200
-                                {% endif %}">
-                                {{ p.result }}
-                            </span>
-                        </td>
-
-                        <!-- IMAGE -->
-                        <td class="px-3 py-2">
-                            {% if p.fingerprint_image %}
-                                <img src="{{ url_for('static', filename=p.fingerprint_image) }}"
-                                     class="w-10 h-10 object-cover rounded border">
-                            {% else %}
-                                -
-                            {% endif %}
-                        </td>
-
-                        <td class="px-3 py-2 text-gray-500">
-                            {% if p.created_at %}
-                                {{ p.created_at.strftime('%Y-%m-%d %H:%M') }}
-                            {% else %}
-                                -
-                            {% endif %}
-                        </td>
-
-                        <!-- DELETE -->
-                        <td class="px-3 py-2 text-center">
-                            <form action="{{ url_for('delete_finger_prediction', id=p.id) }}"
-                                  method="POST"
-                                  onsubmit="return confirm('Delete this fingerprint record?')">
-
-                                <button type="submit"
-                                        class="bg-red-500 text-white px-3 py-1.5 rounded
-                                               hover:bg-red-700 transition text-[10px]
-                                               flex items-center gap-1 mx-auto">
-                                    <i class="fa-solid fa-trash-can"></i> Delete
-                                </button>
-                            </form>
-                        </td>
-
-                    </tr>
-                    {% endfor %}
-
-                </tbody>
-            </table>
+        <div class="flex justify-between items-center mb-2">
+            <span class="text-xs text-gray-500">ID</span>
+            <span class="font-semibold text-sm">{{ p.id }}</span>
         </div>
 
-    </div>
+        <p class="text-xs text-gray-500">Email</p>
+        <p class="text-sm break-all mb-3">{{ p.email }}</p>
 
-
-    <!-- ================= TOTAL SECTION ================= -->
-    <div class="mt-6 pb-16 flex justify-end">
-
-        <div class="flex items-center gap-3 
-                    bg-gradient-to-r from-[#5b21b6] to-[#7c3aed] 
-                    text-white px-4 py-3 rounded-xl shadow-md">
-
-            <i class="fa-solid fa-database text-sm opacity-90"></i>
-
-            <span class="text-sm font-medium">
-                Total Records:
-            </span>
-
-            <span class="bg-white/20 px-3 py-1 rounded-lg text-sm font-bold">
-                {{ total_count }}
-            </span>
-
+        <div class="grid grid-cols-2 gap-3 text-sm mb-3">
+            <div><p class="text-xs text-gray-500">Age</p><p>{{ p.age }}</p></div>
+            <div><p class="text-xs text-gray-500">Gender</p><p>{% if p.gender == 1 %}Male{% else %}Female{% endif %}</p></div>
+            <div><p class="text-xs text-gray-500">BMI</p><p>{{ p.bmi }}</p></div>
+            <div><p class="text-xs text-gray-500">Glucose</p><p>{{ p.glucose }}</p></div>
         </div>
 
+        <div class="mb-3">
+            <p class="text-xs text-gray-500">Result</p>
+            <span class="px-2 py-1 rounded-full text-xs font-semibold
+                {% if 'LOW' in p.result %}
+                    bg-emerald-100 text-emerald-800
+                {% elif 'MEDIUM' in p.result %}
+                    bg-yellow-100 text-yellow-800
+                {% else %}
+                    bg-red-100 text-red-700
+                {% endif %}">
+                {{ p.result }}
+            </span>
+        </div>
+
+        {% if p.fingerprint_image %}
+        <div class="mb-3">
+            <img src="{{ url_for('static', filename=p.fingerprint_image) }}"
+                 class="w-16 h-16 object-cover rounded border">
+        </div>
+        {% endif %}
+
+        <div class="text-xs text-gray-500 mb-3">
+            {{ p.created_at.strftime('%Y-%m-%d %H:%M') if p.created_at else '-' }}
+        </div>
+
+        <form action="{{ url_for('delete_finger_prediction', id=p.id) }}"
+              method="POST"
+              onsubmit="return confirm('Delete this fingerprint record?')">
+
+            <button type="submit"
+                    class="w-full bg-red-500 text-white py-2 rounded-xl text-sm font-medium hover:bg-red-700 transition">
+                Delete Record
+            </button>
+        </form>
+
     </div>
+    {% endfor %}
+
+</div>
+
+
+
+<!-- ================= TOTAL ================= -->
+<div class="mt-8 flex justify-end">
+    <div class="bg-purple-700 text-white px-5 py-3 rounded-xl shadow-md flex items-center gap-3">
+        <i class="fa-solid fa-database"></i>
+        <span class="text-sm font-medium">Total Records:</span>
+        <span class="bg-white/20 px-3 py-1 rounded-lg font-bold">
+            {{ total_count }}
+        </span>
+    </div>
+</div>
 
 </div>
 

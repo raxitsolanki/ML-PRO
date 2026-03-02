@@ -1,116 +1,128 @@
 {% extends "admin/admin_layout.html" %}
 {% block content %}
 
-<div class="w-full max-w-6xl mx-auto px-3 sm:px-5 lg:px-8 py-5">
+<div class="w-full max-w-6xl mx-auto px-3 sm:px-5 lg:px-8 py-4 sm:py-6">
 
 <!-- ================= HEADER ================= -->
-<div class="bg-white border border-slate-200 rounded-xl shadow-sm p-4 sm:p-5 mb-6">
-    <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+<div class="bg-white border border-slate-200 rounded-2xl shadow-sm p-4 sm:p-6 mb-6">
 
-        <div class="text-center lg:text-left">
-            <h1 class="text-lg sm:text-xl lg:text-2xl font-bold text-slate-800 break-words">
+    <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+
+        <div class="text-center md:text-left break-words">
+            <h1 class="text-lg sm:text-xl md:text-2xl font-bold text-slate-800 break-all">
                 {{ user.username }}
             </h1>
-            <p class="text-xs text-slate-500 mt-1">
+            <p class="text-xs sm:text-sm text-slate-500 mt-1">
                 User Activity Overview
             </p>
         </div>
 
-        <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+        <div class="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
 
             <a href="{{ url_for('export_user_activity_pdf', user_id=user.id) }}"
-               class="w-full sm:w-auto text-center inline-flex justify-center items-center gap-2
+               class="w-full sm:w-auto inline-flex justify-center items-center gap-2
                       bg-gradient-to-r from-purple-600 to-indigo-600
-                      text-white px-3 py-2 rounded-lg
-                      text-xs font-semibold hover:opacity-90 transition">
+                      text-white px-4 py-2 rounded-xl
+                      text-xs sm:text-sm font-semibold
+                      hover:opacity-90 transition">
                 <i class="fa-solid fa-file-pdf text-xs"></i>
                 Export
             </a>
 
-            <a href="{{ request.referrer or url_for('admin_user_analytics') }}"
-               class="w-full sm:w-auto text-center inline-flex justify-center items-center gap-2
+            <a href="{{ url_for('admin_users') }}"
+               class="w-full sm:w-auto inline-flex justify-center items-center gap-2
                       bg-slate-100 text-slate-700
-                      px-3 py-2 rounded-lg
-                      text-xs font-medium hover:bg-slate-200 transition">
+                      px-4 py-2 rounded-xl
+                      text-xs sm:text-sm font-medium
+                      hover:bg-slate-200 transition">
                 <i class="fa-solid fa-arrow-left text-xs"></i>
                 Back
             </a>
+
         </div>
     </div>
 </div>
 
 
-<!-- ================= SMALL STATS CARDS ================= -->
-<div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+<!-- ================= STATS ================= -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6">
 
-    {% macro statCard(title, value, colorClass, modalId) %}
-    <div class="bg-white border rounded-xl p-3 shadow-sm hover:shadow transition">
+{% macro statCard(title, value, colorClass, modalId) %}
+<div class="bg-white border rounded-2xl p-4 shadow-sm
+            hover:shadow-md transition flex flex-col justify-between">
 
+    <div>
         <h2 class="text-[11px] sm:text-xs font-semibold {{ colorClass }}">
             {{ title }}
         </h2>
 
-        <p class="text-lg sm:text-xl font-bold mt-2">
+        <p class="text-lg sm:text-xl md:text-2xl font-bold mt-2">
             {{ value }}
         </p>
-
-        <button onclick="openModal('{{ modalId }}')"
-            class="mt-3 w-full bg-[#5b21b6] text-white py-1.5
-                   rounded-lg text-[11px] font-semibold hover:bg-[#4c1d95] transition">
-            View
-        </button>
     </div>
-    {% endmacro %}
 
-    {{ statCard('Messages', messages, 'text-slate-500', 'messagesModal') }}
-    {{ statCard('Reports', clinical, 'text-emerald-600', 'clinicalModal') }}
-    {{ statCard('Fingerprint', finger, 'text-cyan-600', 'fingerModal') }}
+    <button onclick="openModal('{{ modalId }}')"
+        class="mt-4 w-full bg-purple-600 text-white py-2
+               rounded-xl text-[11px] sm:text-xs font-semibold
+               hover:bg-purple-700 transition">
+        View
+    </button>
 
-    <div class="bg-gradient-to-r from-[#5b21b6] to-[#7c3aed]
-                text-white rounded-xl p-3 shadow hover:shadow-md transition">
+</div>
+{% endmacro %}
 
+{{ statCard('Messages', messages, 'text-slate-500', 'messagesModal') }}
+{{ statCard('Reports', clinical, 'text-emerald-600', 'clinicalModal') }}
+{{ statCard('Fingerprint', finger, 'text-cyan-600', 'fingerModal') }}
+
+<div class="bg-gradient-to-r from-purple-600 to-indigo-600
+            text-white rounded-2xl p-4 shadow-sm
+            hover:shadow-md transition flex flex-col justify-between">
+
+    <div>
         <h2 class="text-[11px] font-semibold">Total</h2>
-
-        <p class="text-lg sm:text-xl font-bold mt-2">
+        <p class="text-lg sm:text-xl md:text-2xl font-bold mt-2">
             {{ total_predictions }}
         </p>
-
-        <button onclick="openModal('combinedModal')"
-            class="mt-3 w-full bg-white text-[#5b21b6] py-1.5
-                   rounded-lg text-[11px] font-semibold hover:bg-gray-100 transition">
-            View
-        </button>
     </div>
+
+    <button onclick="openModal('combinedModal')"
+        class="mt-4 w-full bg-white text-purple-600 py-2
+               rounded-xl text-[11px] sm:text-xs font-semibold
+               hover:bg-gray-100 transition">
+        View
+    </button>
+</div>
 
 </div>
 
 
-<!-- ================= COMPACT GRAPH ================= -->
-<div class="bg-white shadow rounded-xl p-4 mb-6">
-    <h2 class="text-sm font-semibold mb-3">
+<!-- ================= GRAPH ================= -->
+<div class="bg-white rounded-2xl shadow-sm p-4 sm:p-6 mb-6">
+
+    <h2 class="text-sm sm:text-base font-semibold mb-4">
         Activity Graph
     </h2>
 
-    <div class="w-full overflow-x-auto">
-        <div class="min-w-[260px] h-56 sm:h-64">
-            <canvas id="activityChart"></canvas>
-        </div>
+    <div class="relative w-full h-52 sm:h-64 md:h-72">
+        <canvas id="activityChart"></canvas>
     </div>
-</div>
 
 </div>
 
+</div>
 
-<!-- ================= MODAL MACRO ================= -->
+
+<!-- ================= MODAL ================= -->
 {% macro modalWrapper(id, title) %}
 <div id="{{ id }}"
-     class="fixed inset-0 bg-black/50 hidden
-            items-center justify-center z-50 p-3">
+     class="fixed inset-0 bg-black/60 hidden
+            items-center justify-center z-50 p-3 sm:p-6">
 
-    <div class="bg-white w-full max-w-3xl rounded-xl shadow-lg
-                max-h-[85vh] flex flex-col overflow-hidden">
+    <div class="bg-white w-full max-w-4xl rounded-2xl shadow-xl
+                max-h-[90vh] flex flex-col overflow-hidden">
 
-        <div class="bg-[#5b21b6] text-white px-3 py-2 flex justify-between items-center">
+        <div class="bg-purple-600 text-white px-4 py-3 flex justify-between items-center">
             <h3 class="font-semibold text-xs sm:text-sm truncate">
                 {{ title }}
             </h3>
@@ -119,22 +131,23 @@
             </button>
         </div>
 
-        <div class="p-3 overflow-y-auto flex-1 text-xs sm:text-sm">
+        <div class="p-4 overflow-y-auto flex-1 text-xs sm:text-sm">
             {{ caller() }}
         </div>
+
     </div>
 </div>
 {% endmacro %}
 
 
-<!-- ================= MODALS ================= -->
+<!-- ================= MODALS CONTENT ================= -->
 
 {% call modalWrapper('messagesModal','User Messages') %}
 {% for msg in messages_list %}
-<div class="border rounded-lg p-3 mb-2 bg-slate-50 text-xs">
+<div class="border rounded-xl p-3 mb-3 bg-slate-50 break-words">
 <p><strong>Subject:</strong> {{ msg.subject }}</p>
-<p class="mt-1">{{ msg.message }}</p>
-<p class="text-[10px] text-gray-500 mt-1">
+<p class="mt-1 break-all">{{ msg.message }}</p>
+<p class="text-[10px] text-gray-500 mt-2">
 {{ msg.created_at }} | {{ msg.status }}
 </p>
 </div>
@@ -146,7 +159,7 @@
 
 {% call modalWrapper('clinicalModal','Reports Predictions') %}
 {% for c in clinical_list %}
-<div class="border rounded-lg p-3 mb-3 bg-slate-50 text-xs">
+<div class="border rounded-xl p-3 mb-3 bg-slate-50">
 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
 <p><strong>Result:</strong> {{ c.result }}</p>
 <p><strong>Date:</strong> {{ c.created_at }}</p>
@@ -164,7 +177,7 @@
 
 {% call modalWrapper('fingerModal','Fingerprint Predictions') %}
 {% for f in finger_list %}
-<div class="border rounded-lg p-3 mb-3 bg-slate-50 text-xs">
+<div class="border rounded-xl p-3 mb-3 bg-slate-50">
 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
 <p><strong>Result:</strong> {{ f.result }}</p>
 <p><strong>Date:</strong> {{ f.created_at }}</p>
@@ -182,12 +195,13 @@
 
 {% call modalWrapper('combinedModal','All Predictions') %}
 {% for item in combined_list %}
-<div class="border rounded-lg p-3 mb-2 bg-slate-50 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 text-xs">
+<div class="border rounded-xl p-3 mb-3 bg-slate-50
+            flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
 <div>
 <p class="font-semibold">{{ item.result }}</p>
 <p class="text-[10px] text-gray-500">{{ item.created_at }}</p>
 </div>
-<span class="px-2 py-1 rounded-full text-[10px] font-semibold
+<span class="px-3 py-1 rounded-full text-[10px] font-semibold
 {% if item.type == 'Report' %}
 bg-emerald-100 text-emerald-700
 {% elif item.type == 'Finger' %}
