@@ -1,18 +1,18 @@
 {% extends "admin/admin_layout.html" %}
 {% block content %}
 
-<div class="w-full max-w-6xl mx-auto px-3 sm:px-5 lg:px-8 py-4 sm:py-6">
+<div class="w-full max-w-6xl mx-auto px-3 sm:px-5 lg:px-8 py-4 sm:py-6 pb-16">
 
 <!-- ================= HEADER ================= -->
-<div class="bg-white border border-slate-200 rounded-2xl shadow-sm p-4 sm:p-6 mb-6">
+<div class="bg-white border border-slate-200 rounded-xl shadow-sm p-4 sm:p-5 mb-5">
 
-    <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+    <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
 
         <div class="text-center md:text-left break-words">
-            <h1 class="text-lg sm:text-xl md:text-2xl font-bold text-slate-800 break-all">
+            <h1 class="text-base sm:text-lg md:text-xl font-bold text-slate-800 break-all">
                 {{ user.username }}
             </h1>
-            <p class="text-xs sm:text-sm text-slate-500 mt-1">
+            <p class="text-xs text-slate-500 mt-1">
                 User Activity Overview
             </p>
         </div>
@@ -22,8 +22,8 @@
             <a href="{{ url_for('export_user_activity_pdf', user_id=user.id) }}"
                class="w-full sm:w-auto inline-flex justify-center items-center gap-2
                       bg-gradient-to-r from-purple-600 to-indigo-600
-                      text-white px-4 py-2 rounded-xl
-                      text-xs sm:text-sm font-semibold
+                      text-white px-3 py-2 rounded-lg
+                      text-xs font-semibold
                       hover:opacity-90 transition">
                 <i class="fa-solid fa-file-pdf text-xs"></i>
                 Export
@@ -32,8 +32,8 @@
             <a href="{{ url_for('admin_users') }}"
                class="w-full sm:w-auto inline-flex justify-center items-center gap-2
                       bg-slate-100 text-slate-700
-                      px-4 py-2 rounded-xl
-                      text-xs sm:text-sm font-medium
+                      px-3 py-2 rounded-lg
+                      text-xs font-medium
                       hover:bg-slate-200 transition">
                 <i class="fa-solid fa-arrow-left text-xs"></i>
                 Back
@@ -45,25 +45,28 @@
 
 
 <!-- ================= STATS ================= -->
-<div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-6">
+<div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
 
 {% macro statCard(title, value, colorClass, modalId) %}
-<div class="bg-white border rounded-2xl p-4 shadow-sm
-            hover:shadow-md transition flex flex-col justify-between">
+<div class="bg-white border border-slate-200 rounded-xl
+            p-3 shadow-sm hover:shadow-md
+            transition flex flex-col justify-between
+            min-h-[105px]">
 
     <div>
-        <h2 class="text-[11px] sm:text-xs font-semibold {{ colorClass }}">
+        <h2 class="text-[10px] font-semibold {{ colorClass }}">
             {{ title }}
         </h2>
 
-        <p class="text-lg sm:text-xl md:text-2xl font-bold mt-2">
+        <p class="text-lg sm:text-xl font-bold mt-1">
             {{ value }}
         </p>
     </div>
 
     <button onclick="openModal('{{ modalId }}')"
-        class="mt-4 w-full bg-purple-600 text-white py-2
-               rounded-xl text-[11px] sm:text-xs font-semibold
+        class="mt-2 w-full bg-purple-600 text-white
+               py-1.5 rounded-lg
+               text-[10px] font-semibold
                hover:bg-purple-700 transition">
         View
     </button>
@@ -76,19 +79,21 @@
 {{ statCard('Fingerprint', finger, 'text-cyan-600', 'fingerModal') }}
 
 <div class="bg-gradient-to-r from-purple-600 to-indigo-600
-            text-white rounded-2xl p-4 shadow-sm
-            hover:shadow-md transition flex flex-col justify-between">
+            text-white rounded-xl p-3 shadow-sm
+            hover:shadow-md transition flex flex-col justify-between
+            min-h-[105px]">
 
     <div>
-        <h2 class="text-[11px] font-semibold">Total</h2>
-        <p class="text-lg sm:text-xl md:text-2xl font-bold mt-2">
+        <h2 class="text-[10px] font-semibold">Total</h2>
+        <p class="text-lg sm:text-xl font-bold mt-1">
             {{ total_predictions }}
         </p>
     </div>
 
     <button onclick="openModal('combinedModal')"
-        class="mt-4 w-full bg-white text-purple-600 py-2
-               rounded-xl text-[11px] sm:text-xs font-semibold
+        class="mt-2 w-full bg-white text-purple-600
+               py-1.5 rounded-lg
+               text-[10px] font-semibold
                hover:bg-gray-100 transition">
         View
     </button>
@@ -98,13 +103,13 @@
 
 
 <!-- ================= GRAPH ================= -->
-<div class="bg-white rounded-2xl shadow-sm p-4 sm:p-6 mb-6">
+<div class="bg-white rounded-xl shadow-sm p-4 mb-6">
 
-    <h2 class="text-sm sm:text-base font-semibold mb-4">
+    <h2 class="text-sm font-semibold mb-3">
         Activity Graph
     </h2>
 
-    <div class="relative w-full h-52 sm:h-64 md:h-72">
+    <div class="relative w-full h-48 sm:h-60">
         <canvas id="activityChart"></canvas>
     </div>
 
@@ -117,13 +122,13 @@
 {% macro modalWrapper(id, title) %}
 <div id="{{ id }}"
      class="fixed inset-0 bg-black/60 hidden
-            items-center justify-center z-50 p-3 sm:p-6">
+            items-center justify-center z-50 p-3">
 
-    <div class="bg-white w-full max-w-4xl rounded-2xl shadow-xl
+    <div class="bg-white w-full max-w-3xl rounded-xl shadow-xl
                 max-h-[90vh] flex flex-col overflow-hidden">
 
         <div class="bg-purple-600 text-white px-4 py-3 flex justify-between items-center">
-            <h3 class="font-semibold text-xs sm:text-sm truncate">
+            <h3 class="font-semibold text-xs truncate">
                 {{ title }}
             </h3>
             <button onclick="closeModal('{{ id }}')" class="text-white">
@@ -131,7 +136,7 @@
             </button>
         </div>
 
-        <div class="p-4 overflow-y-auto flex-1 text-xs sm:text-sm">
+        <div class="p-4 overflow-y-auto flex-1 text-xs">
             {{ caller() }}
         </div>
 
@@ -140,11 +145,11 @@
 {% endmacro %}
 
 
-<!-- ================= MODALS CONTENT ================= -->
+<!-- ================= MODALS ================= -->
 
 {% call modalWrapper('messagesModal','User Messages') %}
 {% for msg in messages_list %}
-<div class="border rounded-xl p-3 mb-3 bg-slate-50 break-words">
+<div class="border rounded-lg p-3 mb-3 bg-slate-50 break-words">
 <p><strong>Subject:</strong> {{ msg.subject }}</p>
 <p class="mt-1 break-all">{{ msg.message }}</p>
 <p class="text-[10px] text-gray-500 mt-2">
@@ -159,7 +164,7 @@
 
 {% call modalWrapper('clinicalModal','Reports Predictions') %}
 {% for c in clinical_list %}
-<div class="border rounded-xl p-3 mb-3 bg-slate-50">
+<div class="border rounded-lg p-3 mb-3 bg-slate-50">
 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
 <p><strong>Result:</strong> {{ c.result }}</p>
 <p><strong>Date:</strong> {{ c.created_at }}</p>
@@ -177,7 +182,7 @@
 
 {% call modalWrapper('fingerModal','Fingerprint Predictions') %}
 {% for f in finger_list %}
-<div class="border rounded-xl p-3 mb-3 bg-slate-50">
+<div class="border rounded-lg p-3 mb-3 bg-slate-50">
 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
 <p><strong>Result:</strong> {{ f.result }}</p>
 <p><strong>Date:</strong> {{ f.created_at }}</p>
@@ -195,7 +200,7 @@
 
 {% call modalWrapper('combinedModal','All Predictions') %}
 {% for item in combined_list %}
-<div class="border rounded-xl p-3 mb-3 bg-slate-50
+<div class="border rounded-lg p-3 mb-3 bg-slate-50
             flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2">
 <div>
 <p class="font-semibold">{{ item.result }}</p>
@@ -246,7 +251,7 @@ labels: labels,
 datasets: [{
 data: dataValues,
 borderColor: '#5b21b6',
-backgroundColor: 'rgba(91,33,182,0.1)',
+backgroundColor: 'rgba(91,33,182,0.08)',
 borderWidth: 2,
 tension: 0.4,
 fill: true
