@@ -1,251 +1,120 @@
 {% extends "admin/admin_layout.html" %}
+
 {% block content %}
 
-<div class="w-full px-3 sm:px-6 py-5">
+<h1 class="text-3xl font-bold mb-6">Users Control Panel</h1>
 
-<!-- ================= HEADER ================= -->
-<div class="bg-white border border-slate-200 rounded-lg shadow-sm p-4 mb-5 w-full">
-    <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+<!-- FILTER SECTION -->
+<div class="bg-white border border-gray-200 p-6 rounded-2xl shadow-lg mb-6">
+  <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
 
-        <div class="text-center lg:text-left">
-            <h1 class="text-base sm:text-lg lg:text-xl font-bold text-slate-800 break-words">
-                {{ user.username }}
-            </h1>
-            <p class="text-xs text-slate-500 mt-1">
-                User Activity Overview
-            </p>
-        </div>
-
-        <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-
-            <a href="{{ url_for('export_user_activity_pdf', user_id=user.id) }}"
-               class="w-full sm:w-auto text-center flex justify-center items-center gap-2
-                      bg-purple-600 text-white px-3 py-2 rounded-md
-                      text-xs font-semibold hover:bg-purple-700 transition">
-                <i class="fa-solid fa-file-pdf text-xs"></i>
-                Export
-            </a>
-
-            <a href="{{ request.referrer or url_for('admin_user_analytics') }}"
-               class="w-full sm:w-auto text-center flex justify-center items-center gap-2
-                      bg-slate-100 text-slate-700
-                      px-3 py-2 rounded-md
-                      text-xs font-medium hover:bg-slate-200 transition">
-                <i class="fa-solid fa-arrow-left text-xs"></i>
-                Back
-            </a>
-        </div>
-    </div>
-</div>
-
-
-<!-- ================= STATS CARDS ================= -->
-<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
-
-    {% macro statCard(title, value, colorClass, modalId) %}
-    <div class="bg-white border rounded-lg p-3 shadow-sm w-full">
-
-        <h2 class="text-[11px] font-semibold {{ colorClass }}">
-            {{ title }}
-        </h2>
-
-        <p class="text-base sm:text-lg font-bold mt-1">
-            {{ value }}
-        </p>
-
-        <button onclick="openModal('{{ modalId }}')"
-            class="mt-2 w-full bg-purple-600 text-white py-1.5
-                   rounded-md text-[11px] font-semibold hover:bg-purple-700 transition">
-            View
-        </button>
-    </div>
-    {% endmacro %}
-
-    {{ statCard('Messages', messages, 'text-slate-600', 'messagesModal') }}
-    {{ statCard('Reports', clinical, 'text-emerald-600', 'clinicalModal') }}
-    {{ statCard('Fingerprint', finger, 'text-cyan-600', 'fingerModal') }}
-
-    <div class="bg-purple-600 text-white rounded-lg p-3 shadow-sm w-full">
-
-        <h2 class="text-[11px] font-semibold">Total</h2>
-
-        <p class="text-base sm:text-lg font-bold mt-1">
-            {{ total_predictions }}
-        </p>
-
-        <button onclick="openModal('combinedModal')"
-            class="mt-2 w-full bg-white text-purple-600 py-1.5
-                   rounded-md text-[11px] font-semibold hover:bg-gray-100 transition">
-            View
-        </button>
+    <!-- Left Info -->
+    <div>
+      <h2 class="text-lg font-semibold text-gray-800">Filter</h2>
+      <p class="text-sm text-gray-500">
+        Total Users:
+        <span class="font-semibold text-blue-600">
+          {{ users|length if users else 0 }}
+        </span>
+      </p>
     </div>
 
+    <!-- Filter Form -->
+    <form method="GET"
+          action="{{ url_for('admin_users') }}"
+          class="flex flex-col sm:flex-row items-center gap-3 w-full lg:w-auto">
+
+      <!-- Search -->
+      <input type="text"
+             name="search"
+             value="{{ search or '' }}"
+             placeholder="Search username or email..."
+             class="w-full sm:w-72 px-4 py-2 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+
+      <!-- Sort -->
+      <select name="sort"
+              class="w-full sm:w-48 px-4 py-2 rounded-xl border border-gray-300 text-sm focus:ring-2 focus:ring-blue-500">
+
+        <option value="">Sort</option>
+        <option value="az" {% if sort == 'az' %}selected{% endif %}>A - Z</option>
+        <option value="za" {% if sort == 'za' %}selected{% endif %}>Z - A</option>
+
+      </select>
+
+      <!-- Buttons -->
+      <button type="submit"
+              class="bg-blue-600 text-white px-5 py-2 rounded-xl text-sm font-medium hover:bg-blue-700 transition">
+        Apply
+      </button>
+
+      <a href="{{ url_for('admin_users') }}"
+         class="bg-gray-200 text-gray-700 px-4 py-2 rounded-xl text-sm hover:bg-gray-300 transition">
+        Reset
+      </a>
+
+    </form>
+  </div>
 </div>
 
+<!-- USERS TABLE -->
+<div class="overflow-x-auto rounded-lg shadow-md bg-white">
+  <table class="min-w-full divide-y divide-gray-200">
+    
+    <thead class="bg-gray-100">
+      <tr class="text-left text-xs uppercase tracking-wider text-gray-600">
+        <th class="px-4 py-3">ID</th>
+        <th class="px-4 py-3">Username</th>
+        <th class="px-4 py-3">Email</th>
+        <th class="px-4 py-3 text-center">Action</th>
+      </tr>
+    </thead>
 
-<!-- ================= GRAPH ================= -->
-<div class="bg-white shadow rounded-lg p-4 mb-5 w-full">
+    <tbody class="divide-y divide-gray-200">
 
-    <h2 class="text-sm font-semibold mb-3">
-        Activity Graph
-    </h2>
+      {% if users and users|length > 0 %}
+        {% for u in users %}
+        <tr class="hover:bg-gray-50 text-sm">
 
-    <div class="w-full">
-        <div class="w-full h-52 sm:h-60">
-            <canvas id="activityChart"></canvas>
-        </div>
-    </div>
+          <td class="px-4 py-3">
+            {{ u.id if u.id is defined else u['id'] }}
+          </td>
 
+          <td class="px-4 py-3 font-medium">
+            {{ u.username if u.username is defined else u['username'] }}
+          </td>
+
+          <td class="px-4 py-3">
+            {{ u.email if u.email is defined else u['email'] }}
+          </td>
+
+          <td class="px-4 py-3 text-center">
+
+            <form action="{{ url_for('delete_user', id=(u.id if u.id is defined else u['id'])) }}"
+                  method="POST"
+                  onsubmit="return confirm('Are you sure you want to delete this user?');">
+
+              <button type="submit"
+                      class="bg-red-500 text-white px-3 py-1.5 rounded-lg hover:bg-red-600 text-xs">
+                Delete
+              </button>
+
+            </form>
+
+          </td>
+
+        </tr>
+        {% endfor %}
+
+      {% else %}
+        <tr>
+          <td colspan="4" class="text-center py-10 text-gray-500">
+            No users found.
+          </td>
+        </tr>
+      {% endif %}
+
+    </tbody>
+  </table>
 </div>
-
-</div>
-
-
-<!-- ================= MODAL MACRO ================= -->
-{% macro modalWrapper(id, title) %}
-<div id="{{ id }}"
-     class="fixed inset-0 bg-black/50 hidden
-            items-center justify-center z-50 p-3">
-
-    <div class="bg-white w-full max-w-md sm:max-w-2xl
-                rounded-lg shadow-lg
-                max-h-[85vh] flex flex-col overflow-hidden">
-
-        <div class="bg-purple-600 text-white px-3 py-2 flex justify-between items-center">
-            <h3 class="font-semibold text-xs sm:text-sm truncate">
-                {{ title }}
-            </h3>
-            <button onclick="closeModal('{{ id }}')" class="text-white">
-                <i class="fa-solid fa-xmark text-sm"></i>
-            </button>
-        </div>
-
-        <div class="p-3 overflow-y-auto flex-1 text-xs sm:text-sm">
-            {{ caller() }}
-        </div>
-    </div>
-</div>
-{% endmacro %}
-
-
-<!-- ================= MODALS ================= -->
-
-{% call modalWrapper('messagesModal','User Messages') %}
-{% for msg in messages_list %}
-<div class="border rounded-md p-2 mb-2 bg-slate-50 text-xs break-words">
-<p><strong>Subject:</strong> {{ msg.subject }}</p>
-<p class="mt-1 break-words">{{ msg.message }}</p>
-<p class="text-[10px] text-gray-500 mt-1">
-{{ msg.created_at }} | {{ msg.status }}
-</p>
-</div>
-{% else %}
-<p>No messages found.</p>
-{% endfor %}
-{% endcall %}
-
-
-{% call modalWrapper('clinicalModal','Reports Predictions') %}
-{% for c in clinical_list %}
-<div class="border rounded-md p-2 mb-2 bg-slate-50 text-xs">
-<div class="grid grid-cols-1 sm:grid-cols-2 gap-1">
-<p><strong>Result:</strong> {{ c.result }}</p>
-<p><strong>Date:</strong> {{ c.created_at }}</p>
-<p><strong>Age:</strong> {{ c.age }}</p>
-<p><strong>BMI:</strong> {{ c.bmi }}</p>
-<p><strong>HbA1c:</strong> {{ c.hba1c }}</p>
-<p><strong>Glucose:</strong> {{ c.glucose }}</p>
-</div>
-</div>
-{% else %}
-<p>No reports found.</p>
-{% endfor %}
-{% endcall %}
-
-
-{% call modalWrapper('fingerModal','Fingerprint Predictions') %}
-{% for f in finger_list %}
-<div class="border rounded-md p-2 mb-2 bg-slate-50 text-xs">
-<div class="grid grid-cols-1 sm:grid-cols-2 gap-1">
-<p><strong>Result:</strong> {{ f.result }}</p>
-<p><strong>Date:</strong> {{ f.created_at }}</p>
-<p><strong>Age:</strong> {{ f.age }}</p>
-<p><strong>BMI:</strong> {{ f.bmi }}</p>
-<p><strong>HbA1c:</strong> {{ f.hba1c }}</p>
-<p><strong>Glucose:</strong> {{ f.glucose }}</p>
-</div>
-</div>
-{% else %}
-<p>No fingerprint records found.</p>
-{% endfor %}
-{% endcall %}
-
-
-{% call modalWrapper('combinedModal','All Predictions') %}
-{% for item in combined_list %}
-<div class="border rounded-md p-2 mb-2 bg-slate-50 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-1 text-xs">
-<div class="break-words">
-<p class="font-semibold">{{ item.result }}</p>
-<p class="text-[10px] text-gray-500">{{ item.created_at }}</p>
-</div>
-<span class="px-2 py-0.5 rounded-full text-[10px] font-semibold
-{% if item.type == 'Report' %}
-bg-emerald-100 text-emerald-700
-{% elif item.type == 'Finger' %}
-bg-cyan-100 text-cyan-700
-{% else %}
-bg-gray-100 text-gray-600
-{% endif %}
-">
-{{ item.type }}
-</span>
-</div>
-{% else %}
-<p>No records found.</p>
-{% endfor %}
-{% endcall %}
-
-
-<!-- ================= JS ================= -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<script>
-function openModal(id){
-    const modal = document.getElementById(id);
-    modal.classList.remove('hidden');
-    modal.classList.add('flex');
-    document.body.style.overflow = 'hidden';
-}
-function closeModal(id){
-    const modal = document.getElementById(id);
-    modal.classList.add('hidden');
-    modal.classList.remove('flex');
-    document.body.style.overflow = '';
-}
-
-const labels = [{% for row in graph_data %}"{{ row.day }}",{% endfor %}];
-const dataValues = [{% for row in graph_data %}{{ row.count }},{% endfor %}];
-
-new Chart(document.getElementById('activityChart'), {
-type: 'line',
-data: {
-labels: labels,
-datasets: [{
-data: dataValues,
-borderColor: '#7c3aed',
-backgroundColor: 'rgba(124,58,237,0.1)',
-borderWidth: 2,
-tension: 0.4,
-fill: true
-}]
-},
-options: {
-responsive: true,
-maintainAspectRatio: false,
-plugins: { legend: { display: false }},
-scales: { y: { beginAtZero: true }}
-}
-});
-</script>
 
 {% endblock %}
