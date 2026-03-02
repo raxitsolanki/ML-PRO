@@ -15,7 +15,7 @@ scikit-learn==1.6.1
 joblib==1.2.0
 
 # OpenCV (Server Safe Version)
-opencv-python-headless==4.8.1.78
+opencv-contrib-python-headless==4.8.1.78
 
 # PDF Generation
 reportlab==4.4.5
