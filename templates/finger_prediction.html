@@ -191,5 +191,105 @@
 
 </form>
 </div>
+{% if finger_prediction %}
+<div class="max-w-6xl mx-auto mt-14 px-4 sm:px-6 animate-fade-in">
+
+  <div class="relative overflow-hidden rounded-3xl sm:rounded-[3rem] 
+              border-2 
+              {% if 'HIGH' in finger_prediction %}border-red-100
+              {% elif 'MEDIUM' in finger_prediction %}border-amber-100
+              {% else %}border-emerald-100{% endif %}
+              bg-white shadow-xl">
+
+    <!-- Glow (Reduced for mobile) -->
+    <div class="absolute -right-16 -top-16 w-48 h-48 sm:w-72 sm:h-72
+                {% if 'HIGH' in finger_prediction %}bg-red-100/40
+                {% elif 'MEDIUM' in finger_prediction %}bg-amber-100/40
+                {% else %}bg-emerald-100/40{% endif %}
+                rounded-full blur-3xl">
+    </div>
+
+    <div class="relative z-10 p-6 sm:p-10 md:p-14 text-center">
+
+      <!-- ICON -->
+      <div class="mx-auto mb-6 sm:mb-8 w-24 h-24 sm:w-32 sm:h-32 
+        rounded-full border-4 border-dashed
+        {% if 'HIGH' in finger_prediction %}border-red-300
+        {% elif 'MEDIUM' in finger_prediction %}border-amber-300
+        {% else %}border-emerald-300{% endif %}
+        flex items-center justify-center">
+
+        <div class="w-16 h-16 sm:w-24 sm:h-24 rounded-full flex items-center justify-center
+          {% if 'HIGH' in finger_prediction %}bg-red-500
+          {% elif 'MEDIUM' in finger_prediction %}bg-amber-500
+          {% else %}bg-emerald-500{% endif %}
+          text-white text-2xl sm:text-4xl shadow-lg">
+          <i class="fa-solid fa-fingerprint"></i>
+        </div>
+      </div>
+
+      <!-- BADGE -->
+      <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full
+        {% if 'HIGH' in finger_prediction %}bg-red-100 text-red-700
+        {% elif 'MEDIUM' in finger_prediction %}bg-amber-100 text-amber-700
+        {% else %}bg-emerald-100 text-emerald-700{% endif %}
+        text-[10px] sm:text-xs font-bold uppercase tracking-widest mb-5">
+
+        Fingerprint AI Verdict
+      </div>
+
+      <!-- RESULT -->
+      <h2 class="text-2xl sm:text-4xl md:text-5xl font-extrabold text-slate-900 mb-4 break-words">
+        {{ finger_prediction }}
+      </h2>
+
+      <p class="text-slate-500 text-sm sm:text-base max-w-xl mx-auto mb-8">
+        Our biometric AI engine analyzed fingerprint ridge patterns with
+        clinical indicators to determine your diabetes-related risk level.
+      </p>
+
+      <!-- BUTTONS -->
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+
+        <a href="{{ url_for('suggestion') }}"
+           class="w-full sm:w-auto px-8 py-4 rounded-2xl
+           {% if 'HIGH' in finger_prediction %}bg-red-600
+           {% elif 'MEDIUM' in finger_prediction %}bg-amber-600
+           {% else %}bg-emerald-600{% endif %}
+           text-white font-bold text-xs tracking-wider
+           hover:opacity-90 transition text-center">
+
+          VIEW SUGGESTIONS
+        </a>
+
+        <a href="{{ url_for('download_finger_report', user_id=session['id']) }}"
+           class="w-full sm:w-auto px-8 py-4 bg-slate-900 text-white 
+                  rounded-2xl font-bold text-xs tracking-wider
+                  hover:bg-slate-800 transition text-center">
+
+          EXPORT REPORT
+        </a>
+
+      </div>
+
+    </div>
+
+    <!-- FOOTER STRIP -->
+    <div class="py-3 text-center
+      {% if 'HIGH' in finger_prediction %}bg-red-600
+      {% elif 'MEDIUM' in finger_prediction %}bg-amber-600
+      {% else %}bg-emerald-600{% endif %}
+      text-white text-[10px] sm:text-xs font-bold tracking-widest uppercase">
+
+      AI Biometric Risk Assessment
+
+    </div>
+
+  </div>
+</div>
+{% endif %}
+</div>
+</div>
+
 
 {% endblock %}
