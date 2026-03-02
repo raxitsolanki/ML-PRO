@@ -1470,6 +1470,8 @@ def download_current_report(user_id):
     else:
         return redirect(url_for('download_report', user_id=user_id))
 
+# ================= ADMIN FINGER PREDICTIONS =================
+
 @app.route('/admin/finger-predictions')
 @admin_required
 def admin_finger_predictions():
@@ -1480,12 +1482,12 @@ def admin_finger_predictions():
     cursor.execute("""
         SELECT fp.*, u.email
         FROM finger_predictions fp
-        JOIN users u ON u.id = fp.user_id
+        JOIN userss u ON u.id = fp.user_id
         ORDER BY fp.created_at DESC
     """)
 
     predictions = cursor.fetchall()
-    total_count = len(predictions)   # 👈 COUNT
+    total_count = len(predictions)
 
     cursor.close()
     conn.close()
@@ -1493,8 +1495,11 @@ def admin_finger_predictions():
     return render_template(
         'admin/admin_finger_predictions.html',
         predictions=predictions,
-        total_count=total_count   # 👈 SEND TO TEMPLATE
+        total_count=total_count
     )
+
+
+# ================= DELETE =================
 
 @app.route('/admin/finger/delete/<int:id>', methods=['POST'])
 @admin_required
@@ -1515,9 +1520,6 @@ def delete_finger_prediction(id):
     flash("Fingerprint prediction deleted successfully.", "success")
     return redirect(url_for('admin_finger_predictions'))
 
-
-
-
 @app.route('/admin/export-user-report/<int:user_id>')
 @admin_required
 def export_user_activity_pdf(user_id):
@@ -1527,7 +1529,7 @@ def export_user_activity_pdf(user_id):
 
     try:
         # ================= USER =================
-        cursor.execute("SELECT username, email FROM users WHERE id = %s", (user_id,))
+        cursor.execute("SELECT username, email FROM userss WHERE id = %s", (user_id,))
         user = cursor.fetchone()
 
         if not user:
