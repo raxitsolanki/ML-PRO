@@ -139,7 +139,7 @@
 <!-- ================= MESSAGES MODAL ================= -->
 {% call modalWrapper('messagesModal', 'Messages Activity') %}
 
-<a href="{{ url_for('export_user_messages_pdf', user_id=user.id) }}"
+<a href="{{ url_for('admin_download_messages_pdf', search=search) }}"
    class="inline-flex items-center gap-2 mb-4
           bg-gradient-to-r from-purple-600 to-indigo-600
           text-white px-3 py-1.5 rounded-md
@@ -174,7 +174,7 @@
 <!-- ================= CLINICAL MODAL ================= -->
 {% call modalWrapper('clinicalModal', 'Clinical Predictions') %}
 
-<a href="{{ url_for('export_user_clinical_pdf', user_id=user.id) }}"
+<a href="{{ url_for('admin_download_report', user_id=user.id) }}"
    class="inline-flex items-center gap-2 mb-4
           bg-gradient-to-r from-purple-600 to-indigo-600
           text-white px-3 py-1.5 rounded-md
@@ -209,7 +209,7 @@
 <!-- ================= FINGER MODAL ================= -->
 {% call modalWrapper('fingerModal', 'Fingerprint Predictions') %}
 
-<a href="{{ url_for('export_user_fingerprint_pdf', user_id=user.id) }}"
+<a href="{{ url_for('admin_download_finger_report', user_id=user.id) }}"
    class="inline-flex items-center gap-2 mb-4
           bg-gradient-to-r from-purple-600 to-indigo-600
           text-white px-3 py-1.5 rounded-md

@@ -2014,6 +2014,76 @@ def admin_download_report(user_id):
     return send_file(buffer, as_attachment=True,
                      download_name=filename,
                      mimetype="application/pdf")
+@app.route('/admin/messages/download/pdf')
+@admin_required
+def admin_download_messages_pdf():
+
+    search = request.args.get('search', '').strip()
+
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    query = """
+        SELECT name, email, subject, message, status, is_read, created_at
+        FROM contact_messages
+    """
+
+    conditions = []
+    values = []
+
+    # 🔎 Apply search filter (same as admin_messages)
+    if search:
+        conditions.append("""
+            (name LIKE %s OR email LIKE %s OR subject LIKE %s)
+        """)
+        values.extend([f"%{search}%", f"%{search}%", f"%{search}%"])
+
+    if conditions:
+        query += " WHERE " + " AND ".join(conditions)
+
+    query += " ORDER BY created_at DESC"
+
+    cursor.execute(query, values)
+    messages = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    # 📄 PDF file path
+    filename = f"messages_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf"
+    filepath = os.path.join("static", filename)
+
+    doc = SimpleDocTemplate(filepath, pagesize=A4)
+    elements = []
+
+    styles = getSampleStyleSheet()
+    elements.append(Paragraph("<b>Contact Messages Report</b>", styles['Heading1']))
+    elements.append(Spacer(1, 0.5 * inch))
+
+    data = [["Name", "Email", "Subject", "Status", "Read", "Date"]]
+
+    for msg in messages:
+        data.append([
+            msg['name'],
+            msg['email'],
+            msg['subject'],
+            msg['status'],
+            "Yes" if msg['is_read'] else "No",
+            msg['created_at'].strftime("%Y-%m-%d %H:%M")
+        ])
+
+    table = Table(data, repeatRows=1)
+    table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.black),
+        ('FONTSIZE', (0, 0), (-1, -1), 8),
+    ]))
+
+    elements.append(table)
+    doc.build(elements)
+
+    return send_file(filepath, as_attachment=True)
 
 
 
