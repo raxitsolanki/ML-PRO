@@ -2084,6 +2084,116 @@ def admin_download_messages_pdf():
     doc.build(elements)
 
     return send_file(filepath, as_attachment=True)
+@app.route('/admin/export-user-combined/<int:user_id>')
+@admin_required
+def export_user_combined_pdf(user_id):
+
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    # ================= USER =================
+    cursor.execute("SELECT id, username, email FROM userss WHERE id=%s", (user_id,))
+    user = cursor.fetchone()
+
+    if not user:
+        abort(404)
+
+    # ================= MESSAGES =================
+    cursor.execute("""
+        SELECT message, created_at 
+        FROM contact_messages 
+        WHERE user_id=%s
+        ORDER BY created_at DESC
+    """, (user_id,))
+    messages = cursor.fetchall()
+
+    # ================= CLINICAL =================
+    cursor.execute("""
+        SELECT result, created_at 
+        FROM predictions 
+        WHERE user_id=%s
+        ORDER BY created_at DESC
+    """, (user_id,))
+    clinical = cursor.fetchall()
+
+    # ================= FINGERPRINT =================
+    cursor.execute("""
+        SELECT finger_type, result, created_at 
+        FROM fingerprint_predictions 
+        WHERE user_id=%s
+        ORDER BY created_at DESC
+    """, (user_id,))
+    finger = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    # ================= CREATE PDF =================
+    buffer = BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=A4)
+    elements = []
+    styles = getSampleStyleSheet()
+
+    elements.append(Paragraph("<b>Complete User Report</b>", styles['Heading1']))
+    elements.append(Spacer(1, 0.3 * inch))
+
+    elements.append(Paragraph(f"Username: {user['username']}", styles['Normal']))
+    elements.append(Paragraph(f"Email: {user['email']}", styles['Normal']))
+    elements.append(Paragraph(f"Joined: {user['created_at']}", styles['Normal']))
+    elements.append(Spacer(1, 0.4 * inch))
+
+    # Messages
+    elements.append(Paragraph("<b>Messages</b>", styles['Heading2']))
+    elements.append(Spacer(1, 0.2 * inch))
+
+    if messages:
+        for m in messages:
+            elements.append(
+                Paragraph(f"{m['created_at']} - {m['message']}", styles['Normal'])
+            )
+            elements.append(Spacer(1, 0.1 * inch))
+    else:
+        elements.append(Paragraph("No messages found.", styles['Normal']))
+
+    elements.append(Spacer(1, 0.4 * inch))
+
+    # Clinical
+    elements.append(Paragraph("<b>Clinical Predictions</b>", styles['Heading2']))
+    elements.append(Spacer(1, 0.2 * inch))
+
+    if clinical:
+        for c in clinical:
+            elements.append(
+                Paragraph(f"{c['created_at']} - {c['result']}", styles['Normal'])
+            )
+            elements.append(Spacer(1, 0.1 * inch))
+    else:
+        elements.append(Paragraph("No clinical predictions found.", styles['Normal']))
+
+    elements.append(Spacer(1, 0.4 * inch))
+
+    # Fingerprint
+    elements.append(Paragraph("<b>Fingerprint Predictions</b>", styles['Heading2']))
+    elements.append(Spacer(1, 0.2 * inch))
+
+    if finger:
+        for f in finger:
+            elements.append(
+                Paragraph(f"{f['created_at']} - {f['finger_type']} - {f['result']}", styles['Normal'])
+            )
+            elements.append(Spacer(1, 0.1 * inch))
+    else:
+        elements.append(Paragraph("No fingerprint predictions found.", styles['Normal']))
+
+    doc.build(elements)
+    buffer.seek(0)
+
+    return send_file(
+        buffer,
+        as_attachment=True,
+        download_name=f"user_{user_id}_complete_report.pdf",
+        mimetype='application/pdf'
+    )
 
 
 
