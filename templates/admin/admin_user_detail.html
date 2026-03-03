@@ -128,7 +128,7 @@
 <p><strong>Subject:</strong> {{ msg.subject }}</p>
 <p><strong>Message:</strong> {{ msg.message }}</p>
 <p class="text-xs text-gray-500 mt-2">
-{{ msg.created_at }} | Status: {{ msg.status }} | Read: {{ "Yes" if msg.is_read else "No" }}
+{{ msg.created_at }} | Read: {{ "Yes" if msg.is_read else "No" }}
 </p>
 </div>
 {% else %}
@@ -159,6 +159,12 @@
 <p><strong>Smoking:</strong> {{ c.smoking_label }}</p>
 <p><strong>Hypertension:</strong> {{ c.hypertension_label }}</p>
 <p><strong>Heart Disease:</strong> {{ c.heart_label }}</p>
+<div class="mt-4">
+    <a href="{{ url_for('admin_download_report', user_id=user.id) }}"
+    class="w-full sm:w-auto inline-flex justify-center items-center gap-2 px-4 py-2 bg-red-100 text-red-700 rounded-lg font-semibold text-sm hover:bg-red-200 transition">
+    <i class="fa-solid fa-file-pdf"></i> Download PDF
+    </a>
+    </div>
 </div>
 </div>
 {% else %}
@@ -190,6 +196,13 @@
 <p><strong>Ridge Density:</strong> {{ f.ridge_density }}</p>
 <p><strong>Complexity Score:</strong> {{ f.complexity_score }}</p>
 <p><strong>Pattern Type:</strong> {{ f.pattern_label }}</p>
+<div class="mt-4">
+    <a href="{{ url_for('admin_download_finger_report', user_id=user.id) }}"
+    class="w-full sm:w-auto inline-flex justify-center items-center gap-2 px-4 py-2 bg-red-100 text-red-700 rounded-lg font-semibold text-sm hover:bg-red-200 transition">
+    <i class="fa-solid fa-file-pdf"></i>
+    Download PDF
+    </a>
+    </div>
 </div>
 </div>
 {% else %}
