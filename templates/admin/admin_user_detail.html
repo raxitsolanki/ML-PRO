@@ -1,315 +1,154 @@
 {% extends "admin/admin_layout.html" %}
 {% block content %}
 
-<div class="w-full max-w-6xl mx-auto px-3 sm:px-5 lg:px-8 py-4 pb-14">
+<div class="w-full max-w-6xl mx-auto px-4 py-6">
 
-<!-- ================= HEADER ================= -->
-<div class="bg-white border border-slate-200 rounded-lg shadow-sm p-3 sm:p-4 mb-4">
-    <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+    <h1 class="text-2xl font-bold mb-6">User Analytics</h1>
 
-        <div class="text-center md:text-left break-words">
-            <h1 class="text-sm sm:text-base md:text-lg font-bold text-slate-800 break-all">
-                {{ user.username }}
-            </h1>
-            <p class="text-[11px] text-slate-500 mt-1">
-                User Activity Overview
-            </p>
+    <!-- Summary Cards -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <div class="bg-white p-4 rounded-xl shadow text-center">
+            <p class="text-sm text-gray-500">Messages</p>
+            <p class="text-xl font-bold text-indigo-600">{{ messages }}</p>
         </div>
+        <div class="bg-white p-4 rounded-xl shadow text-center">
+            <p class="text-sm text-gray-500">Clinical</p>
+            <p class="text-xl font-bold text-green-600">{{ clinical }}</p>
+        </div>
+        <div class="bg-white p-4 rounded-xl shadow text-center">
+            <p class="text-sm text-gray-500">Fingerprint</p>
+            <p class="text-xl font-bold text-purple-600">{{ finger }}</p>
+        </div>
+        <div class="bg-white p-4 rounded-xl shadow text-center">
+            <p class="text-sm text-gray-500">Total</p>
+            <p class="text-xl font-bold text-red-600">{{ total_predictions }}</p>
+        </div>
+    </div>
 
-        <div class="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
+    <!-- Buttons -->
+    <div class="flex flex-wrap gap-3">
+        <button onclick="openModal('fingerModal')" class="bg-purple-600 text-white px-4 py-2 rounded-lg text-sm">Fingerprint</button>
+        <button onclick="openModal('clinicalModal')" class="bg-green-600 text-white px-4 py-2 rounded-lg text-sm">Clinical</button>
+        <button onclick="openModal('messageModal')" class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm">Messages</button>
+    </div>
 
-            <a href="{{ url_for('export_user_activity_pdf', user_id=user.id) }}"
-               class="w-full sm:w-auto inline-flex justify-center items-center gap-2
-                      bg-gradient-to-r from-purple-600 to-indigo-600
-                      text-white px-3 py-1.5 rounded-md
-                      text-[11px] font-semibold hover:opacity-90 transition">
-                <i class="fa-solid fa-file-pdf text-[10px]"></i>
-                Export All
+</div>
+
+<!-- Fingerprint Modal -->
+<div id="fingerModal" class="fixed inset-0 bg-black/50 hidden flex justify-center items-center p-3">
+    <div class="bg-white w-full max-w-4xl rounded-xl shadow-lg overflow-auto max-h-[90vh]">
+        <div class="bg-purple-600 text-white p-4 flex justify-between">
+            <h2>Fingerprint Predictions</h2>
+            <button onclick="closeModal('fingerModal')">&times;</button>
+        </div>
+        <div class="p-4">
+            <a href="{{ url_for('admin_download_finger_report', user_id=user.id) }}"
+               class="bg-red-100 text-red-700 px-3 py-2 rounded text-sm inline-block mb-4">
+               Download Fingerprint PDF
             </a>
+            <div class="overflow-x-auto">
+                <table class="w-full border text-sm">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th class="border p-2">Date</th>
+                            <th class="border p-2">Finger Type</th>
+                            <th class="border p-2">Prediction</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for f in finger_list %}
+                        <tr>
+                            <td class="border p-2">{{ f.date }}</td>
+                            <td class="border p-2">{{ f.finger_type }}</td>
+                            <td class="border p-2">{{ f.result }}</td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="3" class="border p-3 text-center">No Data</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
 
-            <a href="{{ url_for('admin_user_analytics') }}"
-               class="w-full sm:w-auto inline-flex justify-center items-center gap-2
-                      bg-slate-100 text-slate-700
-                      px-3 py-1.5 rounded-md
-                      text-[11px] font-medium hover:bg-slate-200 transition">
-                <i class="fa-solid fa-arrow-left text-[10px]"></i>
-                Back
+<!-- Clinical Modal -->
+<div id="clinicalModal" class="fixed inset-0 bg-black/50 hidden flex justify-center items-center p-3">
+    <div class="bg-white w-full max-w-4xl rounded-xl shadow-lg overflow-auto max-h-[90vh]">
+        <div class="bg-green-600 text-white p-4 flex justify-between">
+            <h2>Clinical Predictions</h2>
+            <button onclick="closeModal('clinicalModal')">&times;</button>
+        </div>
+        <div class="p-4">
+            <a href="{{ url_for('admin_download_report', user_id=user.id) }}"
+               class="bg-red-100 text-red-700 px-3 py-2 rounded text-sm inline-block mb-4">
+               Download Clinical PDF
             </a>
-
+            <div class="overflow-x-auto">
+                <table class="w-full border text-sm">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th class="border p-2">Date</th>
+                            <th class="border p-2">Prediction</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for c in clinical_list %}
+                        <tr>
+                            <td class="border p-2">{{ c.date }}</td>
+                            <td class="border p-2">{{ c.result }}</td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="2" class="border p-3 text-center">No Data</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
 
-
-<!-- ================= STATS ================= -->
-{% macro statCard(title, value, modalId) %}
-<div class="bg-white border border-slate-200 rounded-lg
-            p-3 shadow-sm hover:shadow-md transition
-            flex flex-col justify-between min-h-[100px]">
-
-    <div>
-        <h2 class="text-[10px] font-semibold text-slate-500">
-            {{ title }}
-        </h2>
-        <p class="text-lg font-bold mt-1">
-            {{ value }}
-        </p>
-    </div>
-
-    <button onclick="openModal('{{ modalId }}')"
-        class="mt-3 w-full bg-purple-600 text-white
-               py-1.5 rounded-md text-[11px]
-               font-semibold hover:bg-purple-700 transition">
-        View Details
-    </button>
-
-</div>
-{% endmacro %}
-
-<div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
-    {{ statCard('Messages', messages, 'messagesModal') }}
-    {{ statCard('Clinical Reports', clinical, 'clinicalModal') }}
-    {{ statCard('Fingerprint', finger, 'fingerModal') }}
-
-    <div class="bg-gradient-to-r from-purple-600 to-indigo-600
-                text-white rounded-lg p-3 shadow-sm
-                flex flex-col justify-between min-h-[100px]">
-
-        <div>
-            <h2 class="text-[10px] font-semibold">Total</h2>
-            <p class="text-lg font-bold mt-1">
-                {{ total_predictions }}
-            </p>
+<!-- Messages Modal -->
+<div id="messageModal" class="fixed inset-0 bg-black/50 hidden flex justify-center items-center p-3">
+    <div class="bg-white w-full max-w-4xl rounded-xl shadow-lg overflow-auto max-h-[90vh]">
+        <div class="bg-indigo-600 text-white p-4 flex justify-between">
+            <h2>Messages Activity</h2>
+            <button onclick="closeModal('messageModal')">&times;</button>
         </div>
-
-        <button onclick="openModal('combinedModal')"
-            class="mt-3 w-full bg-white text-purple-600
-                   py-1.5 rounded-md text-[11px]
-                   font-semibold hover:bg-gray-100 transition">
-            View All
-        </button>
-    </div>
-</div>
-
-
-<!-- ================= GRAPH ================= -->
-<div class="bg-white rounded-lg shadow-sm p-4 mb-5">
-    <h2 class="text-sm font-semibold mb-3">
-        Activity Graph
-    </h2>
-
-    <div class="relative w-full h-48 sm:h-60">
-        <canvas id="activityChart"></canvas>
-    </div>
-</div>
-
-</div>
-
-
-
-<!-- ================= MODAL WRAPPER ================= -->
-{% macro modalWrapper(id, title) %}
-<div id="{{ id }}"
-     class="fixed inset-0 bg-black/60 hidden
-            items-center justify-center z-50 p-3">
-
-    <div class="bg-white w-full max-w-4xl rounded-xl shadow-xl
-                max-h-[92vh] flex flex-col overflow-hidden">
-
-        <!-- Sticky Header -->
-        <div class="bg-purple-600 text-white px-4 py-3 flex justify-between items-center">
-            <h3 class="font-semibold text-sm truncate">
-                {{ title }}
-            </h3>
-            <button onclick="closeModal('{{ id }}')" class="text-white">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-        </div>
-
-        <!-- Scrollable Body -->
-        <div class="p-4 overflow-y-auto flex-1 text-xs">
-            {{ caller() }}
+       
+            <div class="overflow-x-auto">
+                <table class="w-full border text-sm">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th class="border p-2">Date</th>
+                            <th class="border p-2">Message</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for msg in messages_list %}
+                        <tr>
+                            <td class="border p-2">{{ msg.date }}</td>
+                            <td class="border p-2 break-words">{{ msg.content }}</td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="2" class="border p-3 text-center">No Data</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
-{% endmacro %}
-
-
-
-<!-- ================= MESSAGES MODAL ================= -->
-{% call modalWrapper('messagesModal', 'Messages Activity') %}
-
-<a href="{{ url_for('admin_download_messages_pdf', search=search) }}"
-   class="inline-flex items-center gap-2 mb-4
-          bg-gradient-to-r from-purple-600 to-indigo-600
-          text-white px-3 py-1.5 rounded-md
-          text-[11px] font-semibold hover:opacity-90 transition">
-    <i class="fa-solid fa-file-pdf text-[10px]"></i>
-    Download Messages PDF
-</a>
-
-<div class="overflow-x-auto">
-    <table class="min-w-full text-[11px] border border-slate-200">
-        <thead class="bg-slate-100">
-            <tr>
-                <th class="p-2 text-left">Date</th>
-                <th class="p-2 text-left">Message</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for msg in messages_list %}
-            <tr class="border-t">
-                <td class="p-2 whitespace-nowrap">{{ msg.date }}</td>
-                <td class="p-2 break-words">{{ msg.content }}</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-</div>
-
-{% endcall %}
-
-
-
-<!-- ================= CLINICAL MODAL ================= -->
-{% call modalWrapper('clinicalModal', 'Clinical Predictions') %}
-
-<a href="{{ url_for('admin_download_report', user_id=user.id) }}"
-   class="inline-flex items-center gap-2 mb-4
-          bg-gradient-to-r from-purple-600 to-indigo-600
-          text-white px-3 py-1.5 rounded-md
-          text-[11px] font-semibold hover:opacity-90 transition">
-    <i class="fa-solid fa-file-pdf text-[10px]"></i>
-    Download Clinical PDF
-</a>
-
-<div class="overflow-x-auto">
-    <table class="min-w-full text-[11px] border border-slate-200">
-        <thead class="bg-slate-100">
-            <tr>
-                <th class="p-2 text-left">Date</th>
-                <th class="p-2 text-left">Prediction</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for c in clinical_list %}
-            <tr class="border-t">
-                <td class="p-2 whitespace-nowrap">{{ c.date }}</td>
-                <td class="p-2 break-words">{{ c.result }}</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-</div>
-
-{% endcall %}
-
-
-
-<!-- ================= FINGER MODAL ================= -->
-{% call modalWrapper('fingerModal', 'Fingerprint Predictions') %}
-
-<a href="{{ url_for('admin_download_finger_report', user_id=user.id) }}"
-   class="inline-flex items-center gap-2 mb-4
-          bg-gradient-to-r from-purple-600 to-indigo-600
-          text-white px-3 py-1.5 rounded-md
-          text-[11px] font-semibold hover:opacity-90 transition">
-    <i class="fa-solid fa-file-pdf text-[10px]"></i>
-    Download Fingerprint PDF
-</a>
-
-<div class="overflow-x-auto">
-    <table class="min-w-full text-[11px] border border-slate-200">
-        <thead class="bg-slate-100">
-            <tr>
-                <th class="p-2 text-left">Date</th>
-                <th class="p-2 text-left">Finger Type</th>
-                <th class="p-2 text-left">Prediction</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for f in finger_list %}
-            <tr class="border-t">
-                <td class="p-2 whitespace-nowrap">{{ f.date }}</td>
-                <td class="p-2">{{ f.finger_type }}</td>
-                <td class="p-2 break-words">{{ f.result }}</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-</div>
-
-{% endcall %}
-
-
-
-<!-- ================= COMBINED MODAL ================= -->
-{% call modalWrapper('combinedModal', 'Complete Prediction Report') %}
-
-<a href="{{ url_for('export_user_combined_pdf', user_id=user.id) }}"
-   class="inline-flex items-center gap-2 mb-4
-          bg-gradient-to-r from-purple-600 to-indigo-600
-          text-white px-3 py-1.5 rounded-md
-          text-[11px] font-semibold hover:opacity-90 transition">
-    <i class="fa-solid fa-file-pdf text-[10px]"></i>
-    Download Full Report
-</a>
-
-<p class="text-slate-600 text-[12px]">
-    Includes:
-</p>
-
-<ul class="list-disc pl-5 mt-2 text-[12px] text-slate-700 space-y-1">
-    <li>Messages</li>
-    <li>Clinical Predictions</li>
-    <li>Fingerprint Predictions</li>
-</ul>
-
-{% endcall %}
-
-
-
-<!-- ================= JS ================= -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-function openModal(id){
-    const modal = document.getElementById(id);
-    modal.classList.remove('hidden');
-    modal.classList.add('flex');
-    document.body.classList.add('overflow-hidden');
-}
-
-function closeModal(id){
-    const modal = document.getElementById(id);
-    modal.classList.add('hidden');
-    modal.classList.remove('flex');
-    document.body.classList.remove('overflow-hidden');
-}
-
-const labels = [{% for row in graph_data %}"{{ row.day }}",{% endfor %}];
-const dataValues = [{% for row in graph_data %}{{ row.count }},{% endfor %}];
-
-new Chart(document.getElementById('activityChart'), {
-    type: 'line',
-    data: {
-        labels: labels,
-        datasets: [{
-            data: dataValues,
-            borderColor: '#5b21b6',
-            backgroundColor: 'rgba(91,33,182,0.08)',
-            borderWidth: 2,
-            tension: 0.4,
-            fill: true
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { display: false }},
-        scales: { y: { beginAtZero: true }}
-    }
-});
+function openModal(id){ document.getElementById(id).classList.remove('hidden'); }
+function closeModal(id){ document.getElementById(id).classList.add('hidden'); }
 </script>
 
 {% endblock %}
