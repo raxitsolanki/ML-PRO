@@ -2,14 +2,10 @@
 {% block content %}
 
 <!-- ================= ADMIN HEADER CARD ================= -->
-<div class="bg-white border border-slate-200 rounded-2xl 
-            shadow-md p-4 sm:p-6 mb-6 sm:mb-8">
+<div class="bg-white border border-slate-200 rounded-2xl shadow-md p-4 sm:p-6 mb-6 sm:mb-8">
+    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 sm:gap-6">
 
-    <div class="flex flex-col lg:flex-row 
-                lg:items-center lg:justify-between gap-4 sm:gap-6">
-
-        <!-- Left Side -->
-        <div>
+        <div class="min-w-0">
             <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold text-slate-800 break-words">
                 {{ user.username }}
             </h1>
@@ -18,30 +14,21 @@
             </p>
         </div>
 
-        <!-- Right Side -->
         <div class="flex flex-col sm:flex-row w-full sm:w-auto gap-3">
-
             <a href="{{ url_for('export_user_activity_pdf', user_id=user.id) }}"
-               class="w-full sm:w-auto text-center group inline-flex justify-center items-center gap-2
+               class="w-full sm:w-auto text-center inline-flex justify-center items-center gap-2
                       bg-gradient-to-r from-purple-600 to-indigo-600
-                      text-white px-4 sm:px-5 py-2.5
-                      rounded-xl shadow-lg shadow-purple-500/20
+                      text-white px-4 sm:px-5 py-2.5 rounded-xl shadow-lg
                       hover:from-purple-700 hover:to-indigo-700
-                      transition-all duration-300
-                      text-sm font-semibold">
-
-                <i class="fa-solid fa-file-pdf 
-                          group-hover:scale-110 transition-transform"></i>
+                      transition text-sm font-semibold">
+                <i class="fa-solid fa-file-pdf"></i>
                 Export Full Predictions PDF
             </a>
 
             <a href="{{ request.referrer or url_for('admin_user_analytics') }}"
                class="w-full sm:w-auto text-center inline-flex justify-center items-center gap-2
-                      bg-slate-100 text-slate-700
-                      px-4 py-2.5 rounded-xl
-                      hover:bg-slate-200
-                      transition text-sm font-medium">
-
+                      bg-slate-100 text-slate-700 px-4 py-2.5 rounded-xl
+                      hover:bg-slate-200 transition text-sm font-medium">
                 <i class="fa-solid fa-arrow-left text-xs"></i>
                 Back
             </a>
@@ -49,11 +36,10 @@
     </div>
 </div>
 
-
 <!-- ================= STATS CARDS ================= -->
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8 sm:mb-10">
 
-    <!-- CARD SAME DESIGN ONLY PADDING RESPONSIVE -->
+    <!-- Messages -->
     <div class="bg-white border border-slate-200 shadow-sm rounded-2xl p-4 sm:p-6 hover:shadow-lg transition">
         <div class="flex justify-between items-center">
             <h2 class="text-slate-500 text-xs sm:text-sm font-semibold">Total Messages</h2>
@@ -68,85 +54,101 @@
         </button>
     </div>
 
-    <!-- Copy same padding fix for other 3 cards -->
-    <!-- (Only padding & text size adjusted, no theme change) -->
+    <!-- Clinical -->
+    <div class="bg-white border border-emerald-100 shadow-sm rounded-2xl p-4 sm:p-6 hover:shadow-lg transition">
+        <div class="flex justify-between items-center">
+            <h2 class="text-emerald-600 text-xs sm:text-sm font-semibold">Total Reports Predictions</h2>
+            <div class="bg-emerald-50 p-2 rounded-xl">
+                <i class="fa-solid fa-file-medical text-emerald-600 text-sm"></i>
+            </div>
+        </div>
+        <p class="text-2xl sm:text-3xl font-bold text-emerald-700 mt-3 sm:mt-4">{{ clinical }}</p>
+        <button onclick="openModal('clinicalModal')"
+            class="mt-3 sm:mt-4 w-full bg-[#5b21b6] text-white py-2 rounded-xl text-sm font-semibold hover:bg-[#4c1d95] transition">
+            <i class="fa-solid fa-eye text-xs"></i> View Details
+        </button>
+    </div>
+
+    <!-- Finger -->
+    <div class="bg-white border border-cyan-100 shadow-sm rounded-2xl p-4 sm:p-6 hover:shadow-lg transition">
+        <div class="flex justify-between items-center">
+            <h2 class="text-cyan-600 text-xs sm:text-sm font-semibold">Total Fingerprint Predictions</h2>
+            <div class="bg-cyan-50 p-2 rounded-xl">
+                <i class="fa-solid fa-fingerprint text-cyan-600 text-sm"></i>
+            </div>
+        </div>
+        <p class="text-2xl sm:text-3xl font-bold text-cyan-700 mt-3 sm:mt-4">{{ finger }}</p>
+        <button onclick="openModal('fingerModal')"
+            class="mt-3 sm:mt-4 w-full bg-[#5b21b6] text-white py-2 rounded-xl text-sm font-semibold hover:bg-[#4c1d95] transition">
+            <i class="fa-solid fa-eye text-xs"></i> View Details
+        </button>
+    </div>
+
+    <!-- Combined -->
+    <div class="bg-gradient-to-r from-[#5b21b6] to-[#7c3aed] text-white shadow-md rounded-2xl p-4 sm:p-6 hover:shadow-xl transition">
+        <div class="flex justify-between items-center">
+            <h2 class="text-xs sm:text-sm font-semibold text-indigo-100">Total Prediction Activity</h2>
+            <div class="bg-white/20 p-2 rounded-xl">
+                <i class="fa-solid fa-chart-line text-sm"></i>
+            </div>
+        </div>
+        <p class="text-2xl sm:text-3xl font-bold mt-3 sm:mt-4">{{ total_predictions }}</p>
+        <button onclick="openModal('combinedModal')"
+            class="mt-3 sm:mt-4 w-full bg-white text-[#5b21b6] py-2 rounded-xl text-sm font-semibold hover:bg-gray-100 transition">
+            <i class="fa-solid fa-eye text-xs"></i> View Details
+        </button>
+    </div>
 
 </div>
-
 
 <!-- ================= GRAPH ================= -->
 <div class="bg-white shadow rounded-2xl p-4 sm:p-6 mb-8 sm:mb-10">
     <h2 class="text-lg sm:text-xl font-bold mb-4 sm:mb-6">Prediction Activity Graph</h2>
     <div class="w-full overflow-x-auto">
-        <canvas id="activityChart" class="min-w-[300px]"></canvas>
+        <canvas id="activityChart"></canvas>
     </div>
 </div>
 
+<style>
+.modal-container { max-height: 90vh; }
+</style>
 
-<!-- ================= MODALS ================= -->
-<!-- IMPROVED MOBILE RESPONSIVE MODAL -->
+<!-- ================= ALL MODALS ================= -->
 
-<div id="messagesModal" 
-     class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden 
-            flex items-center justify-center z-50 p-3 sm:p-4">
-
-<div class="bg-white w-full max-w-lg sm:max-w-2xl lg:max-w-3xl
-            rounded-2xl shadow-2xl overflow-hidden
-            max-h-[90vh] flex flex-col">
-
-<div class="bg-[#5b21b6] text-white px-4 sm:px-6 py-3 sm:py-4 
-            flex justify-between items-center">
-<h3 class="font-semibold text-sm sm:text-base">User Messages</h3>
-<button onclick="closeModal('messagesModal')">
-<i class="fa-solid fa-xmark text-lg"></i>
-</button>
+<!-- Messages Modal -->
+<div id="messagesModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50 p-3 sm:p-4">
+<div class="bg-white w-full max-w-3xl rounded-2xl shadow-2xl modal-container flex flex-col">
+<div class="bg-[#5b21b6] text-white px-6 py-4 flex justify-between">
+<h3>User Messages</h3>
+<button onclick="closeModal('messagesModal')"><i class="fa-solid fa-xmark"></i></button>
 </div>
-
-<div class="p-4 sm:p-6 overflow-y-auto flex-1 text-sm">
-
+<div class="p-6 overflow-y-auto flex-1">
 {% for msg in messages_list %}
-<div class="border rounded-xl p-3 sm:p-4 mb-3">
-<p class="break-words"><strong>Subject:</strong> {{ msg.subject }}</p>
-<p class="break-words"><strong>Messages:</strong> {{ msg.message }}</p>
-<p class="text-xs text-gray-500 mt-2 break-words">
-{{ msg.created_at }} |
-Status: {{ msg.status }} |
-Read: {{ "Yes" if msg.is_read else "No" }}
+<div class="border rounded-xl p-4 mb-3">
+<p><strong>Subject:</strong> {{ msg.subject }}</p>
+<p><strong>Message:</strong> {{ msg.message }}</p>
+<p class="text-xs text-gray-500 mt-2">
+{{ msg.created_at }} | Status: {{ msg.status }} | Read: {{ "Yes" if msg.is_read else "No" }}
 </p>
 </div>
 {% else %}
-<p class="text-gray-500">No messages found.</p>
+<p>No messages found.</p>
 {% endfor %}
-
 </div>
 </div>
 </div>
 
-
-<!-- SAME STRUCTURE APPLY TO OTHER MODALS -->
-<!-- Just change max width -->
-
-<div id="clinicalModal"
-class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden 
-flex items-center justify-center z-50 p-3 sm:p-4">
-
-<div class="bg-white w-full max-w-lg sm:max-w-3xl lg:max-w-4xl
-rounded-2xl shadow-2xl overflow-hidden
-max-h-[90vh] flex flex-col">
-
-<div class="bg-[#5b21b6] text-white px-4 sm:px-6 py-3 sm:py-4 
-flex justify-between items-center">
-<h3 class="font-semibold text-sm sm:text-base">Reports Predictions</h3>
-<button onclick="closeModal('clinicalModal')">
-<i class="fa-solid fa-xmark text-lg"></i>
-</button>
+<!-- Clinical Modal -->
+<div id="clinicalModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50 p-3 sm:p-4">
+<div class="bg-white w-full max-w-4xl rounded-2xl shadow-2xl modal-container flex flex-col">
+<div class="bg-[#5b21b6] text-white px-6 py-4 flex justify-between">
+<h3>Reports Predictions</h3>
+<button onclick="closeModal('clinicalModal')"><i class="fa-solid fa-xmark"></i></button>
 </div>
-
-<div class="p-4 sm:p-6 overflow-y-auto flex-1 text-sm">
-
+<div class="p-6 overflow-y-auto flex-1">
 {% for c in clinical_list %}
-<div class="border rounded-xl p-3 sm:p-4 mb-4">
-<div class="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 text-xs sm:text-sm">
+<div class="border rounded-xl p-4 mb-4">
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
 <p><strong>Result:</strong> {{ c.result }}</p>
 <p><strong>Date:</strong> {{ c.created_at }}</p>
 <p><strong>Age:</strong> {{ c.age }}</p>
@@ -158,29 +160,75 @@ flex justify-between items-center">
 <p><strong>Hypertension:</strong> {{ c.hypertension_label }}</p>
 <p><strong>Heart Disease:</strong> {{ c.heart_label }}</p>
 </div>
+</div>
+{% else %}
+<p>No Reports records found.</p>
+{% endfor %}
+</div>
+</div>
+</div>
 
-<div class="mt-4">
-<a href="{{ url_for('admin_download_report', user_id=user.id) }}"
-class="w-full sm:w-auto inline-flex justify-center items-center gap-2 
-px-4 py-2 bg-red-100 text-red-700 rounded-lg font-semibold text-sm 
-hover:bg-red-200 transition-colors">
-<i class="fa-solid fa-file-pdf"></i>
-Download PDF
-</a>
+<!-- Finger Modal -->
+<div id="fingerModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50 p-3 sm:p-4">
+<div class="bg-white w-full max-w-4xl rounded-2xl shadow-2xl modal-container flex flex-col">
+<div class="bg-[#5b21b6] text-white px-6 py-4 flex justify-between">
+<h3>Fingerprint Predictions</h3>
+<button onclick="closeModal('fingerModal')"><i class="fa-solid fa-xmark"></i></button>
+</div>
+<div class="p-6 overflow-y-auto flex-1">
+{% for f in finger_list %}
+<div class="border rounded-xl p-4 mb-4">
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+<p><strong>Result:</strong> {{ f.result }}</p>
+<p><strong>Date:</strong> {{ f.created_at }}</p>
+<p><strong>Age:</strong> {{ f.age }}</p>
+<p><strong>BMI:</strong> {{ f.bmi }}</p>
+<p><strong>HbA1c:</strong> {{ f.hba1c }}</p>
+<p><strong>Glucose:</strong> {{ f.glucose }}</p>
+<p><strong>Gender:</strong> {{ f.gender_label }}</p>
+<p><strong>Smoking:</strong> {{ f.smoking_label }}</p>
+<p><strong>Ridge Density:</strong> {{ f.ridge_density }}</p>
+<p><strong>Complexity Score:</strong> {{ f.complexity_score }}</p>
+<p><strong>Pattern Type:</strong> {{ f.pattern_label }}</p>
 </div>
 </div>
 {% else %}
-<p class="text-gray-500">No Reports records found.</p>
+<p>No fingerprint records found.</p>
 {% endfor %}
-
 </div>
 </div>
 </div>
 
+<!-- Combined Modal -->
+<div id="combinedModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50 p-3 sm:p-4">
+<div class="bg-white w-full max-w-4xl rounded-2xl shadow-2xl modal-container flex flex-col">
+<div class="bg-[#5b21b6] text-white px-6 py-4 flex justify-between">
+<h3>All Predictions</h3>
+<button onclick="closeModal('combinedModal')"><i class="fa-solid fa-xmark"></i></button>
+</div>
+<div class="p-6 overflow-y-auto flex-1">
+{% for item in combined_list %}
+<div class="border rounded-xl p-4 mb-3 flex justify-between items-center">
+<div>
+<p class="font-semibold text-sm">{{ item.result }}</p>
+<p class="text-xs text-gray-500">{{ item.created_at }}</p>
+</div>
+<span class="px-3 py-1 rounded-full text-xs font-semibold
+{% if item.type == 'Reports' %}bg-emerald-100 text-emerald-800
+{% elif item.type == 'Finger' %}bg-cyan-100 text-cyan-800
+{% else %}bg-gray-100 text-gray-600{% endif %}">
+{{ item.type }}
+</span>
+</div>
+{% else %}
+<p>No records found.</p>
+{% endfor %}
+</div>
+</div>
+</div>
 
-<!-- ================= JS SAME ================= -->
+<!-- ================= JS ================= -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
 <script>
 function openModal(id){ document.getElementById(id).classList.remove('hidden'); }
 function closeModal(id){ document.getElementById(id).classList.add('hidden'); }
