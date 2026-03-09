@@ -140,77 +140,122 @@
 
 <!-- Clinical Modal -->
 <div id="clinicalModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50 p-3 sm:p-4">
-<div class="bg-white w-full max-w-4xl rounded-2xl shadow-2xl modal-container flex flex-col">
-<div class="bg-[#5b21b6] text-white px-6 py-4 flex justify-between">
-<h3>Reports Predictions</h3>
-<button onclick="closeModal('clinicalModal')"><i class="fa-solid fa-xmark"></i></button>
-</div>
-<div class="p-6 overflow-y-auto flex-1">
-{% for c in clinical_list %}
-<div class="border rounded-xl p-4 mb-4">
-<div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
-<p><strong>Result:</strong> {{ c.result }}</p>
-<p><strong>Date:</strong> {{ c.created_at }}</p>
-<p><strong>Age:</strong> {{ c.age }}</p>
-<p><strong>BMI:</strong> {{ c.bmi }}</p>
-<p><strong>HbA1c:</strong> {{ c.hba1c }}</p>
-<p><strong>Glucose:</strong> {{ c.glucose }}</p>
-<p><strong>Gender:</strong> {{ c.gender_label }}</p>
-<p><strong>Smoking:</strong> {{ c.smoking_label }}</p>
-<p><strong>Hypertension:</strong> {{ c.hypertension_label }}</p>
-<p><strong>Heart Disease:</strong> {{ c.heart_label }}</p>
-<div class="mt-4">
-    <a href="{{ url_for('admin_download_report', user_id=user.id) }}"
-    class="w-full sm:w-auto inline-flex justify-center items-center gap-2 px-4 py-2 bg-red-100 text-red-700 rounded-lg font-semibold text-sm hover:bg-red-200 transition">
-    <i class="fa-solid fa-file-pdf"></i> Download PDF
-    </a>
-    </div>
-</div>
-</div>
-{% else %}
-<p>No Reports records found.</p>
-{% endfor %}
-</div>
-</div>
-</div>
 
+    <div class="bg-white w-full max-w-4xl rounded-2xl shadow-2xl modal-container flex flex-col">
+    
+    <!-- Header -->
+    <div class="bg-[#5b21b6] text-white px-6 py-4 flex justify-between items-center rounded-t-2xl">
+    <h3 class="text-lg font-semibold">Reports Predictions</h3>
+    <button onclick="closeModal('clinicalModal')" class="text-white text-xl">
+    <i class="fa-solid fa-xmark"></i>
+    </button>
+    </div>
+    
+    <!-- Body -->
+    <div class="p-6 overflow-y-auto flex-1">
+    
+    {% for c in clinical_list %}
+    
+    <div class="border rounded-xl p-4 mb-4 shadow-sm">
+    
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+    
+    <p><strong>Result:</strong> {{ c.result }}</p>
+    <p><strong>Date:</strong> {{ c.created_at }}</p>
+    
+    <p><strong>Age:</strong> {{ c.age }}</p>
+    <p><strong>BMI:</strong> {{ c.bmi }}</p>
+    
+    <p><strong>HbA1c:</strong> {{ c.hba1c }}</p>
+    <p><strong>Glucose:</strong> {{ c.glucose }}</p>
+    
+    <p><strong>Gender:</strong> {{ c.gender_label }}</p>
+    <p><strong>Smoking:</strong> {{ c.smoking_label }}</p>
+    
+    <p><strong>Hypertension:</strong> {{ c.hypertension_label }}</p>
+    <p><strong>Heart Disease:</strong> {{ c.heart_label }}</p>
+    
+    </div>
+    
+    <!-- Download Button -->
+    <div class="mt-4">
+    
+    <a href="{{ url_for('admin_download_report', report_id=c.id) }}"
+    class="inline-flex items-center gap-2 px-4 py-2 bg-red-100 text-red-700 rounded-lg font-semibold text-sm hover:bg-red-200 transition">
+    
+    <i class="fa-solid fa-file-pdf"></i>
+    Download PDF
+    
+    </a>
+    
+    </div>
+    
+    </div>
+    
+    {% else %}
+    
+    <p class="text-gray-500 text-center py-6">
+    No Reports records found.
+    </p>
+    
+    {% endfor %}
+    
+    </div>
+    </div>
+    </div>
+    
 <!-- Finger Modal -->
 <div id="fingerModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50 p-3 sm:p-4">
-<div class="bg-white w-full max-w-4xl rounded-2xl shadow-2xl modal-container flex flex-col">
-<div class="bg-[#5b21b6] text-white px-6 py-4 flex justify-between">
-<h3>Fingerprint Predictions</h3>
-<button onclick="closeModal('fingerModal')"><i class="fa-solid fa-xmark"></i></button>
-</div>
-<div class="p-6 overflow-y-auto flex-1">
-{% for f in finger_list %}
-<div class="border rounded-xl p-4 mb-4">
-<div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
-<p><strong>Result:</strong> {{ f.result }}</p>
-<p><strong>Date:</strong> {{ f.created_at }}</p>
-<p><strong>Age:</strong> {{ f.age }}</p>
-<p><strong>BMI:</strong> {{ f.bmi }}</p>
-<p><strong>HbA1c:</strong> {{ f.hba1c }}</p>
-<p><strong>Glucose:</strong> {{ f.glucose }}</p>
-<p><strong>Gender:</strong> {{ f.gender_label }}</p>
-<p><strong>Smoking:</strong> {{ f.smoking_label }}</p>
-<p><strong>Ridge Density:</strong> {{ f.ridge_density }}</p>
-<p><strong>Complexity Score:</strong> {{ f.complexity_score }}</p>
-<p><strong>Pattern Type:</strong> {{ f.pattern_label }}</p>
-<div class="mt-4">
-    <a href="{{ url_for('admin_download_finger_report', user_id=user.id) }}"
-    class="w-full sm:w-auto inline-flex justify-center items-center gap-2 px-4 py-2 bg-red-100 text-red-700 rounded-lg font-semibold text-sm hover:bg-red-200 transition">
+    <div class="bg-white w-full max-w-4xl rounded-2xl shadow-2xl modal-container flex flex-col">
+    
+    <!-- Header -->
+    <div class="bg-[#5b21b6] text-white px-6 py-4 flex justify-between items-center">
+    <h3 class="font-semibold">Fingerprint Predictions</h3>
+    <button onclick="closeModal('fingerModal')">
+    <i class="fa-solid fa-xmark"></i>
+    </button>
+    </div>
+    
+    <!-- Body -->
+    <div class="p-6 overflow-y-auto flex-1">
+    
+    {% for f in finger_list %}
+    <div class="border rounded-xl p-4 mb-4">
+    
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+    
+    <p><strong>Result:</strong> {{ f.result }}</p>
+    <p><strong>Date:</strong> {{ f.created_at }}</p>
+    <p><strong>Age:</strong> {{ f.age }}</p>
+    <p><strong>BMI:</strong> {{ f.bmi }}</p>
+    <p><strong>HbA1c:</strong> {{ f.hba1c }}</p>
+    <p><strong>Glucose:</strong> {{ f.glucose }}</p>
+    <p><strong>Gender:</strong> {{ f.gender_label }}</p>
+    <p><strong>Smoking:</strong> {{ f.smoking_label }}</p>
+    <p><strong>Ridge Density:</strong> {{ f.ridge_density }}</p>
+    <p><strong>Complexity Score:</strong> {{ f.complexity_score }}</p>
+    <p><strong>Pattern Type:</strong> {{ f.pattern_label }}</p>
+    
+    </div>
+    
+    <!-- Download Button -->
+    <div class="mt-4 flex justify-end">
+    <a href="{{ url_for('admin_download_finger_report', report_id=f.id) }}"
+    class="inline-flex items-center gap-2 px-4 py-2 bg-red-100 text-red-700 rounded-lg font-semibold text-sm hover:bg-red-200 transition">
     <i class="fa-solid fa-file-pdf"></i>
     Download PDF
     </a>
     </div>
-</div>
-</div>
-{% else %}
-<p>No fingerprint records found.</p>
-{% endfor %}
-</div>
-</div>
-</div>
+    
+    </div>
+    
+    {% else %}
+    <p class="text-gray-500">No fingerprint records found.</p>
+    {% endfor %}
+    
+    </div>
+    </div>
+    </div>
 
 <!-- Combined Modal -->
 <div id="combinedModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50 p-3 sm:p-4">

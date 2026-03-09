@@ -1774,153 +1774,27 @@ def export_user_activity_pdf(user_id):
         flash("Failed to generate PDF", "danger")
         return redirect(url_for('admin_user_analytics'))
 
-@app.route('/admin/download/finger-report/<int:user_id>')
+@app.route('/admin/report/download/<int:report_id>')
 @admin_required
-def admin_download_finger_report(user_id):
+def admin_download_report(report_id):
 
     conn = get_db_connection()
     cursor = conn.cursor(dictionary=True)
 
     cursor.execute("""
-        SELECT fp.*, u.username, u.email
-        FROM finger_predictions fp
-        JOIN userss u ON u.id = fp.user_id
-        WHERE fp.user_id = %s
-        ORDER BY fp.created_at DESC
-        LIMIT 1
-    """, (user_id,))
+        SELECT p.*, u.username, u.email
+        FROM predictions p
+        JOIN userss u ON u.id = p.user_id
+        WHERE p.id = %s
+    """, (report_id,))
 
-    report = cursor.fetchone()
-    cursor.close()
-    conn.close()
-
-    if not report:
-        flash("No fingerprint report found for this user.", "warning")
-        return redirect(url_for('admin_user_analytics'))
-
-    # -------- SAFE HELPER --------
-    def safe(val):
-        return val if val not in (None, "", "NULL") else "N/A"
-
-    report_date = report['created_at'].strftime("%d-%b-%Y %H:%M") \
-        if hasattr(report['created_at'], 'strftime') else report['created_at']
-
-    # -------- PDF SETUP --------
-    buffer = io.BytesIO()
-    pdf = SimpleDocTemplate(buffer, pagesize=A4,
-                            rightMargin=40, leftMargin=40,
-                            topMargin=40, bottomMargin=40)
-
-    styles = getSampleStyleSheet()
-    elements = []
-
-    styles.add(ParagraphStyle(
-        name='MainTitle',
-        fontSize=20,
-        textColor=colors.HexColor("#064e3b"),
-        fontName='Helvetica-Bold',
-        spaceAfter=10
-    ))
-
-    styles.add(ParagraphStyle(
-        name='SubTitle',
-        fontSize=11,
-        textColor=colors.grey,
-        spaceAfter=20
-    ))
-
-    # -------- HEADER --------
-    elements.append(Paragraph("Fingerprint-Based Diabetes Risk Report", styles['MainTitle']))
-    elements.append(Paragraph("DSP Health AI Clinical Intelligence System", styles['SubTitle']))
-    elements.append(Spacer(1, 20))
-
-    # -------- PATIENT INFO --------
-    patient_info = f"""
-    <b>Patient Name:</b> {safe(report['username'])}<br/>
-    <b>Email:</b> {safe(report['email'])}<br/>
-    <b>Report Date:</b> {report_date}<br/>
-    <b>Assessment Type:</b> Fingerprint Biometric Analysis
-    """
-
-    elements.append(Paragraph(patient_info, styles['Normal']))
-    elements.append(Spacer(1, 25))
-
-    # -------- TABLE DATA --------
-    data = [
-        ["Clinical Metric", "Observed Value"],
-        ["Age", safe(report.get("age"))],
-        ["BMI", safe(report.get("bmi"))],
-        ["Glucose Level", safe(report.get("glucose"))],
-        ["HbA1c", safe(report.get("hba1c"))],
-        ["Smoking Status", safe(report.get("smoking"))],
-        ["Ridge Density", safe(report.get("ridge_density"))],
-        ["Pattern Complexity", safe(report.get("complexity_score"))],
-        ["Fingerprint Pattern", safe(report.get("pattern_type"))],
-        ["Final Risk Assessment", safe(report.get("result"))],
-    ]
-
-    table = Table(data, colWidths=[220, 240])
-    table.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#065f46")),
-        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
-        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-        ('GRID', (0, 0), (-1, -1), 0.6, colors.grey),
-        ('BACKGROUND', (0, 1), (-1, -1), colors.whitesmoke),
-        ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
-        ('TOPPADDING', (0, 0), (-1, -1), 8),
-    ]))
-
-    elements.append(table)
-    elements.append(Spacer(1, 30))
-
-    # -------- INTERPRETATION --------
-    elements.append(Paragraph("""
-    <b>Clinical Interpretation:</b><br/>
-    This fingerprint-based biometric assessment is generated using
-    AI-driven ridge density and metabolic correlation algorithms.
-    It is intended for early screening purposes only and does not
-    replace professional medical diagnosis.
-    """, styles['Normal']))
-
-    elements.append(Spacer(1, 30))
-    elements.append(Paragraph("<b>Authorized Medical Officer</b><br/>Dr. AI Clinical System<br/>DSP Health", styles['Normal']))
-    elements.append(Spacer(1, 40))
-    elements.append(Paragraph("Signature: _______________________________", styles['Normal']))
-    elements.append(Spacer(1, 20))
-    elements.append(Paragraph("DSP Health AI • Secure Medical Intelligence Platform", styles['Italic']))
-
-    pdf.build(elements)
-    buffer.seek(0)
-
-    filename = f"Fingerprint_Report_{report['username']}.pdf"
-
-    return send_file(buffer, as_attachment=True,
-                     download_name=filename,
-                     mimetype="application/pdf")
-@app.route('/admin/report/download/<int:user_id>')
-@admin_required
-def admin_download_report(user_id):
-
-    conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
-
-    cursor.execute("SELECT username, email FROM userss WHERE id=%s", (user_id,))
-    user = cursor.fetchone()
-
-    cursor.execute("""
-        SELECT *
-        FROM predictions
-        WHERE user_id=%s
-        ORDER BY created_at DESC
-        LIMIT 1
-    """, (user_id,))
     pred = cursor.fetchone()
 
     cursor.close()
     conn.close()
 
-    if not user or not pred:
-        flash("No report data found for this user.", "warning")
+    if not pred:
+        flash("Report not found.", "warning")
         return redirect(url_for('admin_dashboard'))
 
     def safe(val):
@@ -1930,9 +1804,15 @@ def admin_download_report(user_id):
         if hasattr(pred['created_at'], 'strftime') else pred['created_at']
 
     buffer = io.BytesIO()
-    pdf = SimpleDocTemplate(buffer, pagesize=A4,
-                            rightMargin=40, leftMargin=40,
-                            topMargin=40, bottomMargin=40)
+
+    pdf = SimpleDocTemplate(
+        buffer,
+        pagesize=A4,
+        rightMargin=40,
+        leftMargin=40,
+        topMargin=40,
+        bottomMargin=40
+    )
 
     styles = getSampleStyleSheet()
     elements = []
@@ -1952,13 +1832,21 @@ def admin_download_report(user_id):
         spaceAfter=20
     ))
 
-    elements.append(Paragraph("Diabetes Clinical Prediction Report", styles['MainTitle']))
-    elements.append(Paragraph("Generated using AI & Clinical Analytics", styles['SubTitle']))
+    elements.append(Paragraph(
+        "Diabetes Clinical Prediction Report",
+        styles['MainTitle']
+    ))
+
+    elements.append(Paragraph(
+        "Generated using AI & Clinical Analytics",
+        styles['SubTitle']
+    ))
+
     elements.append(Spacer(1, 20))
 
     patient_info = f"""
-    <b>Patient Name:</b> {safe(user['username'])}<br/>
-    <b>Email:</b> {safe(user['email'])}<br/>
+    <b>Patient Name:</b> {safe(pred['username'])}<br/>
+    <b>Email:</b> {safe(pred['email'])}<br/>
     <b>Report Date:</b> {report_date}<br/>
     <b>Assessment Type:</b> Clinical Parameter-Based Prediction
     """
@@ -1979,14 +1867,15 @@ def admin_download_report(user_id):
     ]
 
     table = Table(data, colWidths=[220, 240])
+
     table.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#065f46")),
-        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
-        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-        ('GRID', (0, 0), (-1, -1), 0.6, colors.grey),
-        ('BACKGROUND', (0, 1), (-1, -1), colors.whitesmoke),
-        ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
-        ('TOPPADDING', (0, 0), (-1, -1), 8),
+        ('BACKGROUND', (0,0), (-1,0), colors.HexColor("#065f46")),
+        ('TEXTCOLOR', (0,0), (-1,0), colors.white),
+        ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
+        ('GRID', (0,0), (-1,-1), 0.6, colors.grey),
+        ('BACKGROUND', (0,1), (-1,-1), colors.whitesmoke),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 8),
+        ('TOPPADDING', (0,0), (-1,-1), 8),
     ]))
 
     elements.append(table)
@@ -2000,21 +1889,38 @@ def admin_download_report(user_id):
     """, styles['Normal']))
 
     elements.append(Spacer(1, 30))
-    elements.append(Paragraph("<b>Authorized Medical Officer</b><br/>Dr. AI Clinical System<br/>DSP Health", styles['Normal']))
+
+    elements.append(Paragraph(
+        "<b>Authorized Medical Officer</b><br/>Dr. AI Clinical System<br/>DSP Health",
+        styles['Normal']
+    ))
+
     elements.append(Spacer(1, 40))
-    elements.append(Paragraph("Signature: _______________________________", styles['Normal']))
+
+    elements.append(Paragraph(
+        "Signature: _______________________________",
+        styles['Normal']
+    ))
+
     elements.append(Spacer(1, 20))
-    elements.append(Paragraph("DSP Health AI • Secure Medical Intelligence Platform", styles['Italic']))
+
+    elements.append(Paragraph(
+        "DSP Health AI • Secure Medical Intelligence Platform",
+        styles['Italic']
+    ))
 
     pdf.build(elements)
+
     buffer.seek(0)
 
-    filename = f"{user['username']}_Clinical_Report.pdf"
+    filename = f"Clinical_Report_{pred['username']}_{pred['id']}.pdf"
 
-    return send_file(buffer, as_attachment=True,
-                     download_name=filename,
-                     mimetype="application/pdf")
-
+    return send_file(
+        buffer,
+        as_attachment=True,
+        download_name=filename,
+        mimetype="application/pdf"
+    )
 
 # ================= RUN =================
 if __name__ == '__main__':
