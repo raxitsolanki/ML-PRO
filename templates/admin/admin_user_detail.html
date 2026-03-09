@@ -176,11 +176,12 @@
     <p><strong>Heart Disease:</strong> {{ c.heart_label }}</p>
     
     </div>
+</div>
     
     <!-- Download Button -->
     <div class="mt-4">
     
-    <a href="{{ url_for('admin_download_report', report_id=c.id) }}"
+    <a href="{{ url_for('admin_download_report',  report_id=c.id) }}"
     class="inline-flex items-center gap-2 px-4 py-2 bg-red-100 text-red-700 rounded-lg font-semibold text-sm hover:bg-red-200 transition">
     
     <i class="fa-solid fa-file-pdf"></i>
@@ -190,7 +191,7 @@
     
     </div>
     
-    </div>
+    
     
     {% else %}
     
@@ -237,6 +238,7 @@
     <p><strong>Pattern Type:</strong> {{ f.pattern_label }}</p>
     
     </div>
+</div>
     
     <!-- Download Button -->
     <div class="mt-4 flex justify-end">
@@ -245,7 +247,6 @@
     <i class="fa-solid fa-file-pdf"></i>
     Download PDF
     </a>
-    </div>
     
     </div>
     

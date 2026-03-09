@@ -1794,7 +1794,7 @@ def admin_download_report(report_id):
     conn.close()
 
     if not pred:
-        flash("Report not found.", "warning")
+        flash("Clinical report not found.", "warning")
         return redirect(url_for('admin_dashboard'))
 
     def safe(val):
@@ -1817,29 +1817,16 @@ def admin_download_report(report_id):
     styles = getSampleStyleSheet()
     elements = []
 
-    styles.add(ParagraphStyle(
-        name='MainTitle',
-        fontSize=20,
-        textColor=colors.HexColor("#064e3b"),
-        fontName='Helvetica-Bold',
-        spaceAfter=10
-    ))
-
-    styles.add(ParagraphStyle(
-        name='SubTitle',
-        fontSize=11,
-        textColor=colors.grey,
-        spaceAfter=20
-    ))
-
     elements.append(Paragraph(
         "Diabetes Clinical Prediction Report",
-        styles['MainTitle']
+        styles['Title']
     ))
+
+    elements.append(Spacer(1, 10))
 
     elements.append(Paragraph(
         "Generated using AI & Clinical Analytics",
-        styles['SubTitle']
+        styles['Italic']
     ))
 
     elements.append(Spacer(1, 20))
@@ -1874,19 +1861,18 @@ def admin_download_report(report_id):
         ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
         ('GRID', (0,0), (-1,-1), 0.6, colors.grey),
         ('BACKGROUND', (0,1), (-1,-1), colors.whitesmoke),
-        ('BOTTOMPADDING', (0,0), (-1,-1), 8),
-        ('TOPPADDING', (0,0), (-1,-1), 8),
     ]))
 
     elements.append(table)
     elements.append(Spacer(1, 30))
 
-    elements.append(Paragraph("""
-    <b>Clinical Interpretation:</b><br/>
-    This report is generated using predictive analytics on metabolic
-    and cardiovascular parameters. It is intended for screening
-    purposes and does not substitute medical consultation.
-    """, styles['Normal']))
+    elements.append(Paragraph(
+        """<b>Clinical Interpretation:</b><br/>
+        This report is generated using predictive analytics on metabolic
+        and cardiovascular parameters. It is intended for screening
+        purposes and does not substitute medical consultation.""",
+        styles['Normal']
+    ))
 
     elements.append(Spacer(1, 30))
 
@@ -1895,33 +1881,111 @@ def admin_download_report(report_id):
         styles['Normal']
     ))
 
-    elements.append(Spacer(1, 40))
+    pdf.build(elements)
+
+    buffer.seek(0)
+
+    return send_file(
+        buffer,
+        as_attachment=True,
+        download_name=f"Clinical_Report_{pred['username']}_{pred['id']}.pdf",
+        mimetype="application/pdf"
+    )
+@app.route('/admin/download/finger-report/<int:report_id>')
+@admin_required
+def admin_download_finger_report(report_id):
+
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+
+    cursor.execute("""
+        SELECT fp.*, u.username, u.email
+        FROM finger_predictions fp
+        JOIN userss u ON u.id = fp.user_id
+        WHERE fp.id = %s
+    """, (report_id,))
+
+    report = cursor.fetchone()
+
+    cursor.close()
+    conn.close()
+
+    if not report:
+        flash("Fingerprint report not found.", "warning")
+        return redirect(url_for('admin_user_analytics'))
+
+    def safe(val):
+        return val if val not in (None, "", "NULL") else "N/A"
+
+    report_date = report['created_at'].strftime("%d-%b-%Y %H:%M") \
+        if hasattr(report['created_at'], 'strftime') else report['created_at']
+
+    buffer = io.BytesIO()
+
+    pdf = SimpleDocTemplate(
+        buffer,
+        pagesize=A4,
+        rightMargin=40,
+        leftMargin=40,
+        topMargin=40,
+        bottomMargin=40
+    )
+
+    styles = getSampleStyleSheet()
+    elements = []
 
     elements.append(Paragraph(
-        "Signature: _______________________________",
-        styles['Normal']
+        "Fingerprint-Based Diabetes Risk Report",
+        styles['Title']
     ))
 
     elements.append(Spacer(1, 20))
 
-    elements.append(Paragraph(
-        "DSP Health AI • Secure Medical Intelligence Platform",
-        styles['Italic']
-    ))
+    patient_info = f"""
+    <b>Patient Name:</b> {safe(report['username'])}<br/>
+    <b>Email:</b> {safe(report['email'])}<br/>
+    <b>Report Date:</b> {report_date}<br/>
+    <b>Assessment Type:</b> Fingerprint Biometric Analysis
+    """
+
+    elements.append(Paragraph(patient_info, styles['Normal']))
+    elements.append(Spacer(1, 25))
+
+    data = [
+        ["Clinical Metric", "Observed Value"],
+        ["Age", safe(report.get("age"))],
+        ["BMI", safe(report.get("bmi"))],
+        ["Glucose Level", safe(report.get("glucose"))],
+        ["HbA1c", safe(report.get("hba1c"))],
+        ["Smoking Status", safe(report.get("smoking"))],
+        ["Ridge Density", safe(report.get("ridge_density"))],
+        ["Pattern Complexity", safe(report.get("complexity_score"))],
+        ["Fingerprint Pattern", safe(report.get("pattern_type"))],
+        ["Final Risk Assessment", safe(report.get("result"))],
+    ]
+
+    table = Table(data, colWidths=[220, 240])
+
+    table.setStyle(TableStyle([
+        ('BACKGROUND', (0,0), (-1,0), colors.HexColor("#065f46")),
+        ('TEXTCOLOR', (0,0), (-1,0), colors.white),
+        ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
+        ('GRID', (0,0), (-1,-1), 0.6, colors.grey),
+        ('BACKGROUND', (0,1), (-1,-1), colors.whitesmoke),
+    ]))
+
+    elements.append(table)
 
     pdf.build(elements)
 
     buffer.seek(0)
 
-    filename = f"Clinical_Report_{pred['username']}_{pred['id']}.pdf"
-
     return send_file(
         buffer,
         as_attachment=True,
-        download_name=filename,
+        download_name=f"Fingerprint_Report_{report['username']}_{report['id']}.pdf",
         mimetype="application/pdf"
     )
-
 # ================= RUN =================
 if __name__ == '__main__':
     app.run(debug=True)
