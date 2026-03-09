@@ -1814,21 +1814,34 @@ def admin_download_report(report_id):
         bottomMargin=40
     )
 
-    styles = getSampleStyleSheet()
+    styles.add(ParagraphStyle(
+        name='HeaderTitle',
+        fontSize=20,
+        textColor=colors.HexColor("#065f46"),
+        spaceAfter=12,
+        fontName='Helvetica-Bold'
+    ))
+
+    styles.add(ParagraphStyle(
+        name='SubTitle',
+        fontSize=12,
+        textColor=colors.grey,
+        spaceAfter=20
+    ))
+
     elements = []
 
-    # ---------- TITLE ----------
+    # ---------- HEADER ----------
     elements.append(Paragraph(
-        "Diabetes Clinical Prediction Report",
-        styles['Title']
+        "Diabetes Prediction Medical Report",
+        styles['HeaderTitle']
     ))
-
     elements.append(Paragraph(
-        "DSP Health AI Clinical Intelligence System",
-        styles['Italic']
+        "Generated using AI & Clinical Analytics",
+        styles['SubTitle']
     ))
-
     elements.append(Spacer(1, 20))
+
 
     # ---------- PATIENT INFORMATION ----------
     patient_info = f"""
@@ -1955,21 +1968,34 @@ def admin_download_finger_report(report_id):
         bottomMargin=40
     )
 
-    styles = getSampleStyleSheet()
+    styles.add(ParagraphStyle(
+        name='HeaderTitle',
+        fontSize=20,
+        textColor=colors.HexColor("#065f46"),
+        spaceAfter=12,
+        fontName='Helvetica-Bold'
+    ))
+
+    styles.add(ParagraphStyle(
+        name='SubTitle',
+        fontSize=12,
+        textColor=colors.grey,
+        spaceAfter=20
+    ))
+
     elements = []
 
-    # -------- TITLE --------
+    # ---------- HEADER ----------
     elements.append(Paragraph(
-        "Fingerprint-Based Diabetes Risk Report",
-        styles['Title']
+        "Diabetes Prediction Medical Report",
+        styles['HeaderTitle']
     ))
-
     elements.append(Paragraph(
-        "DSP Health AI Clinical Intelligence System",
-        styles['Italic']
+        "Generated using AI & Clinical Analytics",
+        styles['SubTitle']
     ))
-
     elements.append(Spacer(1, 20))
+
 
     # -------- PATIENT INFO --------
     patient_info = f"""
