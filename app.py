@@ -1817,59 +1817,54 @@ def admin_download_report(report_id):
     styles = getSampleStyleSheet()
     elements = []
 
+    # ---------- TITLE ----------
     elements.append(Paragraph(
         "Diabetes Clinical Prediction Report",
         styles['Title']
     ))
 
-    elements.append(Spacer(1, 10))
-
-    # -------- HEADER --------
-    elements.append(Paragraph(
-        "Fingerprint-Based Diabetes Risk Report",
-        styles['MainTitle']
-    ))
-
     elements.append(Paragraph(
         "DSP Health AI Clinical Intelligence System",
-        styles['SubTitle']
+        styles['Italic']
     ))
 
     elements.append(Spacer(1, 20))
 
-    # -------- PATIENT INFO --------
+    # ---------- PATIENT INFORMATION ----------
     patient_info = f"""
-    <b>Patient Name:</b> {safe(report['username'])}<br/>
-    <b>Email:</b> {safe(report['email'])}<br/>
+    <b>Patient Name:</b> {safe(pred['username'])}<br/>
+    <b>Email:</b> {safe(pred['email'])}<br/>
     <b>Report Date:</b> {report_date}<br/>
-    <b>Assessment Type:</b> Fingerprint Biometric Analysis
+    <b>Assessment Type:</b> Clinical Parameter-Based Prediction
     """
 
     elements.append(Paragraph(patient_info, styles['Normal']))
     elements.append(Spacer(1, 25))
 
-    # -------- TABLE DATA --------
+    # ---------- CLINICAL DATA TABLE ----------
     data = [
         ["Clinical Metric", "Observed Value"],
-        ["Age", safe(report.get("age"))],
-        ["BMI", safe(report.get("bmi"))],
-        ["Glucose Level", safe(report.get("glucose"))],
-        ["HbA1c", safe(report.get("hba1c"))],
-        ["Smoking Status", safe(report.get("smoking"))],
-        ["Ridge Density", safe(report.get("ridge_density"))],
-        ["Pattern Complexity", safe(report.get("complexity_score"))],
-        ["Fingerprint Pattern", safe(report.get("pattern_type"))],
-        ["Final Risk Assessment", safe(report.get("result"))],
+        ["Age", safe(pred.get("age"))],
+        ["BMI", safe(pred.get("bmi"))],
+        ["Glucose Level", safe(pred.get("glucose"))],
+        ["HbA1c", safe(pred.get("hba1c"))],
+        ["Hypertension", "Yes" if pred.get("hypertension") else "No"],
+        ["Heart Disease", "Yes" if pred.get("heart_disease") else "No"],
+        ["Smoking Status", safe(pred.get("smoking"))],
+        ["Final Prediction", safe(pred.get("result"))],
     ]
 
-    table = Table(data, colWidths=[220, 240])
+    table = Table(data, colWidths=[230, 230])
 
     table.setStyle(TableStyle([
         ('BACKGROUND', (0,0), (-1,0), colors.HexColor("#065f46")),
         ('TEXTCOLOR', (0,0), (-1,0), colors.white),
         ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
-        ('GRID', (0,0), (-1,-1), 0.6, colors.grey),
+
+        ('GRID', (0,0), (-1,-1), 0.5, colors.grey),
+
         ('BACKGROUND', (0,1), (-1,-1), colors.whitesmoke),
+
         ('BOTTOMPADDING', (0,0), (-1,-1), 8),
         ('TOPPADDING', (0,0), (-1,-1), 8),
     ]))
@@ -1877,17 +1872,18 @@ def admin_download_report(report_id):
     elements.append(table)
     elements.append(Spacer(1, 30))
 
-    # -------- INTERPRETATION --------
+    # ---------- INTERPRETATION ----------
     elements.append(Paragraph("""
     <b>Clinical Interpretation:</b><br/>
-    This fingerprint-based biometric assessment is generated using
-    AI-driven ridge density and metabolic correlation algorithms.
-    It is intended for early screening purposes only and does not
-    replace professional medical diagnosis.
+    This report is generated using predictive analytics on metabolic
+    and cardiovascular parameters using AI-driven medical models.
+    The results are intended for screening purposes only and should
+    not replace professional medical diagnosis or consultation.
     """, styles['Normal']))
 
     elements.append(Spacer(1, 30))
 
+    # ---------- SIGNATURE ----------
     elements.append(Paragraph(
         "<b>Authorized Medical Officer</b><br/>Dr. AI Clinical System<br/>DSP Health",
         styles['Normal']
@@ -1896,22 +1892,23 @@ def admin_download_report(report_id):
     elements.append(Spacer(1, 40))
 
     elements.append(Paragraph(
-        "Signature: _______________________________",
+        "Signature: ___________________________",
         styles['Normal']
     ))
 
     elements.append(Spacer(1, 20))
 
+    # ---------- FOOTER ----------
     elements.append(Paragraph(
         "DSP Health AI • Secure Medical Intelligence Platform",
         styles['Italic']
     ))
 
+    # ---------- BUILD PDF ----------
     pdf.build(elements)
 
     buffer.seek(0)
 
-    
     return send_file(
         buffer,
         as_attachment=True,
@@ -1999,7 +1996,7 @@ def admin_download_finger_report(report_id):
         ["Final Risk Assessment", safe(report.get("result"))],
     ]
 
-    table = Table(data, colWidths=[220, 240])
+    table = Table(data, colWidths=[230, 230])
 
     table.setStyle(TableStyle([
         ('BACKGROUND', (0,0), (-1,0), colors.HexColor("#065f46")),
@@ -2017,10 +2014,10 @@ def admin_download_finger_report(report_id):
     # -------- INTERPRETATION --------
     elements.append(Paragraph("""
     <b>Clinical Interpretation:</b><br/>
-    This fingerprint-based biometric assessment is generated using
-    AI-driven ridge density and metabolic correlation algorithms.
-    It is intended for early screening purposes only and does not
-    replace professional medical diagnosis.
+    This fingerprint-based biometric assessment is generated using 
+    AI-driven ridge density and metabolic correlation algorithms. 
+    The results are intended for early screening purposes only and 
+    should not replace professional medical diagnosis.
     """, styles['Normal']))
 
     elements.append(Spacer(1, 30))
@@ -2034,7 +2031,7 @@ def admin_download_finger_report(report_id):
     elements.append(Spacer(1, 40))
 
     elements.append(Paragraph(
-        "Signature: _______________________________",
+        "Signature: ___________________________",
         styles['Normal']
     ))
 
