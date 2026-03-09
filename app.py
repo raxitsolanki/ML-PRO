@@ -1824,33 +1824,42 @@ def admin_download_report(report_id):
 
     elements.append(Spacer(1, 10))
 
+    # -------- HEADER --------
     elements.append(Paragraph(
-        "Generated using AI & Clinical Analytics",
-        styles['Italic']
+        "Fingerprint-Based Diabetes Risk Report",
+        styles['MainTitle']
+    ))
+
+    elements.append(Paragraph(
+        "DSP Health AI Clinical Intelligence System",
+        styles['SubTitle']
     ))
 
     elements.append(Spacer(1, 20))
 
+    # -------- PATIENT INFO --------
     patient_info = f"""
-    <b>Patient Name:</b> {safe(pred['username'])}<br/>
-    <b>Email:</b> {safe(pred['email'])}<br/>
+    <b>Patient Name:</b> {safe(report['username'])}<br/>
+    <b>Email:</b> {safe(report['email'])}<br/>
     <b>Report Date:</b> {report_date}<br/>
-    <b>Assessment Type:</b> Clinical Parameter-Based Prediction
+    <b>Assessment Type:</b> Fingerprint Biometric Analysis
     """
 
     elements.append(Paragraph(patient_info, styles['Normal']))
     elements.append(Spacer(1, 25))
 
+    # -------- TABLE DATA --------
     data = [
         ["Clinical Metric", "Observed Value"],
-        ["Age", safe(pred.get("age"))],
-        ["BMI", safe(pred.get("bmi"))],
-        ["Glucose Level", safe(pred.get("glucose"))],
-        ["HbA1c", safe(pred.get("hba1c"))],
-        ["Hypertension", "Yes" if pred.get("hypertension") else "No"],
-        ["Heart Disease", "Yes" if pred.get("heart_disease") else "No"],
-        ["Smoking Status", safe(pred.get("smoking"))],
-        ["Final Prediction", safe(pred.get("result"))],
+        ["Age", safe(report.get("age"))],
+        ["BMI", safe(report.get("bmi"))],
+        ["Glucose Level", safe(report.get("glucose"))],
+        ["HbA1c", safe(report.get("hba1c"))],
+        ["Smoking Status", safe(report.get("smoking"))],
+        ["Ridge Density", safe(report.get("ridge_density"))],
+        ["Pattern Complexity", safe(report.get("complexity_score"))],
+        ["Fingerprint Pattern", safe(report.get("pattern_type"))],
+        ["Final Risk Assessment", safe(report.get("result"))],
     ]
 
     table = Table(data, colWidths=[220, 240])
@@ -1861,18 +1870,21 @@ def admin_download_report(report_id):
         ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
         ('GRID', (0,0), (-1,-1), 0.6, colors.grey),
         ('BACKGROUND', (0,1), (-1,-1), colors.whitesmoke),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 8),
+        ('TOPPADDING', (0,0), (-1,-1), 8),
     ]))
 
     elements.append(table)
     elements.append(Spacer(1, 30))
 
-    elements.append(Paragraph(
-        """<b>Clinical Interpretation:</b><br/>
-        This report is generated using predictive analytics on metabolic
-        and cardiovascular parameters. It is intended for screening
-        purposes and does not substitute medical consultation.""",
-        styles['Normal']
-    ))
+    # -------- INTERPRETATION --------
+    elements.append(Paragraph("""
+    <b>Clinical Interpretation:</b><br/>
+    This fingerprint-based biometric assessment is generated using
+    AI-driven ridge density and metabolic correlation algorithms.
+    It is intended for early screening purposes only and does not
+    replace professional medical diagnosis.
+    """, styles['Normal']))
 
     elements.append(Spacer(1, 30))
 
@@ -1881,10 +1893,25 @@ def admin_download_report(report_id):
         styles['Normal']
     ))
 
+    elements.append(Spacer(1, 40))
+
+    elements.append(Paragraph(
+        "Signature: _______________________________",
+        styles['Normal']
+    ))
+
+    elements.append(Spacer(1, 20))
+
+    elements.append(Paragraph(
+        "DSP Health AI • Secure Medical Intelligence Platform",
+        styles['Italic']
+    ))
+
     pdf.build(elements)
 
     buffer.seek(0)
 
+    
     return send_file(
         buffer,
         as_attachment=True,
@@ -1934,13 +1961,20 @@ def admin_download_finger_report(report_id):
     styles = getSampleStyleSheet()
     elements = []
 
+    # -------- TITLE --------
     elements.append(Paragraph(
         "Fingerprint-Based Diabetes Risk Report",
         styles['Title']
     ))
 
+    elements.append(Paragraph(
+        "DSP Health AI Clinical Intelligence System",
+        styles['Italic']
+    ))
+
     elements.append(Spacer(1, 20))
 
+    # -------- PATIENT INFO --------
     patient_info = f"""
     <b>Patient Name:</b> {safe(report['username'])}<br/>
     <b>Email:</b> {safe(report['email'])}<br/>
@@ -1951,6 +1985,7 @@ def admin_download_finger_report(report_id):
     elements.append(Paragraph(patient_info, styles['Normal']))
     elements.append(Spacer(1, 25))
 
+    # -------- TABLE DATA --------
     data = [
         ["Clinical Metric", "Observed Value"],
         ["Age", safe(report.get("age"))],
@@ -1972,10 +2007,46 @@ def admin_download_finger_report(report_id):
         ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
         ('GRID', (0,0), (-1,-1), 0.6, colors.grey),
         ('BACKGROUND', (0,1), (-1,-1), colors.whitesmoke),
+        ('BOTTOMPADDING', (0,0), (-1,-1), 8),
+        ('TOPPADDING', (0,0), (-1,-1), 8),
     ]))
 
     elements.append(table)
+    elements.append(Spacer(1, 30))
 
+    # -------- INTERPRETATION --------
+    elements.append(Paragraph("""
+    <b>Clinical Interpretation:</b><br/>
+    This fingerprint-based biometric assessment is generated using
+    AI-driven ridge density and metabolic correlation algorithms.
+    It is intended for early screening purposes only and does not
+    replace professional medical diagnosis.
+    """, styles['Normal']))
+
+    elements.append(Spacer(1, 30))
+
+    # -------- SIGNATURE --------
+    elements.append(Paragraph(
+        "<b>Authorized Medical Officer</b><br/>Dr. AI Clinical System<br/>DSP Health",
+        styles['Normal']
+    ))
+
+    elements.append(Spacer(1, 40))
+
+    elements.append(Paragraph(
+        "Signature: _______________________________",
+        styles['Normal']
+    ))
+
+    elements.append(Spacer(1, 20))
+
+    # -------- FOOTER --------
+    elements.append(Paragraph(
+        "DSP Health AI • Secure Medical Intelligence Platform",
+        styles['Italic']
+    ))
+
+    # -------- BUILD PDF --------
     pdf.build(elements)
 
     buffer.seek(0)
