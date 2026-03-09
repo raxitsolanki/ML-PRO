@@ -1814,6 +1814,8 @@ def admin_download_report(report_id):
         bottomMargin=40
     )
 
+    styles = getSampleStyleSheet()
+
     styles.add(ParagraphStyle(
         name='HeaderTitle',
         fontSize=20,
@@ -1967,6 +1969,8 @@ def admin_download_finger_report(report_id):
         topMargin=40,
         bottomMargin=40
     )
+
+    styles = getSampleStyleSheet()
 
     styles.add(ParagraphStyle(
         name='HeaderTitle',
