@@ -467,7 +467,7 @@ def admin_required(f):
 def admin_logout():
     session.pop('admin_logged_in', None)
     session.pop('admin_username', None)
-    flash("Logged out successfully", "success")
+   
     return redirect(url_for('admin_login'))
 
 
@@ -557,20 +557,42 @@ from flask import session
 @admin_required
 def delete_user(id):
 
+    # ❌ Admin cannot delete themselves
     if id == session.get("admin_id"):
         flash("You cannot delete yourself!", "danger")
         return redirect(url_for('admin_users'))
 
-    conn = get_db_connection()
-    cursor = conn.cursor()
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
 
-    cursor.execute("DELETE FROM userss WHERE id = %s", (id,))
-    conn.commit()
+        # 1️⃣ Delete predictions related to this user
+        cursor.execute("DELETE FROM predictions WHERE user_id = %s", (id,))
 
-    cursor.close()
-    conn.close()
+        # 2️⃣ Delete contact messages related to this user
+        # Assuming contact_messages has 'email' column linked to user
+        cursor.execute("""
+            DELETE FROM contact_messages
+            WHERE email = (SELECT email FROM userss WHERE id = %s)
+        """, (id,))
 
-    flash("User deleted successfully!", "success")
+        # 3️⃣ Delete fingerprint reports (if you have this table)
+        cursor.execute("DELETE FROM finger_predictions WHERE user_id = %s", (id,))
+
+        # 4️⃣ Finally delete the user
+        cursor.execute("DELETE FROM userss WHERE id = %s", (id,))
+
+        conn.commit()
+        flash("User and all associated activity (predictions, messages, fingerprints) deleted successfully!", "success")
+
+    except Exception as e:
+        print("DELETE USER ERROR:", e)
+        flash("Something went wrong while deleting the user.", "danger")
+
+    finally:
+        cursor.close()
+        conn.close()
+
     return redirect(url_for('admin_users'))
 # ============= Admin messages ====================
 @app.route('/admin/messages')
