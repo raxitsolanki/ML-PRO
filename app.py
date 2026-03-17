@@ -2117,24 +2117,16 @@ def chat():
 
     try:
         data = request.get_json()
-
         user_message = data.get("message")
 
         if not user_message:
             return jsonify({"reply": "Please enter a message"}), 400
 
-        # AI Response
+        # ✅ Simple AI Response (no system role)
         response = client.chat.completions.create(
             model="llama-3.1-8b-instant",
             messages=[
-                {
-                    "role": "system",
-                    "content": "You are a helpful AI health assistant. Give simple, clear, and accurate health advice."
-                },
-                {
-                    "role": "user",
-                    "content": user_message
-                }
+                {"role": "user", "content": user_message}
             ]
         )
 
