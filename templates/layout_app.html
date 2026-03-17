@@ -119,12 +119,12 @@
         {% if request.endpoint == 'suggestion' %} bg-gray-700 text-white {% else %} hover:bg-gray-700 hover:text-white {% endif %}">
          <i class="fa-solid fa-lightbulb w-5"></i> Suggestion
      </a>
-     <a href="{{ url_for('Chatbot') }}"
-   class="flex items-center gap-3 p-3 rounded-lg transition-colors duration-200
-   {% if request.endpoint == 'Chatbot' %} bg-gray-700 text-white {% else %} hover:bg-gray-700 hover:text-white {% endif %}">
-   
-   <i class="fa-solid fa-robot w-5"></i> AI Chatbot
-</a>
+     <a href="{{ url_for('chatbot') }}"
+     class="flex items-center gap-3 p-3 rounded-lg transition-colors duration-200
+     {% if request.endpoint == 'chatbot' %} bg-gray-700 text-white {% else %} hover:bg-gray-700 hover:text-white {% endif %}">
+     
+     <i class="fa-solid fa-robot w-5"></i> AI Chatbot
+  </a>
 
      <a href="{{ url_for('contactus') }}"
         class="flex items-center gap-3 p-3 rounded-lg transition-colors duration-200
