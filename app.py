@@ -2106,7 +2106,7 @@ def admin_download_finger_report(report_id):
         download_name=f"Fingerprint_Report_{report['username']}_{report['id']}.pdf",
         mimetype="application/pdf"
     )
-
+from flask import Flask, render_template, request, jsonify
 from groq import Groq
 
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
