@@ -16,13 +16,17 @@ href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-d
         --emerald:#10b981;
         }
         
-        /* FULL HEIGHT */
+        /* GLOBAL FIX */
+        *{
+        box-sizing:border-box;
+        }
+        
         html, body{
         height:100%;
         margin:0;
         }
         
-        /* MAIN CONTENT */
+        /* MAIN */
         .main-content{
         display:flex;
         flex-direction:column;
@@ -40,7 +44,6 @@ href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-d
         flex-direction:column;
         }
         
-        /* MOBILE WRAPPER */
         @media(max-width:640px){
         .ai-wrapper{
         padding:12px;
@@ -69,56 +72,35 @@ href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-d
         align-items:center;
         }
         
-        @media(max-width:640px){
-        .ai-header small{
-        font-size:11px;
-        }
-        }
-        
-        /* CLEAR BUTTON */
-        .clear-btn{
-        background:#ef4444;
-        border:none;
-        padding:7px 12px;
-        border-radius:8px;
-        color:white;
-        cursor:pointer;
-        font-size:12px;
-        }
-        
-        /* CHAT AREA */
+        /* CHAT BOX */
         .chat-box{
         flex:1;
         overflow-y:auto;
-        padding:18px;
+        overflow-x:hidden;
+        padding:16px;
         background:#f8fafc;
         scroll-behavior:smooth;
         }
         
-        @media(max-width:640px){
-        .chat-box{
-        padding:12px;
-        }
-        }
-        
-        /* MESSAGE */
+        /* MESSAGE BASE */
         .message{
         max-width:75%;
         padding:12px 16px;
         border-radius:16px;
         margin-bottom:12px;
         font-size:14px;
+        line-height:1.6;
         
-        /* 🔥 IMPORTANT FIXES */
-        word-wrap:break-word;
-        overflow-wrap:break-word;
+        /* 🔥 MAIN FIX */
+        white-space:pre-wrap;
         word-break:break-word;
+        overflow-wrap:anywhere;
         }
         
-        /* MOBILE MESSAGE */
+        /* MOBILE */
         @media(max-width:640px){
         .message{
-        max-width:90%;
+        max-width:92%;
         font-size:13px;
         }
         }
@@ -134,34 +116,47 @@ href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-d
         .ai{
         background:white;
         border:1px solid #e2e8f0;
-        max-width:80%;
+        max-width:85%;
         }
         
-        /* 🔥 CODE BLOCK FIX */
+        /* 🔥 CODE BLOCK (IMPORTANT) */
         .message pre{
         background:#0f172a;
         color:#fff;
-        padding:10px;
+        padding:12px;
         border-radius:10px;
         overflow-x:auto;
+        white-space:pre;
         max-width:100%;
         font-size:13px;
         }
         
-        /* INLINE CODE */
         .message code{
+        white-space:pre-wrap;
         word-break:break-word;
         }
         
-        /* 🔥 IMAGES / TABLE SAFE */
-        .message img,
-        .message table{
-        max-width:100%;
-        display:block;
-        overflow-x:auto;
+        /* LIST FIX */
+        .message ul,
+        .message ol{
+        padding-left:18px;
         }
         
-        /* INPUT AREA */
+        /* TABLE FIX */
+        .message table{
+        display:block;
+        overflow-x:auto;
+        max-width:100%;
+        }
+        
+        /* IMAGE FIX */
+        .message img{
+        max-width:100%;
+        height:auto;
+        border-radius:8px;
+        }
+        
+        /* INPUT */
         .chat-input{
         display:flex;
         gap:10px;
@@ -170,12 +165,10 @@ href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-d
         background:white;
         }
         
-        /* MOBILE INPUT STACK */
         @media(max-width:500px){
         .chat-input{
         flex-direction:column;
         }
-        
         .chat-input button{
         width:100%;
         }
@@ -193,13 +186,6 @@ href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-d
         max-height:120px;
         }
         
-        @media(max-width:640px){
-        .chat-input textarea{
-        font-size:13px;
-        padding:9px;
-        }
-        }
-        
         /* BUTTON */
         .chat-input button{
         background:var(--navy);
@@ -209,36 +195,9 @@ href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-d
         border-radius:12px;
         cursor:pointer;
         }
-        
-        /* HEADING */
-        h1{
-        font-size:28px;
-        }
-        
-        @media(max-width:640px){
-        h1{
-        font-size:22px;
-        }
-        }
-        
-        /* 🔥 OPTIONAL SMOOTH ANIMATION */
-        .message{
-        animation:fadeIn 0.3s ease;
-        }
-        
-        @keyframes fadeIn{
-        from{
-        opacity:0;
-        transform:translateY(10px);
-        }
-        to{
-        opacity:1;
-        transform:translateY(0);
-        }
-        }
 </style>
 
-<div class="main-content">
+<div class="main-content" >
 
 <div class="ai-wrapper">
 
@@ -280,19 +239,21 @@ AI Health <span class="text-[--emerald]">Assistant</span>
 
     let chatBox = document.getElementById("chat-box")
 
-    /* ✅ ADD MESSAGE */
+    /* ADD MESSAGE */
     function addMessage(text, type){
     
     let div = document.createElement("div")
     div.className = "message " + type
     
-    // ✅ Safe markdown render
-    let html = marked.parse(text)
-    div.innerHTML = html
+    // ✅ ChatGPT-like markdown render
+    div.innerHTML = marked.parse(text, {
+      breaks: true,
+      gfm: true
+    })
     
     chatBox.appendChild(div)
     
-    /* ✅ Highlight only this message (not whole page) */
+    /* ✅ Highlight only inside this message */
     div.querySelectorAll('pre code').forEach(el => {
       hljs.highlightElement(el);
     })
@@ -305,7 +266,7 @@ AI Health <span class="text-[--emerald]">Assistant</span>
     }
     
     
-    /* ✅ SEND MESSAGE */
+    /* SEND MESSAGE */
     async function sendMessage(){
     
     let input = document.getElementById("message")
@@ -316,10 +277,11 @@ AI Health <span class="text-[--emerald]">Assistant</span>
     document.querySelector(".welcome")?.remove()
     
     addMessage(text, "user")
+    
     input.value = ""
     input.style.height = "auto"
     
-    /* ✅ Typing indicator improved */
+    /* Typing UI */
     let typing = document.createElement("div")
     typing.className = "message ai"
     typing.innerHTML = "🤖 <i>Typing...</i>"
@@ -328,10 +290,11 @@ AI Health <span class="text-[--emerald]">Assistant</span>
     chatBox.scrollTop = chatBox.scrollHeight
     
     try{
+    
     let res = await fetch("/chat", {
     method: "POST",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify({message: text})
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({message:text})
     })
     
     let data = await res.json()
@@ -340,13 +303,13 @@ AI Health <span class="text-[--emerald]">Assistant</span>
     
     addMessage(data.reply || "⚠️ No response", "ai")
     
-    }catch(err){
+    }catch{
     typing.innerHTML = "❌ Server error..."
     }
     }
     
     
-    /* ✅ CLEAR CHAT */
+    /* CLEAR */
     document.querySelector(".clear-btn").onclick = () => {
     chatBox.innerHTML = `
     <div class="welcome">
@@ -356,7 +319,7 @@ AI Health <span class="text-[--emerald]">Assistant</span>
     }
     
     
-    /* ✅ ENTER SEND */
+    /* ENTER SEND */
     document.getElementById("message").addEventListener("keydown", function(e){
     if(e.key === "Enter" && !e.shiftKey){
     e.preventDefault()
@@ -365,7 +328,7 @@ AI Health <span class="text-[--emerald]">Assistant</span>
     })
     
     
-    /* ✅ AUTO RESIZE TEXTAREA */
+    /* AUTO RESIZE */
     const textarea = document.getElementById("message");
     
     textarea.addEventListener("input", () => {
