@@ -16,9 +16,9 @@ href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-d
 --emerald:#10b981;
 }
 
-/* BODY FIX (IMPORTANT) */
+/* ✅ MOBILE HEIGHT FIX */
 body{
-height:100vh;
+height:100dvh;
 overflow:hidden;
 }
 
@@ -27,7 +27,7 @@ overflow:hidden;
 max-width:1100px;
 margin:auto;
 padding:20px;
-height:100vh;
+height:100dvh;
 display:flex;
 flex-direction:column;
 }
@@ -54,37 +54,16 @@ justify-content:space-between;
 align-items:center;
 }
 
-.ai-title{
-font-size:18px;
-font-weight:600;
-}
-
-.ai-sub{
-font-size:12px;
-opacity:0.7;
-}
-
-/* CLEAR BUTTON */
-.clear-btn{
-background:rgba(255,255,255,0.1);
-border:none;
-padding:6px 12px;
-border-radius:10px;
-color:white;
-cursor:pointer;
-}
-
-.clear-btn:hover{
-background:rgba(255,255,255,0.2);
-}
-
-/* CHAT BOX */
+/* CHAT BOX (IMPORTANT FIX) */
 .chat-box{
 flex:1;
 overflow-y:auto;
 padding:20px;
 background:#f8fafc;
 scroll-behavior:smooth;
+
+/* 🔥 smooth mobile scroll */
+-webkit-overflow-scrolling: touch;
 }
 
 /* MESSAGE */
@@ -110,13 +89,7 @@ background:white;
 border:1px solid #e2e8f0;
 }
 
-/* TYPING */
-.typing{
-font-size:13px;
-color:#64748b;
-}
-
-/* INPUT */
+/* INPUT FIX */
 .chat-input{
 display:flex;
 gap:10px;
@@ -126,8 +99,12 @@ background:white;
 align-items:flex-end;
 position:sticky;
 bottom:0;
+
+/* 🔥 keyboard safe */
+z-index:5;
 }
 
+/* TEXTAREA */
 .chat-input textarea{
 flex:1;
 border:1px solid #e2e8f0;
@@ -140,6 +117,7 @@ max-height:120px;
 overflow-y:auto;
 }
 
+/* BUTTON */
 .chat-input button{
 background:var(--navy);
 color:white;
@@ -150,31 +128,12 @@ cursor:pointer;
 font-weight:600;
 }
 
-/* WELCOME */
-.welcome{
-text-align:center;
-margin-top:40px;
-color:#64748b;
-}
-
-.welcome h2{
-font-size:22px;
-color:#1e293b;
-margin-bottom:6px;
-}
-
-/* ANIMATION */
-@keyframes fadeIn{
-from{opacity:0;transform:translateY(6px);}
-to{opacity:1;transform:translateY(0);}
-}
-
 /* MOBILE FIX */
 @media(max-width:768px){
 
 .ai-wrapper{
 padding:10px;
-height:100vh;
+height:100dvh; /* 🔥 FIX */
 }
 
 .ai-card{
@@ -182,8 +141,10 @@ height:100%;
 border-radius:14px;
 }
 
+/* 🔥 IMPORTANT FIX */
 .chat-box{
 padding:14px;
+overflow-y:auto;
 }
 
 .message{
@@ -261,7 +222,6 @@ div.innerHTML=marked.parse(text)
 
 chatBox.appendChild(div)
 chatBox.scrollTop=chatBox.scrollHeight
-
 hljs.highlightAll()
 }
 
@@ -285,12 +245,9 @@ chatBox.appendChild(typing)
 chatBox.scrollTop=chatBox.scrollHeight
 
 try{
-
 let res=await fetch("/chat",{
 method:"POST",
-headers:{
-"Content-Type":"application/json"
-},
+headers:{"Content-Type":"application/json"},
 body:JSON.stringify({message:text})
 })
 
@@ -302,7 +259,6 @@ addMessage(data.reply,"ai")
 }catch{
 typing.innerText="Server error..."
 }
-
 }
 
 function clearChat(){
