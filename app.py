@@ -2106,6 +2106,54 @@ def admin_download_finger_report(report_id):
         download_name=f"Fingerprint_Report_{report['username']}_{report['id']}.pdf",
         mimetype="application/pdf"
     )
+
+from groq import Groq
+
+GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
+
+client = Groq(api_key=GROQ_API_KEY)
+@app.route("/chat", methods=["POST"])
+def chat():
+
+    try:
+        data = request.get_json()
+
+        user_message = data.get("message")
+
+        if not user_message:
+            return jsonify({"reply": "Please enter a message"}), 400
+
+        # AI Response
+        response = client.chat.completions.create(
+            model="llama-3.1-8b-instant",
+            messages=[
+                {
+                    "role": "system",
+                    "content": "You are a helpful AI health assistant. Give simple, clear, and accurate health advice."
+                },
+                {
+                    "role": "user",
+                    "content": user_message
+                }
+            ]
+        )
+
+        bot_reply = response.choices[0].message.content
+
+        return jsonify({
+            "reply": bot_reply
+        })
+
+    except Exception as e:
+        print("ERROR:", e)
+        return jsonify({
+            "reply": "Server error. Please try again."
+        }), 500
+
+
+
+
+
 # ================= RUN =================
 if __name__ == '__main__':
     app.run(debug=True)
