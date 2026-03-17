@@ -2149,7 +2149,9 @@ def chat():
         return jsonify({
             "reply": "Server error. Please try again."
         }), 500
-
+@app.route("/chatbot")
+def chatbot():
+    return render_template("Chatbot.html")
 
 
 
