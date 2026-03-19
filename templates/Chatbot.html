@@ -11,188 +11,216 @@ href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-d
 
 <style>
 
-  :root {
-    --navy: #1e293b;
-    --emerald: #10b981;
-    --border: #e2e8f0;
-    --bg-light: #f8fafc;
-}
-
-/* GLOBAL RESET */
-* {
-    box-sizing: border-box;
-}
-
-html, body {
-    height: 100%;
-    margin: 0;
-    background-color: #f1f5f9;
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
-}
-
-/* MAIN CONTAINER - Using dvh for better mobile support */
-.main-content {
-    display: flex;
-    flex-direction: column;
-    height: 100dvh; 
-}
-
-/* WRAPPER */
-.ai-wrapper {
-    max-width: 1100px;
-    margin: auto;
-    padding: 20px;
-    width: 100%;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden; /* Prevents outer body scroll */
-}
-
-@media (max-width: 640px) {
-    .ai-wrapper {
-        padding: 10px;
-    }
-}
-
-/* THE CARD - The key Flexbox container */
-.ai-card {
-    background: white;
-    border-radius: 20px;
-    border: 1px solid var(--border);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-    display: flex;
-    flex-direction: column;
-    height: 100%; 
-    overflow: hidden; /* Clips the inner children (header/box/input) */
-}
-
-/* HEADER - Fixed at top of card */
-.ai-header {
-    flex-shrink: 0;
-    padding: 14px 16px;
-    background: linear-gradient(135deg, var(--navy), #0f172a);
-    color: white;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-/* CHAT BOX - This grows to fill space and scrolls */
-.chat-box {
-    flex: 1;
-    overflow-y: auto;
-    overflow-x: hidden;
-    padding: 20px;
-    background: var(--bg-light);
-    scroll-behavior: smooth;
-    -webkit-overflow-scrolling: touch; /* Smooth mobile scroll */
-}
-
-/* MESSAGE STYLING */
-.message {
-    max-width: 80%;
-    padding: 12px 16px;
-    border-radius: 16px;
-    margin-bottom: 16px;
-    font-size: 14px;
-    line-height: 1.6;
-    white-space: pre-wrap;
-    word-break: break-word;
-    overflow-wrap: anywhere;
-    position: relative;
-}
-
-.user {
-    background: var(--emerald);
-    color: white;
-    margin-left: auto;
-    border-bottom-right-radius: 4px;
-}
-
-.ai {
-    background: white;
-    border: 1px solid var(--border);
-    margin-right: auto;
-    border-bottom-left-radius: 4px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.02);
-}
-
-/* FOOTER / INPUT AREA - Fixed at bottom of card */
-.chat-input {
-    flex-shrink: 0;
-    display: flex;
-    gap: 10px;
-    padding: 16px;
-    border-top: 1px solid var(--border);
-    background: white;
-}
-
-.chat-input textarea {
-    flex: 1;
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 12px;
-    resize: none;
-    outline: none;
-    font-size: 14px;
-    max-height: 150px;
-    transition: border-color 0.2s;
-}
-
-.chat-input textarea:focus {
-    border-color: var(--emerald);
-}
-
-/* BUTTONS */
-.chat-input button {
-    background: var(--navy);
-    color: white;
-    border: none;
-    padding: 0 20px;
-    border-radius: 12px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: opacity 0.2s;
-}
-
-.chat-input button:hover {
-    opacity: 0.9;
-}
-
-.clear-btn {
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: white;
-    padding: 6px 12px;
-    border-radius: 10px;
-    font-size: 13px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
-
-.clear-btn:hover {
-    background: #ef4444;
-    border-color: #ef4444;
-}
-
-/* HELPERS */
-.message pre {
-    background: #0f172a;
-    color: #e2e8f0;
-    padding: 12px;
-    border-radius: 10px;
-    overflow-x: auto;
-    margin: 10px 0;
-}
-
-/* MOBILE FIXES */
-@media (max-width: 640px) {
-    .message { max-width: 90%; }
-    .chat-input { padding: 10px; }
-}
+    :root{
+        --navy:#1e293b;
+        --emerald:#10b981;
+        }
+        
+        /* GLOBAL FIX */
+        *{
+        box-sizing:border-box;
+        }
+        
+        html, body{
+        height:100%;
+        margin:0;
+        }
+        
+        /* MAIN */
+        .main-content{
+        display:flex;
+        flex-direction:column;
+        min-height:100vh;
+        }
+        
+        /* WRAPPER */
+        .ai-wrapper{
+        max-width:1100px;
+        margin:auto;
+        padding:20px;
+        width:100%;
+        flex:1;
+        display:flex;
+        gap:20px;
+        flex-direction:column;
+        }
+        
+        @media(max-width:640px){
+        .ai-wrapper{
+        padding:12px;
+        }
+        }
+        
+        /* CARD */
+        .ai-card{
+        background:white;
+        border-radius:20px;
+        border:1px solid #e2e8f0;
+        box-shadow:0 10px 30px rgba(0,0,0,0.05);
+        display:flex;
+        flex-direction:column;
+        flex:1;
+        overflow:hidden;
+        }
+        
+        /* HEADER */
+        .ai-header{
+        padding:14px 16px;
+        background:linear-gradient(135deg,var(--navy),#0f172a);
+        color:white;
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        }
+        
+        /* CHAT BOX */
+        .chat-box{
+        flex:1;
+        overflow-y:auto;
+        overflow-x:hidden;
+        padding:16px;
+        background:#f8fafc;
+        scroll-behavior:smooth;
+        }
+        
+        /* MESSAGE BASE */
+        .message{
+        max-width:75%;
+        padding:12px 16px;
+        border-radius:16px;
+        margin-bottom:12px;
+        font-size:14px;
+        line-height:1.6;
+        
+        /* 🔥 MAIN FIX */
+        white-space:pre-wrap;
+        word-break:break-word;
+        overflow-wrap:anywhere;
+        }
+        
+        /* MOBILE */
+        @media(max-width:640px){
+        .message{
+        max-width:92%;
+        font-size:13px;
+        }
+        }
+        
+        /* USER */
+        .user{
+        background:var(--emerald);
+        color:white;
+        margin-left:auto;
+        }
+        
+        /* AI */
+        .ai{
+        background:white;
+        border:1px solid #e2e8f0;
+        max-width:85%;
+        }
+        
+        /* 🔥 CODE BLOCK (IMPORTANT) */
+        .message pre{
+        background:#0f172a;
+        color:#fff;
+        padding:12px;
+        border-radius:10px;
+        overflow-x:auto;
+        white-space:pre;
+        max-width:100%;
+        font-size:13px;
+        }
+        
+        .message code{
+        white-space:pre-wrap;
+        word-break:break-word;
+        }
+        
+        /* LIST FIX */
+        .message ul,
+        .message ol{
+        padding-left:18px;
+        }
+        
+        /* TABLE FIX */
+        .message table{
+        display:block;
+        overflow-x:auto;
+        max-width:100%;
+        }
+        
+        /* IMAGE FIX */
+        .message img{
+        max-width:100%;
+        height:auto;
+        border-radius:8px;
+        }
+        
+        /* INPUT */
+        .chat-input{
+        display:flex;
+        gap:10px;
+        padding:12px;
+        border-top:1px solid #e2e8f0;
+        background:white;
+        }
+        
+        @media(max-width:500px){
+        .chat-input{
+        flex-direction:column;
+        }
+        .chat-input button{
+        width:100%;
+        }
+        }
+        
+        /* TEXTAREA */
+        .chat-input textarea{
+        flex:1;
+        border:1px solid #e2e8f0;
+        border-radius:12px;
+        padding:10px;
+        resize:none;
+        outline:none;
+        font-size:14px;
+        max-height:120px;
+        }
+        
+        /* BUTTON */
+        .chat-input button{
+        background:var(--navy);
+        color:white;
+        border:none;
+        padding:10px 16px;
+        border-radius:12px;
+        cursor:pointer;
+        }
+        .clear-btn{
+          background:rgba(255,255,255,0.1);
+          border:1px solid rgba(255,255,255,0.2);
+          color:white;
+          padding:6px 12px;
+          border-radius:10px;
+          font-size:13px;
+          cursor:pointer;
+          transition:all 0.25s ease;
+          display:flex;
+          align-items:center;
+          gap:6px;
+          }
+          
+          /* Hover */
+          .clear-btn:hover{
+          background:#ef4444;
+          border-color:#ef4444;
+          transform:scale(1.05);
+          }
+          
+          /* Click */
+          .clear-btn:active{
+          transform:scale(0.95);
+          }
 </style>
 
 <div class="main-content" >
@@ -212,7 +240,8 @@ AI Health <span class="text-[--emerald]">Assistant</span>
 <small>Ask anything about health</small>
 </div>
 
-<button class="clear-btn">Clear Chat
+<button class="clear-btn">
+Clear Chat
   </button>
 </div>
 
