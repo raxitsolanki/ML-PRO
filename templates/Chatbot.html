@@ -41,6 +41,7 @@ href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-d
         width:100%;
         flex:1;
         display:flex;
+        gap:20px;
         flex-direction:column;
         }
         
@@ -195,6 +196,31 @@ href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-d
         border-radius:12px;
         cursor:pointer;
         }
+        .clear-btn{
+          background:rgba(255,255,255,0.1);
+          border:1px solid rgba(255,255,255,0.2);
+          color:white;
+          padding:6px 12px;
+          border-radius:10px;
+          font-size:13px;
+          cursor:pointer;
+          transition:all 0.25s ease;
+          display:flex;
+          align-items:center;
+          gap:6px;
+          }
+          
+          /* Hover */
+          .clear-btn:hover{
+          background:#ef4444;
+          border-color:#ef4444;
+          transform:scale(1.05);
+          }
+          
+          /* Click */
+          .clear-btn:active{
+          transform:scale(0.95);
+          }
 </style>
 
 <div class="main-content" >
@@ -214,7 +240,9 @@ AI Health <span class="text-[--emerald]">Assistant</span>
 <small>Ask anything about health</small>
 </div>
 
-<button class="clear-btn">Clear</button>
+<button class="clear-btn">
+  🗑 Clear Chat
+  </button>
 </div>
 
 <!-- 🔥 SCROLL ONLY HERE -->
