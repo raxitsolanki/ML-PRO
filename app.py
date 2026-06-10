@@ -2144,6 +2144,11 @@ def chat():
 @app.route("/chatbot")
 def chatbot():
     return render_template("Chatbot.html")
+from flask import send_from_directory
+
+@app.route('/google0511d7c47088df37.html')
+def google_verification():
+    return send_from_directory('static', 'google0511d7c47088df37.html')
 
 
 
